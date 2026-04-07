@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka vs. RegattaDB — Competitive Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: letter;
+    margin: 0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #1A1A1A;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Header / Brand Bar ── */
+  .header {
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    margin: 0 0 0 0;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo svg {
+    height: 22px;
+    width: auto;
+  }
+  .header .tagline {
+    font-size: 8.5pt;
+    font-weight: 400;
+    color: #ccc;
+    text-align: right;
+  }
+
+  /* ── Title Block ── */
+  .title-block {
+    margin-top: 16px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #F5C518;
+    padding-bottom: 10px;
+  }
+  .title-block h1 {
+    font-size: 17pt;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .title-block .subtitle {
+    font-size: 9.5pt;
+    color: #4E4E4E;
+    font-weight: 500;
+  }
+  .title-block .meta {
+    font-size: 7.5pt;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* ── Summary Table ── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+    font-size: 8pt;
+  }
+  .summary-table th {
+    background: #000;
+    color: #fff;
+    text-align: left;
+    padding: 5px 8px;
+    font-weight: 600;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .summary-table th:first-child { border-radius: 3px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 3px 0 0; }
+  .summary-table td {
+    padding: 5px 8px;
+    border-bottom: 1px solid #e5e5e5;
+    vertical-align: top;
+  }
+  .summary-table tr:nth-child(even) td { background: #FAFAFA; }
+  .summary-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .summary-table .rival-col { color: #555; }
+  .summary-table .akka-col { color: #000; font-weight: 500; }
+  .summary-table .highlight { background: #FFF9DB; }
+
+  /* ── Two-Column Layout ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 12px;
+  }
+
+  /* ── Section Styles ── */
+  .section { margin-bottom: 13px; }
+  .section h2 {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #000;
+    border-left: 4px solid #F5C518;
+    padding-left: 8px;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .section h3 {
+    font-size: 9pt;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 3px;
+    margin-top: 6px;
+  }
+  .section p, .section li {
+    font-size: 8.5pt;
+    color: #333;
+    line-height: 1.4;
+  }
+  .section ul {
+    padding-left: 14px;
+    margin-bottom: 4px;
+  }
+  .section li { margin-bottom: 2px; }
+
+  /* ── Callout / Quote Box ── */
+  .callout {
+    background: #000;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 4px;
+    margin: 8px 0;
+    font-size: 8.5pt;
+    line-height: 1.4;
+    font-style: italic;
+  }
+  .callout .source {
+    display: block;
+    margin-top: 4px;
+    font-style: normal;
+    font-size: 7pt;
+    color: #F5C518;
+  }
+
+  /* ── Comparison Mini-Table ── */
+  .cmp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    margin: 6px 0;
+  }
+  .cmp-table th {
+    background: #F5F5F5;
+    font-weight: 600;
+    text-align: left;
+    padding: 4px 6px;
+    border-bottom: 2px solid #F5C518;
+    font-size: 7.5pt;
+  }
+  .cmp-table td {
+    padding: 3px 6px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  .cmp-table .bad { color: #C0392B; font-weight: 500; }
+  .cmp-table .good { color: #1A7A3A; font-weight: 500; }
+
+  /* ── Stats Row ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .stat-card {
+    background: #000;
+    color: #fff;
+    border-radius: 4px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+  .stat-card .number {
+    font-size: 16pt;
+    font-weight: 700;
+    color: #F5C518;
+    line-height: 1.1;
+  }
+  .stat-card .label {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: #ccc;
+    margin-top: 2px;
+  }
+
+  /* ── Warning/Risk Table ── */
+  .risk-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    margin: 6px 0;
+  }
+  .risk-table th {
+    background: #C0392B;
+    color: #fff;
+    text-align: left;
+    padding: 4px 8px;
+    font-weight: 600;
+    font-size: 7.5pt;
+  }
+  .risk-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid #eee;
+  }
+  .risk-table td:last-child { font-weight: 600; color: #C0392B; }
+
+  /* ── Objection Handling ── */
+  .objection {
+    margin-bottom: 6px;
+  }
+  .objection .q {
+    font-weight: 600;
+    font-size: 8.5pt;
+    color: #000;
+  }
+  .objection .a {
+    font-size: 8pt;
+    color: #444;
+    font-style: italic;
+    margin-top: 1px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 2px solid #000;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7pt;
+    color: #888;
+  }
+  .footer a { color: #888; text-decoration: none; }
+
+  /* ── Page Break ── */
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+    margin-top: 0;
+    padding-top: 12px;
+  }
+
+  /* ── Screen-only styling ── */
+  @media screen {
+    body { max-width: 8.5in; margin: 0 auto; padding: 0.55in 0.65in; }
+  }
+
+  /* ── Accent ── */
+  strong.accent { color: #000; background: #FFF3C4; padding: 0 3px; border-radius: 2px; }
+  .yellow { color: #D4A017; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ PAGE 1 ════════════════════════ -->
+
+<div class="header">
+  <div class="logo"><svg width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_344_191)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="white"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="white"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="white"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9854H36.2456V14.8833L45.2828 24.9854H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="white"/></g><defs><clipPath id="clip0_344_191"><rect width="109" height="25" fill="white"/></clipPath></defs></svg></div>
+  <div class="tagline">Reliable AI for Every Industry<br>The Agentic Systems Platform</div>
+</div>
+
+<div class="title-block">
+  <h1>Why Akka Beats RegattaDB</h1>
+  <div class="subtitle">Agentic AI Platform vs. Distributed Database — Why a Database Is Never Enough</div>
+  <div class="meta">Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+<!-- Summary Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="number">18 yr</div>
+    <div class="label">Production Runtime / 100K+ Deployments</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">99.9999%</div>
+    <div class="label">Availability SLA</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">&lt;10ms</div>
+    <div class="label">Agentic Memory Read/Write</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">19+</div>
+    <div class="label">Compliance Certifications</div>
+  </div>
+</div>
+
+<!-- At-a-Glance Comparison -->
+<table class="summary-table">
+  <tr>
+    <th>Dimension</th>
+    <th>RegattaDB</th>
+    <th>Akka</th>
+  </tr>
+  <tr>
+    <td>Platform Scope</td>
+    <td class="rival-col">Distributed database only &mdash; orchestration, governance, and streaming must be sourced and integrated separately</td>
+    <td class="akka-col">Full-stack: agents, orchestration, memory, streaming, governance &mdash; one platform, one bill</td>
+  </tr>
+  <tr>
+    <td>Agent Orchestration</td>
+    <td class="rival-col">Not included &mdash; requires LangChain, Temporal, or another framework to coordinate agents</td>
+    <td class="akka-col">Built-in multi-agent orchestration (A2A + ACP), durable workflows, autonomous and sequential agents</td>
+  </tr>
+  <tr>
+    <td>Production Maturity</td>
+    <td class="rival-col">Emerged from stealth March 2024 &mdash; no public customer case studies, no named references</td>
+    <td class="akka-col">18 years, 100,000+ deployments, 2B+ daily users &mdash; Morgan Stanley, Manulife, Verizon, Apple</td>
+  </tr>
+  <tr>
+    <td>Governance &amp; Compliance</td>
+    <td class="rival-col">No published compliance certifications found &mdash; compliance posture must be built by the customer</td>
+    <td class="akka-col">19+ certifications (EU AI Act, ISO 42001, SOC 2, Singapore Agent Framework); runtime-embedded governance</td>
+  </tr>
+  <tr>
+    <td>Availability SLA</td>
+    <td class="rival-col">HA/DR details undisclosed; no public SLA published</td>
+    <td class="akka-col">99.9999% active-active HA/DR; sub-1 min RTO; zero byte RPO; backed by indemnities</td>
+  </tr>
+  <tr>
+    <td>Vendor Lock-In</td>
+    <td class="rival-col">Fully proprietary &mdash; patented concurrency control, custom storage format, no open source</td>
+    <td class="akka-col">Source-available (BSL &rarr; Apache 2.0); deploy on any cloud, on-prem, or Akka's managed cloud</td>
+  </tr>
+</table>
+
+<!-- Two-Column: Platform Completeness + Production Maturity -->
+<div class="two-col">
+  <div class="section">
+    <h2>1. A Database Is 20% of the Stack</h2>
+    <p>RegattaDB solves the data layer &mdash; persistent, distributed, transactional storage for AI agents. That is one piece. The remaining 80% of the agentic stack still needs to be sourced, integrated, and operated:</p>
+    <ul>
+      <li><strong>Agent orchestration</strong> &mdash; coordinating agents, handoffs, A2A protocols</li>
+      <li><strong>Durable workflow execution</strong> &mdash; long-running, fault-tolerant agent processes</li>
+      <li><strong>Real-time streaming</strong> &mdash; sensors, feeds, event loops for agent feedback</li>
+      <li><strong>Governance &amp; policy enforcement</strong> &mdash; guardrails, audit trails, human intervention</li>
+      <li><strong>Observability &amp; FinOps</strong> &mdash; tracing, token tracking, cost optimization</li>
+    </ul>
+    <h3>Akka: One Platform, No Assembly Required</h3>
+    <p>Orchestration, agents, memory, streaming, APIs, and governance all run on Akka's shared compute. One SDK. One runtime. One bill. No integration layer to build or maintain.</p>
+    <div class="callout">
+      "RegattaDB is purpose-built AI data infrastructure. We offer a highly performant data store. Orchestration and governance require complementary frameworks."
+      <span class="source">&mdash; Regatta product positioning, regatta.dev (requires separate integration stack)</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>2. Emerging Product vs. Proven Platform</h2>
+    <table class="cmp-table">
+      <tr><th>Metric</th><th>RegattaDB</th><th>Akka</th></tr>
+      <tr><td>Founded / GA</td><td class="bad">2019 founded; stealth until Mar 2024</td><td class="good">Runtime in production since 2009</td></tr>
+      <tr><td>Customer Cases</td><td class="bad">No public case studies</td><td class="good">Manulife, Verizon, Morgan Stanley, Apple</td></tr>
+      <tr><td>Daily Users</td><td class="bad">Not disclosed</td><td class="good">2 billion+ touch Akka-powered apps daily</td></tr>
+      <tr><td>Deployments</td><td class="bad">Not disclosed</td><td class="good">100,000+ production deployments</td></tr>
+      <tr><td>Compliance Certs</td><td class="bad">None published</td><td class="good">19+ (EU AI Act, SOC 2, ISO 42001)</td></tr>
+      <tr><td>Availability SLA</td><td class="bad">Not published</td><td class="good">99.9999%, backed by indemnities</td></tr>
+    </table>
+    <p style="font-size:7.5pt; color:#666; margin-top:4px;">Enterprise AI systems fail silently, at scale, and at the worst times. Regulated industries &mdash; insurance, banking, healthcare &mdash; cannot stake production workloads on a database with no public SLA, no customer references, and no compliance certifications.</p>
+  </div>
+</div>
+
+<!-- Manulife Proof Point -->
+<div style="background: #FFF9DB; border: 2px solid #F5C518; border-radius: 5px; padding: 10px 14px; margin-bottom: 13px; display: flex; align-items: flex-start; gap: 12px;">
+  <div style="flex-shrink:0; background:#000; color:#F5C518; font-size:18pt; font-weight:700; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:4px;">M</div>
+  <div>
+    <div style="font-size:9.5pt; font-weight:700; color:#000; margin-bottom:2px;">Manulife — #1 Life Insurance Company for AI Maturity — Chose Akka</div>
+    <div style="font-size:8pt; color:#333; line-height:1.45;">Manulife, ranked #1 life insurance company for AI maturity, selected Akka to operationalize agentic AI for customer and colleague decision-making at enterprise scale. The deciding factors: <strong>production-grade HA/DR and cost effectiveness</strong>. They needed a platform they could trust with production AI &mdash; not a database they would need to build a platform around. &nbsp;<span style="font-size:7pt; color:#888;">akka.io/blog/manulife-selects-akka-to-operationalize-agentic-ai</span></div>
+  </div>
+</div>
+
+<!-- Two-Column: Governance + Memory Performance -->
+<div class="two-col">
+  <div class="section">
+    <h2>3. Governance: Embedded vs. Non-Existent</h2>
+    <h3>RegattaDB has no published compliance posture</h3>
+    <ul>
+      <li>No SOC 2, HIPAA, GDPR, ISO 42001, or EU AI Act certifications found</li>
+      <li>Customers in regulated industries must build their own compliance layer</li>
+      <li>No runtime policy enforcement, guardrails, or audit trail tooling</li>
+      <li>PII handling, human intervention, and explainability are out of scope</li>
+    </ul>
+    <h3>Akka: Governance is a runtime property</h3>
+    <ul>
+      <li>19+ compliance certifications &mdash; inherit Akka's posture instead of building your own</li>
+      <li>Inline policy enforcement: guardrails, LLMs-as-judge, and sanitizers at runtime</li>
+      <li>Immutable interaction logging &mdash; every decision witnessed and encoded</li>
+      <li>Human pause/override/redirect for any running agentic process</li>
+      <li>EU AI Act &amp; Singapore Agent Framework certified</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>4. Agentic Memory: Purpose-Built vs. Query-Based</h2>
+    <p>RegattaDB provides a high-performance SQL database &mdash; agents read and write state via SQL queries. This works, but it is not the same as purpose-built agentic memory:</p>
+    <table class="cmp-table">
+      <tr><th>Capability</th><th>RegattaDB</th><th>Akka Memory</th></tr>
+      <tr><td>Read/Write Latency</td><td class="bad">SQL query overhead; connection pooling required</td><td class="good">&lt;10ms &mdash; sharded in-memory, no query planner</td></tr>
+      <tr><td>Memory API</td><td class="bad">ANSI SQL via JDBC/ODBC; schema management burden</td><td class="good">Native SDK APIs &mdash; no schema design required</td></tr>
+      <tr><td>Agent Context</td><td class="bad">Must be modeled as relational schema by developer</td><td class="good">Durable, sharded state native to the agent runtime</td></tr>
+      <tr><td>Failover</td><td class="bad">HA configuration not publicly documented</td><td class="good">Active-active; sub-1 min RTO; zero byte RPO</td></tr>
+      <tr><td>Scale</td><td class="bad">Linear database scaling; storage I/O can bottleneck</td><td class="good">10M agentic TPS with scale-to-zero</td></tr>
+    </table>
+    <p style="font-size:7.5pt; color:#666; margin-top:4px;">Bolt-on memory at ~200ms &mdash; typical in LangChain stacks &mdash; forces redundant LLM calls and inflates token costs. Akka's sub-10ms memory is 20x faster and integrated into the runtime.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════ PAGE 2 ════════════════════════ -->
+
+<div class="page-break"></div>
+
+<div class="section">
+  <h2>5. Vendor Lock-In: Proprietary IP vs. Source-Available Platform</h2>
+
+  <div class="two-col" style="margin-top:6px;">
+    <div>
+      <h3>RegattaDB: deep proprietary lock-in</h3>
+      <table class="risk-table">
+        <tr><th>Lock-In Layer</th><th>Risk</th></tr>
+        <tr><td>Concurrency Control</td><td>Patented CCP &mdash; proprietary, not replicable elsewhere</td></tr>
+        <tr><td>Storage Format</td><td>Custom raw-block layout, no standard file system &mdash; migration requires full data export</td></tr>
+        <tr><td>Source Code</td><td>Fully closed &mdash; no visibility into internals, no community, no audit path</td></tr>
+        <tr><td>Pricing</td><td>No public pricing &mdash; zero budget visibility before vendor engagement</td></tr>
+        <tr><td>Customer References</td><td>No named customers &mdash; no peer validation available</td></tr>
+      </table>
+      <p style="font-size:7.5pt; color:#555; margin-top:4px;">A $58M-funded startup with patented proprietary internals, no published SLA, and no customer case studies is a concentration risk &mdash; not just a technology bet.</p>
+    </div>
+
+    <div>
+      <h3>Akka: open and portable by design</h3>
+      <ul>
+        <li><strong>Source-available</strong> &mdash; BSL license converting to Apache 2.0; code is inspectable and auditable</li>
+        <li><strong>Any cloud</strong> &mdash; deploy on Akka's cloud, your hyperscaler VPC (AWS, Azure, GCP), your own Kubernetes, or on-prem</li>
+        <li><strong>Same APIs everywhere</strong> &mdash; no proprietary lock-in at identity, orchestration, data, or governance layers</li>
+        <li><strong>Transparent pricing tiers</strong> &mdash; Fast Prod, Day 2 Ops, Business Continuity, Sovereign Cloud</li>
+        <li><strong>Named enterprise customers</strong> &mdash; Manulife, Verizon, Morgan Stanley, Apple, Starbucks, RBC, Capital One</li>
+      </ul>
+      <div class="callout" style="margin-top: 8px;">
+        Akka is backed by 18 years of production use, more than 100,000 deployments, and a runtime that 2 billion people touch every day — including 52 banks running Akka in production.
+        <span class="source">&mdash; akka.io/llms.txt</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Side-by-Side: What You Must Build Without Akka</h3>
+  <table class="cmp-table">
+    <tr><th style="width:22%;">Capability Required</th><th style="width:39%;">RegattaDB + DIY Stack</th><th style="width:39%;">Akka</th></tr>
+    <tr>
+      <td>Agent orchestration</td>
+      <td class="bad">Buy/build separately &mdash; LangChain, Temporal, or custom; each adds operational overhead and integration cost</td>
+      <td class="good">Built in &mdash; multi-agent orchestration (A2A + ACP), durable workflows, sequential and autonomous agents</td>
+    </tr>
+    <tr>
+      <td>Durable agentic memory</td>
+      <td class="bad">RegattaDB via SQL queries &mdash; schema design burden, connection pooling, query latency</td>
+      <td class="good">Native sub-10ms sharded in-memory state &mdash; no schema, no query planner, no connection pool</td>
+    </tr>
+    <tr>
+      <td>Real-time streaming</td>
+      <td class="bad">External Kafka + consumer framework required; additional ops burden</td>
+      <td class="good">Built in &mdash; high-performance continuous data processing for AI feedback loops</td>
+    </tr>
+    <tr>
+      <td>Policy enforcement &amp; guardrails</td>
+      <td class="bad">Not provided &mdash; must bolt on a third-party governance layer reading logs after the fact</td>
+      <td class="good">Inline at runtime &mdash; guardrails, sanitizers, LLMs-as-judge executing before tokens are consumed</td>
+    </tr>
+    <tr>
+      <td>Compliance certifications</td>
+      <td class="bad">Not provided &mdash; customer must obtain SOC 2, ISO 42001, EU AI Act coverage independently</td>
+      <td class="good">Inherit Akka's 19+ certifications &mdash; EU AI Act, SOC 2, ISO 42001, Singapore Agent Framework</td>
+    </tr>
+    <tr>
+      <td>HA/DR with SLA</td>
+      <td class="bad">No published SLA; HA configuration undocumented; no indemnity-backed guarantee</td>
+      <td class="good">99.9999% active-active HA/DR; sub-1 min RTO; zero byte RPO; contractual indemnities</td>
+    </tr>
+    <tr>
+      <td>Spec-driven development</td>
+      <td class="bad">Not applicable &mdash; database only, all application tooling must be sourced elsewhere</td>
+      <td class="good">Plain language specs generate production-ready systems &mdash; PMs and analysts can contribute directly</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Objection Handling -->
+<div class="section" style="margin-top:12px;">
+  <h2>Handling Common Objections</h2>
+
+  <div class="two-col" style="gap:14px;">
+    <div>
+      <div class="objection">
+        <div class="q">"RegattaDB is purpose-built for AI agent workloads"</div>
+        <div class="a">"RegattaDB is purpose-built for the data layer of AI agents — a faster, distributed Postgres. Agents still need orchestration, streaming, governance, and memory management. RegattaDB requires an integration stack around it. Akka is the integration stack, with memory already built in."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"RegattaDB has stronger transactional guarantees"</div>
+        <div class="a">"RegattaDB's serializable isolation is impressive for a database. Akka is not a general-purpose database — it is an agentic runtime with durable in-process memory. For agent state, Akka's sub-10ms native memory outperforms any SQL query path. For external relational data, Akka integrates with your existing database of choice."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"We need a specialized AI database alongside Akka"</div>
+        <div class="a">"Akka's memory layer handles durable agent state at sub-10ms. For vector search, Akka integrates with your preferred vector database. If you also need a distributed SQL layer for external data, that can be a separate integration — but Akka is not a replacement for a general database, and RegattaDB is not a replacement for an agentic platform."</div>
+      </div>
+    </div>
+    <div>
+      <div class="objection">
+        <div class="q">"RegattaDB is cheaper because it's just a database"</div>
+        <div class="a">"RegattaDB has no published pricing. Once you add orchestration, governance, streaming, observability, and compliance tooling to the stack, the all-in cost will exceed Akka's shared compute model. Akka's 90% infrastructure cost reduction is measured against the full assembled stack — not a single component."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"RegattaDB is a drop-in Postgres replacement — easy to adopt"</div>
+        <div class="a">"Postgres compatibility is a migration story, not an agentic AI story. The challenge is not migrating your existing data. The challenge is building, governing, and operating reliable agentic AI in production. That requires a platform — not a database."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"We'll use RegattaDB as the memory layer under Akka"</div>
+        <div class="a">"You can. Akka integrates with external data stores. But Akka's built-in memory is already durable, sharded, and sub-10ms — an order of magnitude faster than any SQL path. Unless you have an existing RegattaDB investment, adding it creates cost and complexity without a performance advantage."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sources & Footer -->
+<div class="section" style="margin-top: 10px;">
+  <h2>Sources</h2>
+  <p style="font-size: 7pt; color: #666; line-height: 1.55; columns: 2; column-gap: 18px;">
+    <strong>RegattaDB stealth exit (Mar 2024):</strong> blocksandfiles.com/2024/03/21/chad-sakac-regatta &mdash; emerged from stealth with no published customer references<br>
+    <strong>RegattaDB architecture:</strong> regatta.dev/blog/regattas-architecture-a-birds-eye-view &mdash; shared-nothing, custom concurrency control, raw block storage<br>
+    <strong>RegattaDB benchmarks:</strong> regatta.dev/blog/regattadb-tpc-c-benchmark-750k-tps-1-5m-warehouses &mdash; storage-bound queries hit I/O ceiling on analytical workloads<br>
+    <strong>RegattaDB funding ($58.3M):</strong> crunchbase.com/organization/regatta-4699 &mdash; Comcast, Salesforce, Amdocs, LightSpeed, 83North<br>
+    <strong>RegattaDB no public pricing:</strong> regatta.dev &mdash; "contact us" only; no pricing page or tier documentation<br>
+    <strong>RegattaDB compliance posture:</strong> No SOC 2, HIPAA, ISO 42001, or EU AI Act certifications found in public documentation as of April 2026<br>
+    <strong>Akka 99.9999% SLA &amp; indemnities:</strong> akka.io/llms.txt<br>
+    <strong>Akka 19+ certifications:</strong> akka.io &mdash; EU AI Act, ISO 42001, SOC 2 Type II, Singapore Agent Framework, and more<br>
+    <strong>Akka sub-10ms memory:</strong> akka.io/llms.txt &mdash; "less than 10ms read/write of agentic AI memory, where most vendors only offer memory as a bolt on that is ~200ms"<br>
+    <strong>Akka 90% infrastructure reduction:</strong> akka.io/llms.txt &mdash; shared compute model vs. LangChain or Temporal<br>
+    <strong>Manulife selects Akka:</strong> akka.io/blog/manulife-selects-akka-to-operationalize-agentic-ai<br>
+    <strong>Dell PowerFlex + Regatta (storage bottleneck finding):</strong> blocksandfiles.com/2025/11/06/dell-powerflex-regatta-database-combo &mdash; 4 of 9 analytic queries hit storage I/O ceiling
+  </p>
+</div>
+
+<div class="footer">
+  <div style="display:flex; align-items:center; gap:8px;"><svg width="65" height="15" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip1)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="#1A1A1A"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="#1A1A1A"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="#1A1A1A"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9854H36.2456V14.8833L45.2828 24.9854H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="#1A1A1A"/></g><defs><clipPath id="clip1"><rect width="109" height="25" fill="white"/></clipPath></defs></svg> <span>Reliable AI for Every Industry &nbsp;|&nbsp; akka.io</span></div>
+  <div>Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+</body>
+</html>
