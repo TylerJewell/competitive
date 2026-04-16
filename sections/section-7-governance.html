@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka — Section 7: Self-Governing AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* SHARED-CSS */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --yellow: #F5C518;
+  --black:  #000;
+  --dark:   #07070C;
+  --white:  #fff;
+  --gray:   #555;
+}
+html { scroll-behavior: auto; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+@keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
+@keyframes slideUp { to { opacity:1; transform:translateY(0); } }
+@keyframes bounceDown {
+  0%,100% { transform:rotate(45deg) translate(0,0); }
+  50%     { transform:rotate(45deg) translate(4px,4px); }
+}
+@keyframes bgSlide {
+  from { background-position:0 0; }
+  to   { background-position:36px 36px; }
+}
+/* /SHARED-CSS */
+
+/* SECTION-CSS */
+
+/* ── Phase 1: The Problem ── */
+#s7-problem {
+  height: 140vh;
+  position: relative;
+}
+#s7-problem-sticky {
+  position: sticky; top: 0;
+  height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 8vw;
+  background: var(--black);
+  overflow: hidden;
+}
+#s7-problem-sticky::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(245,60,60,0.04) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events:none; z-index:0;
+}
+
+.s7-eyebrow {
+  font-size:11px; text-transform:uppercase; letter-spacing:3px;
+  color:var(--yellow); font-weight:600; margin-bottom:14px;
+  position:relative; z-index:1;
+  opacity:0; transition: opacity .5s ease;
+}
+.s7-eyebrow.visible { opacity:1; }
+.s7-eyebrow::before { content:''; display:inline-block; width:28px; height:2px; background:var(--yellow); margin-right:10px; vertical-align:middle; }
+
+.s7-problem-headline {
+  font-size: clamp(30px, 4vw, 58px); font-weight:700;
+  line-height:1.08; letter-spacing:-0.03em; color:var(--white);
+  max-width: 800px; margin-bottom: 40px;
+  position:relative; z-index:1;
+  opacity:0; transform:translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+}
+.s7-problem-headline.visible { opacity:1; transform:none; }
+.s7-problem-headline .accent { color: #E74C3C; }
+
+.s7-problems {
+  display: flex; gap: 32px;
+  max-width: 1100px;
+  position: relative; z-index: 1;
+  margin-bottom: 40px;
+}
+.s7-prob {
+  flex: 1;
+  padding: 20px 0;
+  border-top: 2px solid #E74C3C;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .5s ease, transform .5s cubic-bezier(0.16,1,0.3,1);
+}
+.s7-prob.visible { opacity: 1; transform: none; }
+.s7-prob-stat {
+  font-size: clamp(28px, 3vw, 42px); font-weight: 700;
+  color: #E74C3C; letter-spacing: -0.03em; line-height: 1;
+  margin-bottom: 8px;
+}
+.s7-prob-text {
+  font-size: 14px; color: #999; line-height: 1.5;
+}
+
+.s7-thesis {
+  font-size: clamp(18px, 2vw, 26px); font-weight: 700;
+  color: var(--yellow); letter-spacing: -0.02em; line-height: 1.3;
+  max-width: 700px;
+  position: relative; z-index: 1;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .6s ease .1s, transform .6s cubic-bezier(0.16,1,0.3,1) .1s;
+}
+.s7-thesis.visible { opacity: 1; transform: none; }
+
+/* ── Phase 2: The Answer ── */
+#s7-answer-wrapper {
+  height: 140vh;
+  position: relative;
+}
+#s7-answer {
+  background: var(--dark);
+  padding: 80px 8vw 80px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+#s7-answer::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(245,197,24,0.03) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events:none; z-index:0;
+}
+
+.s7-reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+  position: relative; z-index: 1;
+}
+.s7-reveal.visible { opacity: 1; transform: none; }
+
+.s7-answer-headline {
+  font-size: clamp(28px, 3.5vw, 52px); font-weight:700;
+  line-height:1.08; letter-spacing:-0.03em; color:var(--white);
+  max-width: 900px; margin-bottom: 48px;
+}
+.s7-answer-headline .accent { color:var(--yellow); }
+
+/* ── Answer layout: carousel left, features right ── */
+.s7-answer-layout {
+  display: flex; gap: 40px; align-items: flex-start;
+  position: relative; z-index: 1;
+}
+
+/* ── Carousel ── */
+.s7-carousel-section {
+  flex: 1; min-width: 0;
+  margin-right: 40px;
+}
+.s7-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #0A0A0A;
+  border: 1px solid #1A1A1A;
+}
+.s7-carousel-track {
+  display: flex;
+  transition: transform .5s cubic-bezier(0.16,1,0.3,1);
+}
+.s7-carousel-slide {
+  min-width: 100%;
+  display: flex;
+  height: 480px;
+}
+.s7-slide-img {
+  flex: 1; min-width: 0;
+  overflow: hidden;
+  padding: 16px 0 16px 16px;
+  position: relative;
+}
+.s7-slide-img::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 48px;
+  background: linear-gradient(to right, transparent, rgba(10,10,10,0.85));
+  pointer-events: none;
+}
+.s7-slide-img img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 6px 0 0 6px;
+  object-fit: cover;
+  object-position: top left;
+}
+.s7-slide-text {
+  width: 280px; flex-shrink: 0;
+  padding: 32px 28px;
+  display: flex; flex-direction: column; justify-content: center;
+  background: #0A0A0A;
+}
+.s7-slide-num {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+  color: var(--yellow); font-weight: 600; margin-bottom: 16px;
+}
+.s7-slide-title {
+  font-size: clamp(18px, 1.8vw, 24px); font-weight: 700; color: var(--white);
+  letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 12px;
+}
+.s7-slide-desc {
+  font-size: 13px; color: #999; line-height: 1.6;
+}
+
+/* Navigation */
+.s7-carousel-nav {
+  display: flex; justify-content: center; gap: 8px;
+  margin-top: 20px;
+}
+.s7-carousel-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #333; border: none; cursor: pointer;
+  transition: background .3s ease, width .3s ease;
+}
+.s7-carousel-dot.active { background: var(--yellow); width: 24px; border-radius: 4px; }
+.s7-carousel-arrows {
+  position: absolute; top: 50%; left: 0; right: 0;
+  display: flex; justify-content: space-between;
+  padding: 0 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 2;
+}
+.s7-carousel-arrow {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(0,0,0,0.8); border: 1px solid #333;
+  color: var(--white); font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; pointer-events: all;
+  transition: border-color .2s ease;
+}
+.s7-carousel-arrow:hover { border-color: var(--yellow); }
+
+/* ── Feature columns ── */
+.s7-features {
+  width: 380px; flex-shrink: 0;
+  display: flex; gap: 28px;
+  margin-left: 40px;
+}
+.s7-feat-col {
+  flex: 1; min-width: 0;
+}
+.s7-feat-col-title {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2.5px;
+  color: var(--yellow); font-weight: 600; margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #222;
+}
+.s7-feat-item {
+  font-size: 13px; color: #999; line-height: 1.35;
+  padding: 4px 0;
+  display: flex; align-items: baseline; gap: 7px;
+}
+.s7-feat-item::before {
+  content: '';
+  width: 4px; height: 4px;
+  background: var(--yellow);
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+/* /SECTION-CSS */
+</style>
+</head>
+<body>
+
+<!-- SECTION-HTML -->
+<!-- Phase 1: The Problem -->
+<div id="s7-problem">
+  <div id="s7-problem-sticky">
+    <div class="s7-eyebrow" data-s7="0">Self-governing AI</div>
+    <div class="s7-problem-headline" data-s7="0">Bolt-on governance is the <span class="accent">illusion of control.</span></div>
+    <div class="s7-problems">
+      <div class="s7-prob" data-s7="1">
+        <div class="s7-prob-stat">29</div>
+        <div class="s7-prob-text">AI regulations coming online. The EU AI Act alone imposes penalties up to &euro;35M. Every deployment must be explainable and controlled.</div>
+      </div>
+      <div class="s7-prob" data-s7="2">
+        <div class="s7-prob-stat">$$$</div>
+        <div class="s7-prob-text">Runaway mega-bills from eval and observability vendors. You're paying per-seat for tools that produce copies of copies &mdash; not truth.</div>
+      </div>
+      <div class="s7-prob" data-s7="3">
+        <div class="s7-prob-stat">PB+</div>
+        <div class="s7-prob-text">Petabyte-scale storage for regulatory holds. Copied logs aren't tamper-proof. When auditors come, you need hashchains &mdash; not hope.</div>
+      </div>
+    </div>
+    <div class="s7-thesis" data-s7="4">When the runtime governs itself &mdash; AI answers to you, not the other way around.</div>
+  </div>
+</div>
+
+<!-- Phase 2: The Answer -->
+<div id="s7-answer-wrapper">
+<div id="s7-answer">
+  <div class="s7-answer-headline s7-reveal"><span class="accent">AI that is regulation-ready</span> on every deployment.</div>
+
+  <div class="s7-answer-layout s7-reveal">
+  <div class="s7-carousel-section">
+    <div class="s7-carousel" id="s7Carousel">
+      <div class="s7-carousel-track" id="s7Track">
+
+        <!-- Slide 1: Compliance Overview -->
+        <div class="s7-carousel-slide">
+          <div class="s7-slide-img"><img src="../images/governance-posture.png" alt="Compliance Overview"></div>
+          <div class="s7-slide-text">
+            <div class="s7-slide-num">01 / 05</div>
+            <div class="s7-slide-title">Compliance Overview</div>
+            <div class="s7-slide-desc">Article-by-article EU AI Act posture mapped to your live systems. Violations, halted executions, rubber-stamped HITL, and scope violations &mdash; tracked in real time, not reconstructed from logs after the fact.</div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Interaction Log -->
+        <div class="s7-carousel-slide">
+          <div class="s7-slide-img"><img src="../images/interaction-log.png" alt="Interaction Log"></div>
+          <div class="s7-slide-text">
+            <div class="s7-slide-num">02 / 05</div>
+            <div class="s7-slide-title">Immutable Interaction Log</div>
+            <div class="s7-slide-desc">Every agent coordination event captured automatically by the runtime &mdash; zero developer instrumentation. Hashchained for tamper-proof evidence. No copies of copies. When auditors arrive, this is the source of truth.</div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Control Agent -->
+        <div class="s7-carousel-slide">
+          <div class="s7-slide-img"><img src="../images/control-agent.png" alt="Control Agent"></div>
+          <div class="s7-slide-text">
+            <div class="s7-slide-num">03 / 05</div>
+            <div class="s7-slide-title">Control Agent</div>
+            <div class="s7-slide-desc">AI-powered governance assistant that can investigate violations, quarantine misbehaving agents, trigger circuit breakers, draft policy proposals, and generate compliance reports &mdash; all from a single interface.</div>
+          </div>
+        </div>
+
+        <!-- Slide 4: Policy Sandbox -->
+        <div class="s7-carousel-slide">
+          <div class="s7-slide-img"><img src="../images/policy-sandbox.png" alt="Policy Sandbox"></div>
+          <div class="s7-slide-text">
+            <div class="s7-slide-num">04 / 05</div>
+            <div class="s7-slide-title">Policy Sandbox</div>
+            <div class="s7-slide-desc">Test policy changes against every scenario before they go live. See exactly which agents break, which pass, and what regresses. Catch the blast radius of a policy change before it hits production.</div>
+          </div>
+        </div>
+
+        <!-- Slide 5: Audit Trail -->
+        <div class="s7-carousel-slide">
+          <div class="s7-slide-img"><img src="../images/audit.png" alt="Audit Trail"></div>
+          <div class="s7-slide-text">
+            <div class="s7-slide-num">05 / 05</div>
+            <div class="s7-slide-title">Audit Trail &amp; Evidence Export</div>
+            <div class="s7-slide-desc">Complete human stewardship record: every proposal, approval, rejection, incident, and legal hold. SOX-exportable. Continuous evidence push to Vanta, Drata, and Sprinto. The compliance team's single pane of glass.</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="s7-carousel-arrows">
+        <button class="s7-carousel-arrow" onclick="s7Prev()">&#8249;</button>
+        <button class="s7-carousel-arrow" onclick="s7Next()">&#8250;</button>
+      </div>
+    </div>
+    <div class="s7-carousel-nav" id="s7Dots"></div>
+  </div>
+
+  <div class="s7-features">
+    <div class="s7-feat-col">
+      <div class="s7-feat-col-title">Capabilities</div>
+      <div class="s7-feat-item">Inline guardrails</div>
+      <div class="s7-feat-item">LLMs-as-judges</div>
+      <div class="s7-feat-item">PII Sanitization</div>
+      <div class="s7-feat-item">Verifiable Identity</div>
+      <div class="s7-feat-item">Transaction tracing</div>
+      <div class="s7-feat-item">Agent engagement loop logging</div>
+      <div class="s7-feat-item">Zero trust networking</div>
+      <div class="s7-feat-item">OTEL metrics</div>
+      <div class="s7-feat-item">HITL interference</div>
+      <div class="s7-feat-item">Eval: toxicity, summarization, hallucination</div>
+      <div class="s7-feat-item">Embedded OPA execution engine</div>
+      <div class="s7-feat-item">Jurisdictional policy generator</div>
+      <div class="s7-feat-item">Policy mapping to enforcement points</div>
+      <div class="s7-feat-item">Policy execution monitoring</div>
+      <div class="s7-feat-item">Policy testing sandbox</div>
+      <div class="s7-feat-item">Policies for non-Akka agents via AI gateways</div>
+    </div>
+    <div class="s7-feat-col">
+      <div class="s7-feat-col-title">Regulations</div>
+      <div class="s7-feat-item">EU AI Act</div>
+      <div class="s7-feat-item">Colorado AI Act</div>
+      <div class="s7-feat-item">NYC Local Law 144</div>
+      <div class="s7-feat-item">Illinois HB 3773</div>
+      <div class="s7-feat-item">Utah AI Policy Act</div>
+      <div class="s7-feat-item">California AB 2013</div>
+      <div class="s7-feat-item">California SB 942</div>
+      <div class="s7-feat-item">China GenAI Measures</div>
+      <div class="s7-feat-item">South Korea AI Act</div>
+      <div class="s7-feat-item">Brazil PL 2338</div>
+      <div class="s7-feat-item">UK AI Regulation Bill</div>
+      <div class="s7-feat-item">Council of Europe AI</div>
+      <div class="s7-feat-item">NIST AI RMF</div>
+      <div class="s7-feat-item">ISO/IEC 42001</div>
+      <div class="s7-feat-item">Singapore AI Framework</div>
+      <div class="s7-feat-item">OECD AI Principles</div>
+      <div class="s7-feat-item">SOC 2</div>
+      <div class="s7-feat-item">GDPR</div>
+      <div class="s7-feat-item">HIPAA</div>
+      <div class="s7-feat-item">DORA</div>
+    </div>
+  </div>
+
+  </div>
+</div>
+</div>
+<!-- /SECTION-HTML -->
+
+<script>
+/* SECTION-JS */
+/* ── Phase 1: scroll-driven problem reveals ── */
+const s7wrapper = document.getElementById('s7-problem');
+const s7els     = document.querySelectorAll('[data-s7]');
+
+function updateS7() {
+  const y       = window.scrollY;
+  const wTop    = s7wrapper.offsetTop;
+  const wScroll = s7wrapper.offsetHeight - window.innerHeight;
+  const scrolled = y - wTop;
+  const p = wScroll > 0 ? Math.min(scrolled / wScroll, 1) : 0;
+
+  s7els.forEach(el => {
+    const step = +el.dataset.s7;
+    const threshold = Math.max(0, (step - 1) / 5);
+    el.classList.toggle('visible', p >= threshold);
+  });
+}
+window.addEventListener('scroll', updateS7, { passive: true });
+updateS7();
+
+/* ── Phase 2: IntersectionObserver reveals ── */
+const s7observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('#s7-answer .s7-reveal').forEach(el => s7observer.observe(el));
+
+/* ── Carousel ── */
+let s7idx = 0;
+const s7track = document.getElementById('s7Track');
+const s7slides = s7track ? s7track.children : [];
+const s7dotsEl = document.getElementById('s7Dots');
+
+function s7BuildDots() {
+  if (!s7dotsEl) return;
+  for (let i = 0; i < s7slides.length; i++) {
+    const d = document.createElement('button');
+    d.className = 's7-carousel-dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => s7GoTo(i);
+    s7dotsEl.appendChild(d);
+  }
+}
+function s7GoTo(i) {
+  s7idx = Math.max(0, Math.min(i, s7slides.length - 1));
+  if (s7track) s7track.style.transform = `translateX(-${s7idx * 100}%)`;
+  s7dotsEl.querySelectorAll('.s7-carousel-dot').forEach((d, j) => d.classList.toggle('active', j === s7idx));
+}
+function s7Next() { s7GoTo(s7idx + 1); }
+function s7Prev() { s7GoTo(s7idx - 1); }
+s7BuildDots();
+/* /SECTION-JS */
+</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka — Section 2: System Types</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* SHARED-CSS */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --yellow: #F5C518;
+  --black:  #000;
+  --dark:   #07070C;
+  --white:  #fff;
+  --gray:   #555;
+}
+html { scroll-behavior: auto; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+@keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
+@keyframes slideUp { to { opacity:1; transform:translateY(0); } }
+@keyframes bounceDown {
+  0%,100% { transform:rotate(45deg) translate(0,0); }
+  50%     { transform:rotate(45deg) translate(4px,4px); }
+}
+@keyframes bgSlide {
+  from { background-position:0 0; }
+  to   { background-position:36px 36px; }
+}
+/* /SHARED-CSS */
+
+/* SECTION-CSS */
+#st-wrapper {
+  height: calc(100vh * 1.6);
+  position: relative;
+}
+
+#st-sticky {
+  position: sticky; top: 0;
+  height: 100vh; min-height: 700px;
+  background: var(--dark);
+  padding: 28px 24px 24px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+#st-sticky::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size:36px 36px;
+  animation: bgSlide 28s linear infinite;
+  pointer-events:none; z-index:0;
+}
+
+/* Header */
+.st-header {
+  display:flex; align-items:center; gap:14px;
+  flex-shrink:0; position:relative; z-index:2;
+  margin-bottom:14px; padding-bottom:14px;
+  border-bottom: 1px solid #1C1C1C;
+}
+.st-eyebrow {
+  font-size:10px; text-transform:uppercase; letter-spacing:3.5px;
+  color:var(--yellow); font-weight:600; flex-shrink:0;
+  white-space:nowrap;
+}
+.st-title {
+  font-size:clamp(18px,2vw,30px); font-weight:700;
+  color:#FFFFFF; letter-spacing:-0.02em; line-height:1.2;
+}
+.st-dots { margin-left:auto; display:flex; gap:6px; align-items:center; flex-shrink:0; }
+.st-dot {
+  width:6px; height:6px; border-radius:3px;
+  background:#1C1C1C; border:1px solid #2A2A2A;
+  transition: all .35s cubic-bezier(.34,1.56,.64,1);
+}
+.st-dot.lit { width:20px; background:var(--yellow); border-color:var(--yellow); }
+
+/* 4x2 grid — fills remaining height */
+.st-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  position: relative; z-index: 2;
+}
+
+/* Card — hidden until column threshold is crossed */
+.st-card {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  padding: 18px 18px 16px;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  min-height: 0;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .4s ease, transform .4s cubic-bezier(0.16,1,0.3,1),
+              border-color .3s ease, background .3s ease;
+}
+.st-card[data-row="1"] { transition-delay: 0.08s; }
+.st-card::before {
+  content:''; position:absolute; top:0; left:0; right:0;
+  height:3px; background:var(--yellow);
+  transform: scaleX(0); transform-origin:left;
+  transition: transform .5s cubic-bezier(0.16,1,0.3,1) .2s;
+}
+.st-card.visible {
+  opacity: 1; transform: none;
+  background: #141414;
+  border-color: #2E2E2E;
+}
+.st-card.visible::before { transform: scaleX(1); }
+.st-card.visible:hover { border-color: #3C3C3C; }
+
+/* Card content */
+.st-card-content { display:flex; flex-direction:column; flex:1; min-height:0; }
+
+.st-num {
+  font-size:11px; font-weight:700; color:var(--yellow);
+  letter-spacing:2px; margin-bottom:6px;
+}
+.st-name {
+  font-size:clamp(15px,1.4vw,22px); font-weight:700;
+  color:#FFFFFF; letter-spacing:-0.02em; line-height:1.15; margin-bottom:5px;
+}
+.st-desc {
+  font-size:10px; text-transform:uppercase; letter-spacing:1.5px;
+  color:#666; font-weight:600; margin-bottom:10px;
+}
+.st-context {
+  font-size:13px; color:#B8B8B8; line-height:1.65;
+  margin-bottom:14px; flex-shrink:0;
+}
+.st-divider { height:1px; background:#222; margin-bottom:12px; flex-shrink:0; }
+
+/* Logo photo tiles from JPG */
+.st-logos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  overflow: hidden;
+  flex: 1; min-height: 0;
+  align-content: start;
+}
+.logo-tile-img {
+  width: 100%; aspect-ratio: 268 / 168;
+  object-fit: cover; border-radius: 5px;
+  display: block;
+}
+/* /SECTION-CSS */
+</style>
+</head>
+<body>
+
+<!-- SECTION-HTML -->
+<div id="st-wrapper">
+  <div id="st-sticky">
+    <div class="st-header">
+      <div class="st-eyebrow">The proof</div>
+      <div class="st-title">One runtime. Every system. 18&nbsp;years.</div>
+      <div class="st-dots" id="stDots"></div>
+    </div>
+    <div class="st-grid" id="stGrid"></div>
+  </div>
+</div>
+<!-- /SECTION-HTML -->
+
+<script>
+/* SECTION-JS */
+/* ── Type data ─────────────────────────────────────── */
+/* Ordered: 0-3 = top row (col 0-3), 4-7 = bottom row (col 0-3) */
+// si = simple-icons slug (https://simpleicons.org) — blank = CSS text fallback
+const TYPES = [
+  { n:'01', name:'transact & reason', desc:'Process operational data',
+    context:'Every payment, order, and decision — at sub-millisecond speed with zero data loss.',
+    imgs:['capitalone','ING','westpac','bookingdotcom','gebit'] },
+  { n:'02', name:'analytics', desc:'Analyze real-time data',
+    context:'AI-powered analytics acting on data as it arrives — decisions before the moment passes.',
+    imgs:['verizon','swiggy','dream11','HPE','usaacredit'] },
+  { n:'03', name:'memory', desc:'Track & replay shared state',
+    context:'Durable sub-10ms memory that survives failures and enables time-travel debugging.',
+    imgs:['adobe','verizon','dream11'] },
+  { n:'04', name:'digital twins', desc:'Converge replicated data',
+    context:'Live replicas of physical systems — vehicles, factories, ports — in real time.',
+    imgs:['vw','norwegian','bsh'] },
+  { n:'05', name:'streaming', desc:'Process continuous data',
+    context:'Millions of events per second with exactly-once delivery at global scale.',
+    imgs:['disney','tubi','sky','webex','reflek'] },
+  { n:'06', name:'workflows', desc:'Orchestrate long-term processes',
+    context:'Business processes spanning days, surviving restarts, never losing state.',
+    imgs:['walmart','tesco','workday','bp'] },
+  { n:'07', name:'edge relays', desc:'Daisy chain device-to-cloud',
+    context:'Reliable coordination across thousands of distributed devices — zero message loss.',
+    imgs:['vw','johndeere','gm','tesla','bsh'] },
+  { n:'08', name:'model inference', desc:'Agent & tool execution',
+    context:'Autonomous agents making real decisions in production — not demos, not prototypes.',
+    imgs:['ciena','amprion','lloyds','RBC','tubi'] },
+];
+
+/* ── Build grid ────────────────────────────────────── */
+const stGrid   = document.getElementById('stGrid');
+const stDotsEl = document.getElementById('stDots');
+
+
+TYPES.forEach((t, i) => {
+  const col = i % 4;
+  const row = i < 4 ? 0 : 1;
+
+  const card = document.createElement('div');
+  card.className = 'st-card';
+  card.dataset.col = col;
+  card.dataset.row = row;
+
+  const pills = t.imgs.map(name =>
+    `<img class="logo-tile-img" src="../logos/${name}.png" alt="${name}" loading="lazy">`
+  ).join('');
+
+  card.innerHTML = `
+    <div class="st-card-content">
+      <div class="st-num">${t.n}</div>
+      <div class="st-name">${t.name}</div>
+      <div class="st-desc">${t.desc}</div>
+      <div class="st-context">${t.context}</div>
+      <div class="st-divider"></div>
+      <div class="st-logos">${pills}</div>
+    </div>
+  `;
+  stGrid.appendChild(card);
+});
+
+/* 4 progress dots */
+for (let i = 0; i < 4; i++) {
+  const d = document.createElement('div');
+  d.className = 'st-dot';
+  stDotsEl.appendChild(d);
+}
+
+/* ── Scroll driver — scroll-linked, no thresholds ──── */
+const stWrapper = document.getElementById('st-wrapper');
+const cards   = document.querySelectorAll('.st-card');
+const stDots  = document.querySelectorAll('.st-dot');
+
+function updateCols() {
+  const y       = window.scrollY;
+  const wTop    = stWrapper.offsetTop;
+  const wScroll = stWrapper.offsetHeight - window.innerHeight;
+  const scrolled = y - wTop;
+
+  // p is NOT clamped on the low end so negative = before section (all hidden)
+  const p = wScroll > 0 ? Math.min(scrolled / wScroll, 1) : 0;
+
+  // Each column activates at p = col/4 (0, 0.25, 0.5, 0.75)
+  // The whole card — text, logos, everything — enters as one CSS-animated unit
+  cards.forEach(card => {
+    card.classList.toggle('visible', p >= +card.dataset.col / 4);
+  });
+
+  stDots.forEach((dot, i) => {
+    dot.classList.toggle('lit', p >= i / 4);
+  });
+}
+
+window.addEventListener('scroll', updateCols, { passive: true });
+updateCols();
+/* /SECTION-JS */
+</script>
+</body>
+</html>

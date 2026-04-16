@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka — Section 5: Dev Cost Approaches Zero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* SHARED-CSS */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --yellow: #F5C518;
+  --black:  #000;
+  --dark:   #07070C;
+  --white:  #fff;
+  --gray:   #555;
+}
+html { scroll-behavior: auto; }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+@keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
+@keyframes slideUp { to { opacity:1; transform:translateY(0); } }
+@keyframes bounceDown {
+  0%,100% { transform:rotate(45deg) translate(0,0); }
+  50%     { transform:rotate(45deg) translate(4px,4px); }
+}
+@keyframes bgSlide {
+  from { background-position:0 0; }
+  to   { background-position:36px 36px; }
+}
+/* /SHARED-CSS */
+
+/* SECTION-CSS */
+#s5-wrapper {
+  height: 140vh;
+  position: relative;
+}
+#s5 {
+  background: var(--black);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 0 24px;
+  overflow: hidden;
+}
+#s5::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(245,197,24,0.03) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events:none; z-index:0;
+}
+
+.s5-reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+  position: relative; z-index: 1;
+}
+.s5-reveal.visible { opacity: 1; transform: none; }
+
+.s5-top {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 6vw; margin-bottom: 24px;
+  gap: 40px; flex-shrink: 0;
+}
+.s5-top-left { flex: 1; }
+
+.s5-eyebrow {
+  font-size:11px; text-transform:uppercase; letter-spacing:3px;
+  color:var(--yellow); font-weight:600; margin-bottom:10px;
+}
+.s5-eyebrow::before { content:''; display:inline-block; width:28px; height:2px; background:var(--yellow); margin-right:10px; vertical-align:middle; }
+
+.s5-headline {
+  font-size: clamp(26px, 3.5vw, 50px); font-weight:700;
+  line-height:1.08; letter-spacing:-0.03em; color:var(--white);
+  max-width: 700px;
+}
+.s5-headline .accent { color:var(--yellow); }
+
+.s5-props {
+  display: flex; gap: 36px; flex-shrink: 0;
+}
+.s5-prop { border-left: 3px solid #222; padding-left: 18px; max-width: 220px; }
+.s5-prop-title {
+  font-size: 18px; font-weight: 700; color: var(--white);
+  letter-spacing: -0.02em; margin-bottom: 4px; line-height: 1.2;
+}
+.s5-prop-desc { font-size: 14px; color: #888; line-height: 1.45; }
+.s5-prop.active { border-left-color: var(--yellow); }
+.s5-prop.active .s5-prop-title { color: var(--yellow); }
+
+/* ── Main area: terminal left, artifacts right ── */
+.s5-main {
+  flex: 1; min-height: 0;
+  display: flex; gap: 28px;
+  padding-left: 0;
+  padding-right: 6vw;
+}
+
+/* Terminal — left-aligned to screen edge */
+.s5-term-col {
+  width: 52%; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.s5-terminal {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 120px rgba(245,197,24,0.05);
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+}
+.s5-term-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid #1C1C1C;
+  flex-shrink: 0;
+}
+.s5-term-dot { width: 10px; height: 10px; border-radius: 50%; }
+.s5-term-dot.r { background: #FF5F57; }
+.s5-term-dot.y { background: #FEBC2E; }
+.s5-term-dot.g { background: #28C840; }
+.s5-term-title {
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px; color: #555; margin-left: 8px;
+}
+.s5-term-body {
+  padding: 16px 24px;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+}
+.s5-term-body::-webkit-scrollbar { width: 4px; }
+.s5-term-body::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+.s5-tline { white-space: pre-wrap; }
+.s5-tline .prompt { color: var(--yellow); user-select: none; }
+.s5-tline .cmd { color: var(--white); }
+.s5-tline .ai { color: #999; font-style: italic; }
+.s5-tline .success { color: #28C840; }
+.s5-tline .warn { color: var(--yellow); font-weight: 600; }
+
+.s5-cursor {
+  display: inline-block; width: 7px; height: 13px;
+  background: var(--yellow); vertical-align: middle;
+  animation: s5blink 1s step-end infinite;
+}
+
+@keyframes s5blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Artifacts panel (right) ── */
+.s5-artifacts {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 20px;
+  min-height: 0;
+}
+
+/* Shared artifact card style */
+.s5-artifact {
+  background: #0D0D0D;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  transition: opacity .8s ease, transform .8s cubic-bezier(0.16,1,0.3,1);
+}
+.s5-artifact.show {
+  opacity: 1;
+  transform: none;
+}
+
+.s5-artifact-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid #1C1C1C;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.02);
+}
+.s5-artifact-icon {
+  width: 16px; height: 16px; fill: var(--yellow); flex-shrink: 0;
+}
+.s5-artifact-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--yellow); font-weight: 600;
+}
+.s5-artifact-file {
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px; color: #555; margin-left: auto;
+}
+
+/* Spec document */
+.s5-spec-body {
+  padding: 16px 20px;
+  font-size: 12px; line-height: 1.7; color: #999;
+}
+.s5-spec-body h3 {
+  font-size: 14px; color: var(--white); font-weight: 700;
+  margin-bottom: 8px; letter-spacing: -0.02em;
+}
+.s5-spec-body h4 {
+  font-size: 11px; color: var(--yellow); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin: 12px 0 6px;
+}
+.s5-spec-body p { margin-bottom: 6px; }
+.s5-spec-body ul {
+  list-style: none; padding: 0;
+}
+.s5-spec-body li {
+  padding-left: 14px; position: relative; margin-bottom: 3px;
+}
+.s5-spec-body li::before {
+  content: '\2022'; position: absolute; left: 0; color: #444;
+}
+.s5-spec-fade {
+  position: relative;
+}
+.s5-spec-fade::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 48px;
+  background: linear-gradient(transparent, #0D0D0D);
+  pointer-events: none;
+}
+
+/* Architecture diagram */
+.s5-arch-body {
+  padding: 16px 20px 20px;
+}
+.s5-arch-body svg {
+  width: 100%; height: auto; display: block;
+}
+
+@media (max-width: 1000px) {
+  .s5-main { flex-direction: column; padding-left: 6vw; }
+  .s5-term-col { width: 100%; }
+  .s5-terminal { border-radius: 12px; }
+  .s5-top { flex-direction: column; align-items: flex-start; }
+  .s5-props { flex-direction: column; gap: 12px; }
+}
+/* /SECTION-CSS */
+</style>
+</head>
+<body>
+
+<!-- SECTION-HTML -->
+<div id="s5-wrapper">
+<section id="s5">
+  <div class="s5-top">
+    <div class="s5-top-left">
+      <div class="s5-eyebrow s5-reveal">Dev cost &rarr; zero</div>
+      <div class="s5-headline s5-reveal">Describe what you want.<br><span class="accent">Ship it in hours.</span></div>
+    </div>
+    <div class="s5-props s5-reveal">
+      <div class="s5-prop" data-phase="specify">
+        <div class="s5-prop-title">No code required</div>
+        <div class="s5-prop-desc">Plain language in, production system out.</div>
+      </div>
+      <div class="s5-prop" data-phase="implement">
+        <div class="s5-prop-title">Hours, not weeks</div>
+        <div class="s5-prop-desc">Spec to deployed service with HA and governance.</div>
+      </div>
+      <div class="s5-prop" data-phase="deploy">
+        <div class="s5-prop-title">No lost knowledge</div>
+        <div class="s5-prop-desc">The spec is the source of truth. Always.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s5-main s5-reveal">
+    <!-- Terminal (left, screen-edge aligned) -->
+    <div class="s5-term-col">
+      <div class="s5-terminal">
+        <div class="s5-term-header">
+          <div class="s5-term-dot r"></div>
+          <div class="s5-term-dot y"></div>
+          <div class="s5-term-dot g"></div>
+          <span class="s5-term-title">claude-code ~ loyalty-service</span>
+        </div>
+        <div class="s5-term-body" id="s5TermBody"></div>
+      </div>
+    </div>
+
+    <!-- Artifacts (right) -->
+    <div class="s5-artifacts">
+      <!-- Spec document -->
+      <div class="s5-artifact" id="s5Spec">
+        <div class="s5-artifact-header">
+          <svg class="s5-artifact-icon" viewBox="0 0 16 16"><path d="M2 1.5A1.5 1.5 0 013.5 0h6.586a1.5 1.5 0 011.06.44l2.415 2.414A1.5 1.5 0 0114 3.914V14.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 012 14.5zm1.5-.5a.5.5 0 00-.5.5v13a.5.5 0 00.5.5h9a.5.5 0 00.5-.5V4H10.5A1.5 1.5 0 019 2.5V1zM10 1v1.5a.5.5 0 00.5.5H12z"/></svg>
+          <span class="s5-artifact-label">Your Specification</span>
+          <span class="s5-artifact-file">spec.md</span>
+        </div>
+        <div class="s5-spec-fade">
+          <div class="s5-spec-body">
+            <h3>Customer Loyalty Service</h3>
+            <p>A points-based loyalty program with tiered membership, reward redemption, and real-time balance tracking.</p>
+            <h4>Entities</h4>
+            <ul>
+              <li><strong style="color:#ccc">LoyaltyAccount</strong> &mdash; earn, redeem, tier evaluation</li>
+              <li><strong style="color:#ccc">RewardsProgram</strong> &mdash; catalog rules, partner integrations</li>
+            </ul>
+            <h4>Business Rules</h4>
+            <ul>
+              <li>Rolling 12-month expiry from last earn activity</li>
+              <li>Grace period before tier downgrade</li>
+              <li>Reward catalog synced daily from external API</li>
+            </ul>
+            <h4>Views</h4>
+            <ul>
+              <li>CustomerDashboard &mdash; balance, history, current tier</li>
+              <li>AdminOverview &mdash; program metrics, tier distribution</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Architecture diagram -->
+      <div class="s5-artifact" id="s5Arch">
+        <div class="s5-artifact-header">
+          <svg class="s5-artifact-icon" viewBox="0 0 16 16"><path d="M6 3.5A1.5 1.5 0 017.5 2h1A1.5 1.5 0 0110 3.5v1A1.5 1.5 0 018.5 6h-1A1.5 1.5 0 016 4.5zM0 9.5A1.5 1.5 0 011.5 8h1A1.5 1.5 0 014 9.5v1A1.5 1.5 0 012.5 12h-1A1.5 1.5 0 010 10.5zm12 0A1.5 1.5 0 0113.5 8h1A1.5 1.5 0 0116 9.5v1a1.5 1.5 0 01-1.5 1.5h-1a1.5 1.5 0 01-1.5-1.5zM8 6v2m-6 4v-1.5A1.5 1.5 0 013.5 9H5m6 0h1.5A1.5 1.5 0 0114 10.5V12" fill="none" stroke="#F5C518" stroke-width="1.2"/></svg>
+          <span class="s5-artifact-label">Architecture</span>
+          <span class="s5-artifact-file">generated by /akka:design</span>
+        </div>
+        <div class="s5-arch-body">
+          <svg viewBox="0 0 440 155" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <style>
+              .nd { fill:#141414; stroke:#F5C518; stroke-width:0.5; rx:5; }
+              .nd-y { fill:#1a1700; stroke:#F5C518; stroke-width:0.5; rx:5; }
+              .nl { font-family:'Instrument Sans',sans-serif; font-size:11px; fill:#ccc; font-weight:600; }
+              .nl-s { font-family:'SF Mono','Consolas',monospace; font-size:9px; fill:#777; }
+              .el { stroke:#F5C518; stroke-width:1; }
+              .el-y { stroke:#F5C518; stroke-width:1; stroke-dasharray:4,3; }
+            </style>
+
+            <!-- REST Endpoints -->
+            <rect x="150" y="4" width="140" height="28" class="nd-y"/>
+            <text x="220" y="22" text-anchor="middle" class="nl" fill="#F5C518">REST Endpoints</text>
+
+            <!-- Arrows down from endpoints -->
+            <line x1="185" y1="32" x2="80" y2="52" class="el"/>
+            <line x1="220" y1="32" x2="220" y2="52" class="el"/>
+            <line x1="255" y1="32" x2="360" y2="52" class="el"/>
+
+            <!-- LoyaltyAccount Entity -->
+            <rect x="20" y="52" width="120" height="34" class="nd"/>
+            <text x="80" y="66" text-anchor="middle" class="nl">LoyaltyAccount</text>
+            <text x="80" y="78" text-anchor="middle" class="nl-s">Event Sourced</text>
+
+            <!-- RewardsProgram Entity -->
+            <rect x="160" y="52" width="120" height="34" class="nd"/>
+            <text x="220" y="66" text-anchor="middle" class="nl">RewardsProgram</text>
+            <text x="220" y="78" text-anchor="middle" class="nl-s">Key Value</text>
+
+            <!-- RedemptionWorkflow -->
+            <rect x="300" y="52" width="120" height="34" class="nd"/>
+            <text x="360" y="66" text-anchor="middle" class="nl">Redemption</text>
+            <text x="360" y="78" text-anchor="middle" class="nl-s">Workflow</text>
+
+            <!-- Arrows: entities to views -->
+            <line x1="80" y1="86" x2="80" y2="106" class="el-y"/>
+            <line x1="220" y1="86" x2="220" y2="106" class="el-y"/>
+            <line x1="360" y1="86" x2="360" y2="106" class="el-y"/>
+
+            <!-- Views -->
+            <rect x="20" y="106" width="120" height="28" class="nd"/>
+            <text x="80" y="124" text-anchor="middle" class="nl">CustomerDashboard</text>
+
+            <rect x="160" y="106" width="120" height="28" class="nd"/>
+            <text x="220" y="124" text-anchor="middle" class="nl">AdminOverview</text>
+
+            <!-- Timer -->
+            <rect x="300" y="106" width="120" height="28" class="nd"/>
+            <text x="360" y="118" text-anchor="middle" class="nl">ExpiryTimer</text>
+            <text x="360" y="129" text-anchor="middle" class="nl-s">Cron: daily</text>
+
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<!-- /SECTION-HTML -->
+
+<script>
+/* SECTION-JS */
+(function() {
+  var script = [
+    { type:'cmd', text:'/akka:specify "Customer loyalty program with points, tiers, and rewards"', phase:'specify' },
+    { type:'ai',  text:'How should points expire? Fixed calendar window, rolling from last activity, or never?' },
+    { type:'ok',  text:'[specify] spec.md written \u2714  Branch: 001-loyalty-service' },
+    { type:'blank' },
+
+    { type:'cmd', text:'/akka:clarify "Rolling 12-month expiry. Grace period before tier downgrade."', phase:'specify' },
+    { type:'ok',  text:'[clarify] spec.md updated \u2714  2 decisions captured', trigger:'spec' },
+    { type:'blank' },
+
+    { type:'cmd', text:'/akka:plan "High-perf APIs, read data in views. Host client app in backend."', phase:'specify' },
+    { type:'ok',  text:'[plan] plan.md written \u2714  Event Sourced Entities, Views, Endpoints + SPA' },
+    { type:'blank' },
+
+    { type:'cmd', text:'/akka:tasks && /akka:implement && /akka:build', phase:'implement' },
+    { type:'lines', items: [
+      { text:'[tasks] 6 tasks generated, dependency-ordered \u2714', cls:'ok' },
+      { text:'[implement] Writing LoyaltyAccount entity...', cls:'ai' },
+      { text:'[implement] Writing RewardsProgram entity...', cls:'ai' },
+      { text:'[implement] Writing REST endpoints + views...', cls:'ai' },
+      { text:'[implement] Writing RedemptionWorkflow...', cls:'ai' },
+      { text:'[implement] Generating 50 unit tests...', cls:'ai' },
+      { text:'[implement] 989 lines across 12 files \u2714  50/50 tests passing', cls:'ok' },
+      { text:'[build] mvn compile \u2714  mvn test \u2714  service running on :8080', cls:'ok' },
+    ], trigger:'arch'},
+    { type:'blank' },
+
+    { type:'cmd', text:'/akka:review && /akka:analyze && /akka:deploy', phase:'deploy' },
+    { type:'lines', items: [
+      { text:'[review] Spec compliance 100% \u2714  Coverage 94%', cls:'ok' },
+      { text:'[analyze] Full cross-artifact traceability \u2714', cls:'ok' },
+      { text:'[deploy] git commit \u2714  git push \u2714', cls:'ai' },
+      { text:'[deploy] Container image built \u2714  Pushed to registry', cls:'ai' },
+      { text:'[deploy] Routes configured \u2714  loyalty.acme.akka.app', cls:'ai' },
+      { text:'[deploy] Deploying to your private Akka cloud \u2714  Active-active HA, 3 replicas', cls:'ok' },
+    ]},
+    { type:'blank' },
+    { type:'warn', text:'\u2728 loyalty-service is live. Spec to production in 2 hours, 14 minutes.' },
+  ];
+
+  var body = document.getElementById('s5TermBody');
+  var specCard = document.getElementById('s5Spec');
+  var archCard = document.getElementById('s5Arch');
+  var props = document.querySelectorAll('.s5-prop');
+  var currentPhase = null;
+  var cursorEl = null;
+
+  var CMD_CHAR_MS  = 24;
+  var AI_CHAR_MS   = 20;
+  var OK_CHAR_MS   = 18;
+  var LINE_DELAY   = 280;
+  var PAUSE_AFTER_CMD = 500;
+  var PAUSE_AFTER_STEP = 400;
+
+  function scroll() { body.scrollTop = body.scrollHeight; }
+
+  function removeCursor() {
+    if (cursorEl) { cursorEl.remove(); cursorEl = null; }
+  }
+
+  function addCursor(parent) {
+    removeCursor();
+    cursorEl = document.createElement('span');
+    cursorEl.className = 's5-cursor';
+    parent.appendChild(cursorEl);
+  }
+
+  function highlightProp(phase) {
+    if (phase && phase !== currentPhase) {
+      currentPhase = phase;
+      props.forEach(function(p) {
+        p.classList.toggle('active', p.getAttribute('data-phase') === phase);
+      });
+    }
+  }
+
+  /* Artifact reveal + terminal reset logic */
+  var revealQueue = [specCard, archCard];
+  var revealIdx = 0;
+  var s5Anchored = false;
+  var s5Running = false;
+  var s5DownCount = 0;
+  var s5WrapperEl = document.getElementById('s5-wrapper');
+
+  var s5UpCount = 0;
+  var s5State = 'idle'; /* idle | forward | reverse | done */
+
+  function fillTerminalFull() {
+    body.innerHTML = '';
+    removeCursor();
+    for (var i = 0; i < script.length; i++) {
+      var step = script[i];
+      if (step.type === 'cmd') {
+        var d = document.createElement('div');
+        d.className = 's5-tline';
+        d.innerHTML = '<span class="prompt">$ </span><span class="cmd">' + step.text + '</span>';
+        body.appendChild(d);
+      } else if (step.type === 'blank') {
+        var d = document.createElement('div');
+        d.className = 's5-tline';
+        d.innerHTML = '&nbsp;';
+        body.appendChild(d);
+      } else if (step.type === 'lines') {
+        for (var j = 0; j < step.items.length; j++) {
+          var item = step.items[j];
+          var ld = document.createElement('div');
+          ld.className = 's5-tline';
+          var c = item.cls === 'ok' ? 'success' : 'ai';
+          ld.innerHTML = '<span class="' + c + '">' + item.text + '</span>';
+          body.appendChild(ld);
+        }
+      } else {
+        var cls = step.type === 'ok' ? 'success' : (step.type === 'warn' ? 'warn' : step.type);
+        var d = document.createElement('div');
+        d.className = 's5-tline';
+        d.innerHTML = '<span class="' + cls + '">' + step.text + '</span>';
+        body.appendChild(d);
+      }
+    }
+    var end = document.createElement('div');
+    end.className = 's5-tline';
+    end.innerHTML = '<span class="prompt">$ </span>';
+    body.appendChild(end);
+    addCursor(end);
+  }
+
+  function resetS5() {
+    body.innerHTML = '';
+    removeCursor();
+    specCard.classList.remove('show');
+    archCard.classList.remove('show');
+    revealIdx = 0;
+    s5DownCount = 0;
+    s5UpCount = 0;
+    currentPhase = null;
+    props.forEach(function(p) { p.classList.remove('active'); });
+    s5Running = false;
+    s5Anchored = false;
+    s5State = 'idle';
+  }
+
+  function checkS5() {
+    var wTop = s5WrapperEl.offsetTop;
+    var wHeight = s5WrapperEl.offsetHeight;
+    var wBottom = wTop + wHeight;
+    var scrollY = window.scrollY;
+    var viewBottom = scrollY + window.innerHeight;
+
+    var progress = (scrollY - wTop) / (wHeight - window.innerHeight);
+
+    var pastBelow = scrollY > wBottom;
+    var pastAbove = viewBottom < wTop;
+    var inView = !pastAbove && !pastBelow;
+    var anchored = progress >= 0 && progress <= 1;
+
+    if (pastAbove || pastBelow) {
+      if (s5State !== 'idle') resetS5();
+      return;
+    }
+
+    if (s5State === 'idle' && inView) {
+      /* Wrapper just entered viewport — determine direction */
+      if (viewBottom > wBottom - 10) {
+        /* Bottom of wrapper is near bottom of viewport = scrolling up from below */
+        s5State = 'reverse';
+        s5Running = true;
+        s5Anchored = true;
+        fillTerminalFull();
+        specCard.classList.add('show');
+        archCard.classList.add('show');
+        revealIdx = 2;
+        s5UpCount = 0;
+      } else if (anchored) {
+        /* Top of wrapper is above viewport = forward entry, already anchored */
+        s5State = 'forward';
+        s5Anchored = true;
+        s5Running = true;
+        setTimeout(function() { run(0); }, 600);
+      }
+    }
+
+    /* Forward: detect when we first anchor */
+    if (s5State === 'forward' && anchored && !s5Anchored) {
+      s5Anchored = true;
+      if (!s5Running) {
+        s5Running = true;
+        setTimeout(function() { run(0); }, 600);
+      }
+    }
+
+    /* Reverse: peel off artifacts based on scroll progress toward top */
+    if (s5State === 'reverse' && anchored) {
+      /* progress 1 = bottom of wrapper, 0 = top. As we scroll up, progress decreases */
+      if (progress < 0.55 && archCard.classList.contains('show')) {
+        archCard.classList.remove('show');
+      }
+      if (progress < 0.25 && specCard.classList.contains('show')) {
+        specCard.classList.remove('show');
+      }
+    }
+  }
+  window.addEventListener('scroll', checkS5, { passive: true });
+
+  document.addEventListener('keydown', function(e) {
+    if (!s5Anchored) return;
+
+    if (e.key === 'ArrowDown') {
+      s5DownCount++;
+      if (s5DownCount % 3 === 0 && revealIdx < revealQueue.length) {
+        revealQueue[revealIdx].classList.add('show');
+        revealIdx++;
+      }
+    }
+
+  });
+
+  function fireTrigger(t) {
+    if (t === 'spec' && !specCard.classList.contains('show')) {
+      specCard.classList.add('show');
+      if (revealIdx < 1) revealIdx = 1;
+    }
+    if (t === 'arch' && !archCard.classList.contains('show')) {
+      archCard.classList.add('show');
+      if (revealIdx < 2) revealIdx = 2;
+    }
+  }
+
+  function typeText(span, text, charMs, cb) {
+    var i = 0;
+    function tick() {
+      if (i < text.length) {
+        span.textContent += text[i]; i++;
+        scroll();
+        setTimeout(tick, charMs);
+      } else { if (cb) cb(); }
+    }
+    tick();
+  }
+
+  function makeLine(cls) {
+    var div = document.createElement('div');
+    div.className = 's5-tline';
+    var span = document.createElement('span');
+    span.className = cls;
+    div.appendChild(span);
+    body.appendChild(div);
+    return span;
+  }
+
+  function playLines(items, idx, cb) {
+    if (idx >= items.length) { if (cb) cb(); return; }
+    var item = items[idx];
+    var clsMap = { ok:'success', ai:'ai' };
+    var span = makeLine(clsMap[item.cls] || 'success');
+    addCursor(span.parentNode);
+    typeText(span, item.text, OK_CHAR_MS, function() {
+      setTimeout(function() { playLines(items, idx + 1, cb); }, LINE_DELAY);
+    });
+  }
+
+  function run(idx) {
+    if (idx >= script.length) {
+      removeCursor();
+      var end = document.createElement('div');
+      end.className = 's5-tline';
+      end.innerHTML = '<span class="prompt">$ </span>';
+      body.appendChild(end);
+      addCursor(end);
+      scroll();
+      props.forEach(function(p) { p.classList.remove('active'); });
+      return;
+    }
+
+    var step = script[idx];
+    if (step.phase) highlightProp(step.phase);
+
+    if (step.type === 'blank') {
+      var bl = document.createElement('div');
+      bl.className = 's5-tline';
+      bl.innerHTML = '&nbsp;';
+      body.appendChild(bl);
+      scroll();
+      setTimeout(function() { run(idx + 1); }, 120);
+
+    } else if (step.type === 'cmd') {
+      var line = document.createElement('div');
+      line.className = 's5-tline';
+      line.innerHTML = '<span class="prompt">$ </span>';
+      var cmdSpan = document.createElement('span');
+      cmdSpan.className = 'cmd';
+      line.appendChild(cmdSpan);
+      body.appendChild(line);
+      addCursor(line);
+      scroll();
+      typeText(cmdSpan, step.text, CMD_CHAR_MS, function() {
+        setTimeout(function() { removeCursor(); run(idx + 1); }, PAUSE_AFTER_CMD);
+      });
+
+    } else if (step.type === 'ai') {
+      var span = makeLine('ai');
+      addCursor(span.parentNode);
+      typeText(span, step.text, AI_CHAR_MS, function() {
+
+        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
+      });
+
+    } else if (step.type === 'ok') {
+      var span = makeLine('success');
+      addCursor(span.parentNode);
+      typeText(span, step.text, OK_CHAR_MS, function() {
+        if (step.trigger) fireTrigger(step.trigger);
+        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
+      });
+
+    } else if (step.type === 'warn') {
+      var span = makeLine('warn');
+      addCursor(span.parentNode);
+      typeText(span, step.text, AI_CHAR_MS, function() {
+        removeCursor();
+        if (step.trigger) fireTrigger(step.trigger);
+        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
+      });
+
+    } else if (step.type === 'lines') {
+      playLines(step.items, 0, function() {
+        if (step.trigger) fireTrigger(step.trigger);
+        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
+      });
+    }
+  }
+
+  var revObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('#s5 .s5-reveal').forEach(function(el) { revObs.observe(el); });
+})();
+/* /SECTION-JS */
+</script>
+</body>
+</html>
