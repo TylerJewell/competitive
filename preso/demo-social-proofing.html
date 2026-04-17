@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka Demo Showcase — Social Proofing Agent</title>
+<link rel="icon" href="https://akka.io/favicon.ico" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --yellow: #F5C518;
+  --black:  #000;
+  --dark:   #07070C;
+  --white:  #fff;
+  --gray:   #555;
+  --green:  #28C840;
+  --red:    #E74C3C;
+  --blue:   #1E90FF;
+  --purple: #A855F7;
+  --orange: #F97316;
+  --nav-width: 240px;
+}
+
+html { background: var(--black); }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  overflow: hidden;
+  height: 100vh;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+@keyframes fadeUp   { to { opacity:1; transform:translateY(0); } }
+@keyframes drawLine { to { stroke-dashoffset: 0; } }
+@keyframes boxIn    { from { opacity:0; transform:scale(0.8); } to { opacity:1; transform:scale(1); } }
+@keyframes pulse    { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+@keyframes slideIn  { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:translateX(0); } }
+@keyframes scaleX   { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+@keyframes blink    { 0%,100% { opacity:1; } 50% { opacity:0; } }
+@keyframes flowDash { to { stroke-dashoffset: -20; } }
+
+/* ── Layout ── */
+.showcase {
+  display: flex;
+  height: 100vh;
+  position: relative;
+}
+
+/* ── Left Navigation ── */
+.nav {
+  width: var(--nav-width);
+  flex-shrink: 0;
+  background: #0A0A0A;
+  border-right: 1px solid #1C1C1C;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.nav-header {
+  padding: 0 24px 28px;
+  border-bottom: 1px solid #1C1C1C;
+  margin-bottom: 8px;
+}
+.nav-logo svg { height: 24px; width: auto; margin-bottom: 12px; display: block; }
+.nav-title {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2.5px;
+  color: var(--yellow); font-weight: 600;
+}
+
+.nav-tab {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 24px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all .25s ease;
+  position: relative;
+}
+.nav-tab:hover { background: #0D0D0D; }
+.nav-tab.active {
+  background: #141414;
+  border-left-color: var(--yellow);
+}
+.nav-tab-icon {
+  width: 20px; height: 20px; flex-shrink: 0;
+  color: #555;
+  transition: color .25s ease;
+}
+.nav-tab.active .nav-tab-icon { color: var(--yellow); }
+.nav-tab-icon svg { width: 100%; height: 100%; }
+
+.nav-tab-label {
+  font-size: 13px; font-weight: 600; color: #888;
+  letter-spacing: 0.02em;
+  transition: color .25s ease;
+}
+.nav-tab.active .nav-tab-label { color: var(--white); }
+
+.nav-tab-num {
+  font-size: 10px; font-weight: 700; color: #333;
+  letter-spacing: 1px;
+  margin-left: auto;
+  transition: color .25s ease;
+}
+.nav-tab.active .nav-tab-num { color: var(--yellow); }
+
+.nav-footer {
+  margin-top: auto;
+  padding: 20px 24px 0;
+  border-top: 1px solid #1C1C1C;
+}
+.nav-footer-text {
+  font-size: 11px; color: #444; line-height: 1.5;
+}
+
+/* ── Content Area ── */
+.content {
+  flex: 1; min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-panel {
+  position: absolute;
+  inset: 0;
+  padding: 48px 56px;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity .4s ease, transform .4s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+}
+.tab-panel.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.tab-panel::-webkit-scrollbar { width: 4px; }
+.tab-panel::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+/* Background dot pattern */
+.content::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(245,197,24,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── Shared Typography ── */
+.tab-eyebrow {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+  color: var(--yellow); font-weight: 600; margin-bottom: 16px;
+  position: relative;
+}
+.tab-eyebrow::before {
+  content: ''; display: inline-block; width: 28px; height: 2px;
+  background: var(--yellow); margin-right: 10px; vertical-align: middle;
+}
+
+.tab-headline {
+  font-size: clamp(28px, 3vw, 44px); font-weight: 700;
+  line-height: 1.08; letter-spacing: -0.03em; color: var(--white);
+  margin-bottom: 32px;
+}
+.tab-headline .accent { color: var(--yellow); }
+
+.tab-desc {
+  font-size: 15px; color: #B8B8B8; line-height: 1.65;
+  max-width: 700px; margin-bottom: 40px;
+}
+
+/* ── Reveal animation ── */
+.reveal {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s cubic-bezier(0.16,1,0.3,1);
+}
+.tab-panel.active .reveal { opacity: 1; transform: none; }
+.tab-panel.active .reveal:nth-child(2) { transition-delay: .1s; }
+.tab-panel.active .reveal:nth-child(3) { transition-delay: .2s; }
+.tab-panel.active .reveal:nth-child(4) { transition-delay: .3s; }
+.tab-panel.active .reveal:nth-child(5) { transition-delay: .4s; }
+.tab-panel.active .reveal:nth-child(6) { transition-delay: .5s; }
+
+/* ── Cards ── */
+.card {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--yellow);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .5s cubic-bezier(0.16,1,0.3,1) .2s;
+}
+.tab-panel.active .card::before { transform: scaleX(1); }
+
+.card-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--yellow); font-weight: 600; margin-bottom: 10px;
+}
+.card-title {
+  font-size: 17px; font-weight: 700; color: var(--white);
+  margin-bottom: 6px;
+}
+.card-text {
+  font-size: 13px; color: #999; line-height: 1.5;
+}
+
+/* ═══════════════════════════════════
+   TAB 1: THE BRIEF
+═══════════════════════════════════ */
+.brief-bar {
+  display: flex; align-items: center; gap: 40px;
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  border-top: 3px solid var(--yellow);
+  padding: 20px 28px;
+  margin-top: 47px;
+  max-width: 760px;
+}
+.brief-bar-item {
+  display: flex; align-items: baseline; gap: 10px;
+}
+.brief-bar-num {
+  font-size: clamp(28px, 3vw, 40px); font-weight: 700;
+  color: var(--green); letter-spacing: -0.04em; line-height: 1;
+}
+.brief-bar-text {
+  font-size: 13px; color: #888; line-height: 1.3;
+}
+
+.brief-reqs {
+  list-style: none;
+  border-left: 2px solid var(--yellow);
+  padding-left: 20px;
+  max-width: 760px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.brief-reqs li {
+  font-size: 14px; color: #B8B8B8; line-height: 1.5;
+}
+
+/* ═══════════════════════════════════
+   TAB 2: THE APP
+═══════════════════════════════════ */
+.app-frame {
+  background: #0D0D0D;
+  border: 1px solid #1C1C1C;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 120px rgba(245,197,24,0.03);
+}
+.app-chrome {
+  background: #0D0D0D;
+  padding: 8px 16px;
+  display: flex; align-items: center;
+  border-bottom: 1px solid #1C1C1C;
+}
+.app-url {
+  font-size: 11px; color: #555;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+}
+.app-body {
+  height: 420px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  background: linear-gradient(135deg, #0A0A0A 0%, #111 100%);
+}
+.app-placeholder {
+  text-align: center; color: #333;
+}
+.app-placeholder-icon { font-size: 48px; margin-bottom: 12px; }
+.app-placeholder-text { font-size: 14px; }
+
+.app-stats {
+  display: flex; gap: 24px; margin-top: 24px;
+  flex-wrap: wrap;
+}
+.app-stat {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 20px;
+  padding: 8px 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.app-stat-num {
+  font-size: 16px; font-weight: 700; color: var(--yellow);
+}
+.app-stat-label {
+  font-size: 12px; color: #888;
+}
+
+/* ═══════════════════════════════════
+   TAB 3: THE ARCHITECTURE — Expandable Table
+═══════════════════════════════════ */
+.arch-layout {
+  margin-top: 8px;
+  height: calc(100vh - 220px);
+  min-height: 400px;
+  overflow-y: auto;
+}
+.arch-layout::-webkit-scrollbar { width: 4px; }
+.arch-layout::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+/* Summary stats grid (default view) */
+.arch-summary {
+  display: flex; flex-direction: column; justify-content: center;
+  margin-bottom: 32px;
+}
+.arch-summary-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 12px; max-width: 600px;
+}
+.arch-summary-stat {
+  background: #0A0A0A; border: 1px solid #1C1C1C;
+  border-radius: 8px; padding: 16px; text-align: center;
+}
+.arch-summary-num {
+  font-size: 28px; font-weight: 700; color: var(--yellow);
+  line-height: 1; margin-bottom: 4px;
+}
+.arch-summary-label {
+  font-size: 11px; color: #888; text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.arch-summary-hint {
+  font-size: 13px; color: #444; margin-top: 24px;
+  font-style: italic;
+}
+
+/* Expandable component table */
+.comp-table { width: 100%; }
+.comp-group-header {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  font-weight: 600; padding: 12px 0 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.comp-group-header .dot { width: 7px; height: 7px; border-radius: 4px; }
+.comp-group-count { color: #444; font-size: 10px; }
+
+.comp-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #111;
+  border-left: 2px solid transparent;
+  transition: background .15s ease, border-color .15s ease;
+}
+.comp-row:hover { background: #0D0D0D; border-left-color: #333; }
+.comp-row.expanded { background: #141414; border-bottom-color: transparent; border-left-color: var(--yellow); }
+.comp-row-chevron {
+  font-size: 8px; color: #333; flex-shrink: 0; width: 14px; text-align: center;
+  transition: transform .2s ease, color .15s ease;
+}
+.comp-row:hover .comp-row-chevron { color: #888; }
+.comp-row.expanded .comp-row-chevron { transform: rotate(90deg); color: var(--yellow); }
+
+.comp-row-dot { width: 6px; height: 6px; border-radius: 3px; flex-shrink: 0; }
+.comp-row-name { font-size: 12px; font-weight: 600; color: #ccc; flex-shrink: 0; }
+.comp-row-type { font-size: 9px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin-left: 2px; flex-shrink: 0; }
+.comp-row-desc { font-size: 11px; color: #555; margin-left: 8px; }
+
+.comp-detail {
+  display: none;
+  background: #0A0A0A;
+  border-bottom: 1px solid #1C1C1C;
+  padding: 16px 20px;
+}
+.comp-detail.open { display: block; }
+.comp-detail-desc { font-size: 13px; color: #888; line-height: 1.5; margin-bottom: 12px; }
+
+.comp-detail-code {
+  background: #070707;
+  border: 1px solid #1C1C1C;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.comp-detail-code-bar {
+  background: #0D0D0D;
+  padding: 6px 14px;
+  border-bottom: 1px solid #1C1C1C;
+  font-size: 11px; color: #666;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+}
+.comp-detail-code-body {
+  padding: 14px 18px;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #B8B8B8;
+  white-space: pre;
+  overflow-x: auto;
+}
+.comp-detail-code-body .kw { color: #C792EA; }
+.comp-detail-code-body .ty { color: #FFCB6B; }
+.comp-detail-code-body .st { color: #C3E88D; }
+.comp-detail-code-body .cm { color: #546E7A; font-style: italic; }
+.comp-detail-code-body .an { color: #F5C518; }
+.comp-detail-code-body .fn { color: #82AAFF; }
+.comp-detail-code-body .num { color: #F78C6C; }
+
+/* Diagram placeholder for design views */
+.comp-detail-diagram {
+  background: #070707;
+  border: 1px solid #1C1C1C;
+  border-radius: 8px;
+  padding: 20px;
+  color: #ccc;
+}
+
+/* Diagram node boxes */
+.dg-layer { padding: 16px 0; border-bottom: 1px solid #1C1C1C; }
+.dg-layer:last-child { border-bottom: none; }
+.dg-layer-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 2px;
+  font-weight: 700; color: #F5C518; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.dg-layer-label::before { content:''; width: 14px; height: 1px; background: #F5C518; }
+.dg-layer-nodes { display: flex; gap: 8px; flex-wrap: wrap; }
+.dg-node {
+  border-radius: 6px; padding: 6px 12px; text-align: center;
+  min-width: 100px; max-width: 170px;
+}
+.dg-node-type { font-size: 7px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px; }
+.dg-node-name { font-size: 11px; font-weight: 700; color: #fff; }
+.dg-node-ext { background: #1A1A1A; border: 1px dashed #666; }
+.dg-node-ext .dg-node-type { color: #666; }
+.dg-node-ext .dg-node-name { color: #999; }
+.dg-node-ep { background: #141414; border: 1px solid #fff; }
+.dg-node-ep .dg-node-type { color: #888; }
+.dg-node-ese { background: #1A1600; border: 1px solid #F5C518; }
+.dg-node-ese .dg-node-type { color: #F5C518; }
+.dg-node-agent { background: #001A1A; border: 1px solid #7EC8E3; }
+.dg-node-agent .dg-node-type { color: #7EC8E3; }
+.dg-node-consumer { background: #1A0A00; border: 1px solid #F97316; }
+.dg-node-consumer .dg-node-type { color: #F97316; }
+.dg-node-view { background: #0D001A; border: 1px solid #A855F7; }
+.dg-node-view .dg-node-type { color: #A855F7; }
+
+/* Diagram connections */
+.dg-connections { padding: 6px 0; display: flex; flex-direction: column; gap: 6px; }
+.dg-conn-group { display: flex; align-items: flex-start; font-size: 11px; border-left: 2px solid transparent; padding-left: 8px; position: relative; }
+.dg-conn-group.ingest { border-left-color: #2196F3; }
+.dg-conn-group.process { border-left-color: #FF9800; }
+.dg-conn-group.deliver { border-left-color: #4CAF50; }
+.dg-conn-step { font-size: 9px; font-weight: 700; color: #F5C518; width: 18px; flex-shrink: 0; font-family: monospace; line-height: 24px; }
+.dg-conn-from { font-weight: 600; color: #ccc; flex-shrink: 0; height: 24px; display: flex; align-items: center; white-space: nowrap; }
+.dg-conn-from::after { content:''; flex:1; height:1px; background:#444; margin-left:6px; min-width:12px; }
+.dg-conn-tree { flex:1; min-width:0; position:relative; }
+.dg-conn-tree svg.dg-lines { position:absolute; left:0; top:0; overflow:visible; pointer-events:none; }
+.dg-conn-branch { display:flex; align-items:center; height:24px; padding-left:36px; }
+.dg-conn-action { font-size:10px; color:#888; padding:0 6px; font-style:italic; }
+.dg-conn-to { font-weight:600; color:#ccc; }
+
+/* Diagram legend */
+.dg-legend { display:flex; gap:16px; padding:10px 0 0; border-top:1px solid #1C1C1C; margin-top:4px; }
+.dg-legend-item { display:flex; align-items:center; gap:4px; font-size:9px; color:#888; }
+.dg-legend-bar { width:12px; height:2px; border-radius:1px; }
+
+/* ── Proper sequence diagram with lifelines ── */
+.seq-diagram { position: relative; overflow-x: auto; }
+.seq-diagram svg { display: block; }
+
+/* Old sequence styles kept for compat */
+.dg-seq-participants { display:flex; gap:0; border-bottom:1px solid #1C1C1C; padding-bottom:8px; }
+.dg-seq-p { flex:1; text-align:center; font-size:9px; font-weight:700; color:#fff; padding:4px 2px; background:#141414; border:1px solid #333; border-radius:4px; margin:0 2px; line-height:1.2; }
+.dg-seq-p-ext { background:#1A1A1A; border-style:dashed; border-color:#666; color:#999; }
+.dg-seq-region { border-left:3px solid; padding:8px 12px; margin:4px 0; border-radius:0 4px 4px 0; }
+.dg-seq-region-blue { border-color:#2196F3; background:rgba(33,150,243,0.04); }
+.dg-seq-region-amber { border-color:#FF9800; background:rgba(255,152,0,0.04); }
+.dg-seq-region-green { border-color:#4CAF50; background:rgba(76,175,80,0.04); }
+.dg-seq-region-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+.dg-seq-region-blue .dg-seq-region-title { color:#2196F3; }
+.dg-seq-region-amber .dg-seq-region-title { color:#FF9800; }
+.dg-seq-region-green .dg-seq-region-title { color:#4CAF50; }
+.dg-seq-msg { display:flex; align-items:center; padding:2px 0; font-size:10px; }
+.dg-seq-msg-from { width:110px; flex-shrink:0; text-align:right; font-weight:600; color:#ccc; padding-right:8px; }
+.dg-seq-msg-arrow { flex:1; display:flex; align-items:center; position:relative; height:16px; }
+.dg-seq-msg-line { flex:1; height:1px; background:#555; }
+.dg-seq-msg-line.dashed { background:none; border-top:1px dashed #444; height:0; }
+.dg-seq-msg-head { width:0; height:0; border-top:3px solid transparent; border-bottom:3px solid transparent; border-left:5px solid #555; flex-shrink:0; }
+.dg-seq-msg-text { position:absolute; top:-9px; left:50%; transform:translateX(-50%); font-size:9px; color:#888; white-space:nowrap; background:#070707; padding:0 4px; }
+.dg-seq-msg-to { width:110px; flex-shrink:0; text-align:left; font-weight:600; color:#ccc; padding-left:8px; }
+.dg-seq-msg-return .dg-seq-msg-from { text-align:left; padding-left:8px; padding-right:0; }
+.dg-seq-msg-return .dg-seq-msg-to { text-align:right; padding-right:8px; padding-left:0; }
+.dg-seq-msg-return .dg-seq-msg-head { border-left:none; border-right:5px solid #555; }
+.dg-seq-msg-return .dg-seq-msg-line { background:none; border-top:1px dashed #444; height:0; }
+
+/* Entity map (simple) */
+.dg-entity-row { display:flex; gap:8px; align-items:center; margin:8px 0; }
+.dg-entity-arrow { color:#444; font-size:14px; }
+.dg-entity-label { font-size:10px; color:#888; font-style:italic; }
+
+/* Actor-goal table */
+.dg-ag-table { width:100%; font-size:11px; border-collapse:collapse; }
+.dg-ag-table th { text-align:left; padding:6px 10px; border-bottom:1px solid #222; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:#F5C518; font-weight:600; }
+.dg-ag-table td { padding:5px 10px; border-bottom:1px solid #111; color:#B8B8B8; }
+.dg-ag-table td:first-child { color:#ccc; font-weight:600; }
+
+/* User journey nodes */
+.dg-journey-nodes { display:flex; flex-direction:column; gap:6px; }
+.dg-journey-row { display:flex; gap:8px; align-items:center; }
+.dg-journey-node { padding:6px 12px; border-radius:6px; font-size:11px; font-weight:600; }
+.dg-journey-p1 { background:#0A1A2A; border:1px solid #2196F3; color:#fff; }
+.dg-journey-p2 { background:#1A1200; border:1px solid #FF9800; color:#fff; }
+.dg-journey-p3 { background:#0A1A0A; border:1px solid #4CAF50; color:#fff; }
+.dg-journey-arrow { color:#444; font-size:11px; }
+
+/* ═══════════════════════════════════
+   TAB 4: THE PLATFORM
+═══════════════════════════════════ */
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 8px;
+}
+.platform-card {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.platform-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--yellow);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .5s cubic-bezier(0.16,1,0.3,1);
+}
+.tab-panel.active .platform-card::before {
+  transform: scaleX(1);
+}
+.tab-panel.active .platform-card:nth-child(1)::before { transition-delay: .2s; }
+.tab-panel.active .platform-card:nth-child(2)::before { transition-delay: .3s; }
+.tab-panel.active .platform-card:nth-child(3)::before { transition-delay: .4s; }
+.tab-panel.active .platform-card:nth-child(4)::before { transition-delay: .5s; }
+
+.platform-card-icon {
+  width: 32px; height: 32px; margin-bottom: 16px;
+  color: var(--yellow);
+}
+.platform-card-icon svg { width: 100%; height: 100%; }
+
+.platform-card-stat {
+  font-size: 11px; color: var(--green); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+.platform-card-title {
+  font-size: 17px; font-weight: 700; color: var(--white);
+  margin-bottom: 10px; line-height: 1.3;
+}
+.platform-card-desc {
+  font-size: 13px; color: #888; line-height: 1.55;
+  margin-bottom: 16px;
+}
+
+/* Terminal mock inside platform card */
+.mini-term {
+  background: #000;
+  border: 1px solid #1C1C1C;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #888;
+}
+.mini-term .prompt { color: var(--green); }
+.mini-term .cmd { color: var(--white); }
+
+/* Flow steps */
+.flow-steps {
+  display: flex; gap: 4px; align-items: center;
+  flex-wrap: wrap;
+}
+.flow-step {
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 11px; font-weight: 600; color: #B8B8B8;
+}
+.flow-arrow {
+  color: var(--yellow); font-size: 14px;
+}
+
+/* Changelog feed */
+.changelog {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.changelog-item {
+  display: flex; gap: 12px; align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid #1A1A1A;
+}
+.changelog-week {
+  font-size: 11px; font-weight: 700; color: var(--yellow);
+  flex-shrink: 0; width: 60px;
+}
+.changelog-text {
+  font-size: 12px; color: #B8B8B8; line-height: 1.4;
+}
+
+/* ═══════════════════════════════════
+   TAB 5: SHIP IT
+═══════════════════════════════════ */
+.ship-options {
+  display: flex; gap: 16px;
+  margin-bottom: 40px;
+}
+.ship-option {
+  flex: 1;
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+}
+.ship-option-icon {
+  width: 36px; height: 36px;
+  margin: 0 auto 14px;
+  color: var(--yellow);
+}
+.ship-option-icon svg { width: 100%; height: 100%; }
+.ship-option-title {
+  font-size: 15px; font-weight: 700; color: var(--white);
+  margin-bottom: 6px;
+}
+.ship-option-desc {
+  font-size: 12px; color: #888; line-height: 1.45;
+}
+
+.ship-bottom {
+  display: flex; gap: 24px;
+  margin-top: 8px;
+}
+.ship-bottom-left { flex: 1; }
+.ship-bottom-right { flex: 1; }
+
+.ship-certs {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 12px;
+}
+.ship-cert {
+  background: #141414;
+  border: 1px solid #222;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 11px; font-weight: 600; color: #B8B8B8;
+  letter-spacing: 0.5px;
+}
+
+.ship-cost-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px; margin-top: 12px;
+}
+.ship-cost-table th {
+  text-align: left; padding: 10px 14px;
+  border-bottom: 2px solid #222;
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: 1.5px; font-weight: 600;
+}
+.ship-cost-table th:first-child { color: #888; }
+.ship-cost-table th:nth-child(2) { color: #666; }
+.ship-cost-table th:nth-child(3) { color: var(--yellow); }
+.ship-cost-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid #1A1A1A;
+}
+.ship-cost-table td:nth-child(2) { color: #666; }
+.ship-cost-table td:nth-child(3) { color: var(--green); font-weight: 600; }
+
+/* ═══════════════════════════════════
+   TAB 6: TRY IT YOURSELF
+═══════════════════════════════════ */
+.try-steps {
+  display: flex; flex-direction: column; gap: 0;
+  max-width: 800px;
+}
+.try-step {
+  display: flex; gap: 24px; align-items: flex-start;
+  padding: 24px 0;
+  border-bottom: 1px solid #1A1A1A;
+}
+.try-step:last-child { border-bottom: none; }
+
+.try-step-num {
+  font-size: 28px; font-weight: 700;
+  color: var(--yellow); letter-spacing: -0.04em;
+  line-height: 1; flex-shrink: 0; width: 40px;
+  padding-top: 2px;
+}
+.try-step-content { flex: 1; min-width: 0; }
+.try-step-title {
+  font-size: 17px; font-weight: 700; color: var(--white);
+  margin-bottom: 6px;
+}
+.try-step-desc {
+  font-size: 13px; color: #888; line-height: 1.55;
+  margin-bottom: 14px;
+}
+.try-step .mini-term {
+  margin-top: 0;
+}
+/* Step tabs (shared by step 1 and step 2) */
+.try-tool-content { display: none; }
+.try-tool-content.active { display: block; }
+
+/* Install method tabs */
+.try-os-tabs {
+  display: flex; gap: 4px; margin-bottom: 12px;
+}
+.try-os-tab {
+  padding: 6px 14px;
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 6px;
+  color: #888;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.try-os-tab:hover { border-color: #333; color: #ccc; }
+.try-os-tab.active {
+  background: #141414;
+  border-color: var(--yellow);
+  color: var(--white);
+}
+.try-os-content { display: none; }
+.try-os-content.active { display: block; }
+
+.try-step-alt {
+  font-size: 12px; color: #666; line-height: 1.5;
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid #1A1A1A;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="showcase">
+
+  <!-- ── Left Navigation ── -->
+  <nav class="nav">
+    <div class="nav-header">
+      <svg class="nav-logo" width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#n)">
+          <path d="M72.158 0 63.105 10.133V0h-6.199v24.98h6.199V14.847l9.053 10.133h8.277L69.277 12.49 80.435 0h-8.277Z" fill="#fff"/>
+          <path d="m13.78 8.287 3.485 8.123h-6.968l3.485-8.123h-.002ZM11.336.062 0 25h6.552l1.561-3.436h11.336L21.113 25h6.45L16.275.062h-4.94Z" fill="#fff"/>
+          <path d="m95.22 8.287 3.484 8.123h-6.968l3.485-8.123h-.001ZM92.775.062 81.44 25h6.551l1.561-3.436h11.336L102.552 25H109L97.715.062h-4.94Z" fill="#fff"/>
+          <path d="M45.283.062 36.246 10.179V.062H30.057V25h6.189V14.883l9.037 10.117h8.264L42.408 12.53 53.547.062h-8.264Z" fill="#fff"/>
+        </g>
+        <defs><clipPath id="n"><rect width="109" height="25" fill="#fff"/></clipPath></defs>
+      </svg>
+      <div class="nav-title">Demo Showcase</div>
+    </div>
+
+    <div class="nav-tab active" data-tab="0">
+      <div class="nav-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="nav-tab-label">The Brief</div>
+      <div class="nav-tab-num">01</div>
+    </div>
+
+    <div class="nav-tab" data-tab="1">
+      <div class="nav-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+      <div class="nav-tab-label">The App</div>
+      <div class="nav-tab-num">02</div>
+    </div>
+
+    <div class="nav-tab" data-tab="2">
+      <div class="nav-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+      <div class="nav-tab-label">The Architecture</div>
+      <div class="nav-tab-num">03</div>
+    </div>
+
+    <div class="nav-tab" data-tab="3">
+      <div class="nav-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/></svg></div>
+      <div class="nav-tab-label">The Platform</div>
+      <div class="nav-tab-num">04</div>
+    </div>
+
+    <div class="nav-tab" data-tab="4">
+      <div class="nav-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+      <div class="nav-tab-label">Ship It</div>
+      <div class="nav-tab-num">05</div>
+    </div>
+
+    <div class="nav-tab" data-tab="5">
+      <div class="nav-tab-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+      <div class="nav-tab-label">Try It Yourself</div>
+      <div class="nav-tab-num">06</div>
+    </div>
+
+    <div class="nav-footer">
+      <div class="nav-footer-text">Built with Akka Specify<br>Keys 1-6 to navigate</div>
+    </div>
+  </nav>
+
+  <!-- ── Content Area ── -->
+  <div class="content">
+
+    <!-- TAB 1: THE BRIEF -->
+    <div class="tab-panel active" data-panel="0">
+      <div class="tab-eyebrow reveal">The Brief</div>
+      <div class="tab-headline reveal">Social Proofing <span class="accent">Agent</span></div>
+      <div class="tab-desc reveal">An e-commerce retailer needed AI-powered social proof messages on product pages — "Only 3 left!" or "Bought 12 times in the last hour" — generated intelligently from real-time view counts, order signals, and inventory levels, with sub-10ms cached reads at scale.</div>
+
+      <div class="reveal">
+        <ul class="brief-reqs">
+          <li>Ingest pre-aggregated view counts and order events from external analytics</li>
+          <li>AI agent selects optimal strategy (URGENCY, VALIDATION, SCARCITY, TRENDING) based on signals</li>
+          <li>Generate natural, category-aware copy under 60 characters</li>
+          <li>Cache messages in entity state — zero LLM calls on the read path</li>
+          <li>Real-time SSE streaming for live UI updates</li>
+          <li>Suppress messages when activity falls below threshold</li>
+        </ul>
+      </div>
+
+      <div class="brief-bar reveal">
+        <div class="brief-bar-item">
+          <div class="brief-bar-num">35m</div>
+          <div class="brief-bar-text">Spec to<br>system</div>
+        </div>
+        <div class="brief-bar-item">
+          <div class="brief-bar-num">1</div>
+          <div class="brief-bar-text">Engineer</div>
+        </div>
+        <div class="brief-bar-item">
+          <div class="brief-bar-num">1,800</div>
+          <div class="brief-bar-text">LOC</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: THE APP -->
+    <div class="tab-panel" data-panel="1">
+      <div class="tab-eyebrow reveal">The App</div>
+      <div class="tab-headline reveal">A complete <span class="accent">social proofing system</span></div>
+      <div class="tab-desc reveal">Fully functional from first run — ingestion APIs, AI agent pipeline, cached entity reads, SSE streaming, and a live demo UI. Not a scaffold. Not a prototype. A system.</div>
+
+      <div class="app-frame reveal">
+        <div class="app-chrome">
+          <div class="app-url">http://localhost:9000</div>
+        </div>
+        <div class="app-body">
+          <div class="app-placeholder">
+            <div class="app-placeholder-icon">
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="app-placeholder-text">Live application screenshot or iframe</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-stats reveal">
+        <div class="app-stat"><div class="app-stat-num">8</div><div class="app-stat-label">API endpoints</div></div>
+        <div class="app-stat"><div class="app-stat-num">1</div><div class="app-stat-label">Entity</div></div>
+        <div class="app-stat"><div class="app-stat-num">5</div><div class="app-stat-label">Event types</div></div>
+        <div class="app-stat"><div class="app-stat-num">1</div><div class="app-stat-label">Agent</div></div>
+        <div class="app-stat"><div class="app-stat-num">1</div><div class="app-stat-label">View</div></div>
+        <div class="app-stat"><div class="app-stat-num">1,800</div><div class="app-stat-label">Lines generated</div></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: THE ARCHITECTURE — Expandable Table -->
+    <div class="tab-panel" data-panel="2">
+      <div class="tab-eyebrow reveal">The Architecture</div>
+      <div class="tab-headline reveal">What Specify <span class="accent">actually built</span></div>
+
+      <div class="arch-layout reveal">
+        <!-- Summary stats -->
+        <div class="arch-summary" id="archSummary">
+          <div class="arch-summary-grid">
+            <div class="arch-summary-stat"><div class="arch-summary-num">15</div><div class="arch-summary-label">Components</div></div>
+            <div class="arch-summary-stat"><div class="arch-summary-num">5</div><div class="arch-summary-label">Event Types</div></div>
+            <div class="arch-summary-stat"><div class="arch-summary-num">8</div><div class="arch-summary-label">API Endpoints</div></div>
+            <div class="arch-summary-stat"><div class="arch-summary-num">5</div><div class="arch-summary-label">Design Views</div></div>
+            <div class="arch-summary-stat"><div class="arch-summary-num">1</div><div class="arch-summary-label">Agent</div></div>
+            <div class="arch-summary-stat"><div class="arch-summary-num">1,800</div><div class="arch-summary-label">LOC</div></div>
+          </div>
+          <div class="arch-summary-hint">Click any component row to view its source code</div>
+        </div>
+
+        <!-- Expandable component table -->
+        <div class="comp-table">
+
+          <!-- Design Views -->
+          <div class="comp-group-header"><span class="dot" style="background:#4EC9B0"></span><span class="comp-group-count">(5)</span><span style="color:#4EC9B0">Design Views</span></div>
+
+          <div class="comp-row" data-comp="dv-journey">
+            <span class="comp-row-dot" style="background:#4EC9B0"></span>
+            <span class="comp-row-name">User Journey</span>
+            <span class="comp-row-type">Diagram</span>
+            <span class="comp-row-desc">End-to-end product page visitor flow</span>
+          </div>
+          <div class="comp-detail" data-detail="dv-journey">
+            <div class="comp-detail-desc">Maps features by priority phase — P1 core signal ingestion and display, P2 AI and simulation, P3 demo UI.</div>
+            <div class="comp-detail-diagram">
+              <div class="dg-journey-nodes">
+                <div class="dg-journey-row"><span class="dg-journey-node dg-journey-p1">P1: Ingest View Counts</span><span class="dg-journey-arrow">→</span><span class="dg-journey-node dg-journey-p1">P1: View Social Proof</span></div>
+                <div class="dg-journey-row"><span class="dg-journey-node dg-journey-p1">P1: Ingest Order Events</span><span class="dg-journey-arrow">→</span><span class="dg-journey-node dg-journey-p1">P1: View Social Proof</span></div>
+                <div class="dg-journey-row"><span class="dg-journey-node dg-journey-p2">P2: AI Strategy Selection</span><span class="dg-journey-arrow">→</span><span class="dg-journey-node dg-journey-p1">P1: View Social Proof</span></div>
+                <div class="dg-journey-row"><span class="dg-journey-node dg-journey-p2">P2: Traffic Simulator</span><span class="dg-journey-arrow">→</span><span style="font-size:10px;color:#888">feeds ingestion endpoints</span></div>
+                <div class="dg-journey-row"><span class="dg-journey-node dg-journey-p2">P2: Multi-Region</span><span class="dg-journey-arrow">→</span><span style="font-size:10px;color:#888">replicates social proof</span></div>
+                <div class="dg-journey-row"><span class="dg-journey-node dg-journey-p3">P3: Demo Web UI</span><span class="dg-journey-arrow">→</span><span style="font-size:10px;color:#888">displays social proof</span></div>
+              </div>
+              <div class="dg-legend" style="margin-top:12px"><div class="dg-legend-item"><div class="dg-legend-bar" style="background:#2196F3"></div>P1 Core</div><div class="dg-legend-item"><div class="dg-legend-bar" style="background:#FF9800"></div>P2 Enhanced</div><div class="dg-legend-item"><div class="dg-legend-bar" style="background:#4CAF50"></div>P3 Demo</div></div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="dv-actorgoal">
+            <span class="comp-row-dot" style="background:#4EC9B0"></span>
+            <span class="comp-row-name">Actor-Goal</span>
+            <span class="comp-row-type">Diagram</span>
+            <span class="comp-row-desc">Actors and their system goals</span>
+          </div>
+          <div class="comp-detail" data-detail="dv-actorgoal">
+            <div class="comp-detail-desc">Maps actors to their goals and the system components that fulfill them.</div>
+            <div class="comp-detail-diagram">
+              <table class="dg-ag-table">
+                <thead><tr><th>Actor</th><th>Goal</th><th>Components</th><th>External</th></tr></thead>
+                <tbody>
+                  <tr><td>Customer</td><td>See social proof on product page</td><td>SocialProofEndpoint → ProductEntity</td><td>—</td></tr>
+                  <tr><td>Demo Presenter</td><td>Browse product grid with live updates</td><td>SocialProofView → DemoUIEndpoint</td><td>—</td></tr>
+                  <tr><td>Demo Presenter</td><td>Populate demo with synthetic traffic</td><td>IngestionEndpoint → ProductEntity</td><td>—</td></tr>
+                  <tr><td>(Analytics)</td><td>Ingest pre-aggregated view counts</td><td>IngestionEndpoint → ProductEntity</td><td>Analytics Platform</td></tr>
+                  <tr><td>(System)</td><td>AI selects strategy, generates copy</td><td>Consumer → SocialProofAgent</td><td>LLM Provider</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="dv-entitymap">
+            <span class="comp-row-dot" style="background:#4EC9B0"></span>
+            <span class="comp-row-name">Entity Map</span>
+            <span class="comp-row-type">Diagram</span>
+            <span class="comp-row-desc">Domain entity relationships</span>
+          </div>
+          <div class="comp-detail" data-detail="dv-entitymap">
+            <div class="comp-detail-desc">Domain entity relationships and state composition.</div>
+            <div class="comp-detail-diagram">
+              <div class="dg-entity-row">
+                <div class="dg-node dg-node-ese"><div class="dg-node-type">Event Sourced</div><div class="dg-node-name">Product</div></div>
+                <span class="dg-entity-arrow">→</span>
+                <span class="dg-entity-label">accumulates signals, produces</span>
+                <span class="dg-entity-arrow">→</span>
+                <div class="dg-node" style="background:#1A0A00;border:1px solid #FF9800"><div class="dg-node-type" style="color:#FF9800">Value Object</div><div class="dg-node-name">CachedSocialProof</div></div>
+              </div>
+              <div class="dg-entity-row">
+                <div class="dg-node" style="background:#0A1A0A;border:1px solid #4CAF50"><div class="dg-node-type" style="color:#4CAF50">Config</div><div class="dg-node-name">DemoProductCatalog</div></div>
+                <span class="dg-entity-arrow">→</span>
+                <span class="dg-entity-label">defines</span>
+                <span class="dg-entity-arrow">→</span>
+                <div class="dg-node dg-node-ese"><div class="dg-node-type">Event Sourced</div><div class="dg-node-name">Product</div></div>
+              </div>
+              <div style="margin-top:12px;padding-top:8px;border-top:1px solid #1C1C1C;font-size:10px;color:#666">ProductState contains: productId, name, category, stockLevel, current/previous view+order counts, CachedSocialProof, lastAggregatedAt, idempotency keys (~920 bytes per product)</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="dv-compgraph">
+            <span class="comp-row-dot" style="background:#4EC9B0"></span>
+            <span class="comp-row-name">Component Graph</span>
+            <span class="comp-row-type">Diagram</span>
+            <span class="comp-row-desc">Full component dependency graph</span>
+          </div>
+          <div class="comp-detail" data-detail="dv-compgraph">
+            <div class="comp-detail-desc">Full component dependency graph with numbered interaction steps.</div>
+            <div class="comp-detail-diagram">
+              <div class="dg-layer"><div class="dg-layer-label">External / Out of Scope</div><div class="dg-layer-nodes"><div class="dg-node dg-node-ext"><div class="dg-node-type">Simulation</div><div class="dg-node-name">Gatling</div></div><div class="dg-node dg-node-ext"><div class="dg-node-type">AI Provider</div><div class="dg-node-name">LLM Provider</div></div><div class="dg-node dg-node-ext"><div class="dg-node-type">Client</div><div class="dg-node-name">Browser</div></div></div></div>
+              <div class="dg-connections"><div class="dg-conn-group ingest"><div class="dg-conn-step">①②</div><div class="dg-conn-from">Gatling</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">PUT /products</div><div class="dg-conn-to">ProductEndpoint</div></div><div class="dg-conn-branch"><div class="dg-conn-action">POST /ingestion</div><div class="dg-conn-to">IngestionEndpoint</div></div></div></div></div>
+              <div class="dg-layer"><div class="dg-layer-label">API Layer</div><div class="dg-layer-nodes"><div class="dg-node dg-node-ep"><div class="dg-node-type">Endpoint</div><div class="dg-node-name">ProductEP</div></div><div class="dg-node dg-node-ep"><div class="dg-node-type">Endpoint</div><div class="dg-node-name">IngestionEP</div></div><div class="dg-node dg-node-ep"><div class="dg-node-type">Endpoint</div><div class="dg-node-name">SocialProofEP</div></div><div class="dg-node dg-node-ep"><div class="dg-node-type">Endpoint</div><div class="dg-node-name">DemoUIEP</div></div></div></div>
+              <div class="dg-connections"><div class="dg-conn-group ingest"><div class="dg-conn-step">③</div><div class="dg-conn-from">ProductEP</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">updateProduct</div><div class="dg-conn-to">ProductEntity</div></div></div></div><div class="dg-conn-group ingest"><div class="dg-conn-step">④</div><div class="dg-conn-from">IngestionEP</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">recordViews / recordOrder</div><div class="dg-conn-to">ProductEntity</div></div></div></div></div>
+              <div class="dg-layer"><div class="dg-layer-label">Application Layer</div><div class="dg-layer-nodes"><div class="dg-node dg-node-ese"><div class="dg-node-type">Event Sourced</div><div class="dg-node-name">ProductEntity</div></div><div class="dg-node dg-node-consumer"><div class="dg-node-type">Consumer</div><div class="dg-node-name">SocialProofConsumer</div></div><div class="dg-node dg-node-agent"><div class="dg-node-type">Agent</div><div class="dg-node-name">SocialProofAgent</div></div><div class="dg-node dg-node-view"><div class="dg-node-type">View</div><div class="dg-node-name">SocialProofView</div></div></div></div>
+              <div class="dg-connections"><div class="dg-conn-group process"><div class="dg-conn-step">⑤</div><div class="dg-conn-from">ProductEntity</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">events</div><div class="dg-conn-to">SocialProofConsumer</div></div><div class="dg-conn-branch"><div class="dg-conn-action">events</div><div class="dg-conn-to">SocialProofView</div></div></div></div><div class="dg-conn-group process"><div class="dg-conn-step">⑥</div><div class="dg-conn-from">Consumer</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">generateMessage</div><div class="dg-conn-to">SocialProofAgent</div></div></div></div><div class="dg-conn-group process"><div class="dg-conn-step">⑦⑧</div><div class="dg-conn-from">Agent</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">getProductDetails</div><div class="dg-conn-to">ProductEntity</div></div><div class="dg-conn-branch"><div class="dg-conn-action">prompt + signals</div><div class="dg-conn-to">LLM Provider</div></div></div></div><div class="dg-conn-group process"><div class="dg-conn-step">⑨</div><div class="dg-conn-from">Consumer</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">cacheSocialProof</div><div class="dg-conn-to">ProductEntity</div></div></div></div></div>
+              <div class="dg-connections"><div class="dg-conn-group deliver"><div class="dg-conn-step">⑩</div><div class="dg-conn-from">Browser</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">GET /social-proof</div><div class="dg-conn-to">SocialProofEP</div></div><div class="dg-conn-branch"><div class="dg-conn-action">GET /</div><div class="dg-conn-to">DemoUIEP</div></div></div></div><div class="dg-conn-group deliver"><div class="dg-conn-step">⑪</div><div class="dg-conn-from">SocialProofEP</div><div class="dg-conn-tree"><div class="dg-conn-branch"><div class="dg-conn-action">getSocialProof</div><div class="dg-conn-to">ProductEntity</div></div><div class="dg-conn-branch"><div class="dg-conn-action">list + stream</div><div class="dg-conn-to">SocialProofView</div></div></div></div></div>
+              <div class="dg-legend"><div class="dg-legend-item"><div class="dg-legend-bar" style="background:#2196F3"></div>Ingestion</div><div class="dg-legend-item"><div class="dg-legend-bar" style="background:#FF9800"></div>Processing</div><div class="dg-legend-item"><div class="dg-legend-bar" style="background:#4CAF50"></div>Delivery</div></div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="dv-sequence">
+            <span class="comp-row-dot" style="background:#4EC9B0"></span>
+            <span class="comp-row-name">Sequence</span>
+            <span class="comp-row-type">Diagram</span>
+            <span class="comp-row-desc">Runtime message flow for signal processing</span>
+          </div>
+          <div class="comp-detail" data-detail="dv-sequence">
+            <div class="comp-detail-desc">Runtime message flow — ingestion, aggregation, agent processing, caching, and cached reads.</div>
+            <div class="comp-detail-diagram">
+              <div id="seqDiagram" class="seq-diagram"></div>
+            </div>
+          </div>
+
+          <!-- Domain Objects -->
+          <div class="comp-group-header"><span class="dot" style="background:#82AAFF"></span><span class="comp-group-count">(6)</span><span style="color:#82AAFF">Domain Objects</span></div>
+
+          <div class="comp-row" data-comp="do-strategy">
+            <span class="comp-row-dot" style="background:#82AAFF"></span>
+            <span class="comp-row-name">Strategy</span>
+            <span class="comp-row-type">Enum</span>
+            <span class="comp-row-desc">Social proof strategy types</span>
+          </div>
+          <div class="comp-detail" data-detail="do-strategy">
+            <div class="comp-detail-desc">Defines the four social proof strategies the agent can select based on real-time product signals.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">Strategy.java</div>
+              <div class="comp-detail-code-body"><span class="cm">// Agent selects one strategy per evaluation cycle</span>
+<span class="kw">public enum</span> <span class="ty">Strategy</span> {
+  <span class="cm">/** Low inventory — "Only 3 left in stock!" */</span>
+  SCARCITY,
+  <span class="cm">/** High recent orders — "Bought 47 times today" */</span>
+  VALIDATION,
+  <span class="cm">/** Rapid velocity increase — "Trending now!" */</span>
+  TRENDING,
+  <span class="cm">/** Time-limited signal — "Selling fast, don't miss out" */</span>
+  URGENCY
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="do-trend">
+            <span class="comp-row-dot" style="background:#82AAFF"></span>
+            <span class="comp-row-name">TrendDirection</span>
+            <span class="comp-row-type">Enum</span>
+            <span class="comp-row-desc">Signal velocity direction</span>
+          </div>
+          <div class="comp-detail" data-detail="do-trend">
+            <div class="comp-detail-desc">Indicates whether product activity is accelerating, stable, or declining. Used by the agent to decide if a TRENDING strategy is appropriate.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">TrendDirection.java</div>
+              <div class="comp-detail-code-body"><span class="kw">public enum</span> <span class="ty">TrendDirection</span> {
+  RISING,
+  STABLE,
+  FALLING
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="do-signals">
+            <span class="comp-row-dot" style="background:#82AAFF"></span>
+            <span class="comp-row-name">ProductSignals</span>
+            <span class="comp-row-type">Record</span>
+            <span class="comp-row-desc">Aggregated activity signals per product</span>
+          </div>
+          <div class="comp-detail" data-detail="do-signals">
+            <div class="comp-detail-desc">Pre-aggregated metrics from external analytics. The agent uses these signals to pick a strategy and generate contextual copy.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">ProductSignals.java</div>
+              <div class="comp-detail-code-body"><span class="kw">public record</span> <span class="ty">ProductSignals</span>(
+    <span class="ty">int</span> viewsLastHour,
+    <span class="ty">int</span> ordersLastHour,
+    <span class="ty">int</span> inventoryRemaining,
+    <span class="ty">TrendDirection</span> trend,
+    <span class="ty">String</span> category,
+    <span class="ty">Instant</span> collectedAt
+) {
+  <span class="kw">public boolean</span> <span class="fn">meetsThreshold</span>() {
+    <span class="kw">return</span> viewsLastHour &gt; <span class="num">5</span>
+        || ordersLastHour &gt; <span class="num">0</span>;
+  }
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="do-state">
+            <span class="comp-row-dot" style="background:#82AAFF"></span>
+            <span class="comp-row-name">ProductState</span>
+            <span class="comp-row-type">Record</span>
+            <span class="comp-row-desc">Entity state with cached social proof</span>
+          </div>
+          <div class="comp-detail" data-detail="do-state">
+            <div class="comp-detail-desc">The entity's persisted state. Holds the latest signals and the cached social proof message, enabling zero-LLM reads.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">ProductState.java</div>
+              <div class="comp-detail-code-body"><span class="kw">public record</span> <span class="ty">ProductState</span>(
+    <span class="ty">String</span> productId,
+    <span class="ty">ProductSignals</span> latestSignals,
+    <span class="ty">CachedSocialProof</span> cachedProof,
+    <span class="ty">Instant</span> lastUpdated
+) {
+  <span class="kw">public static</span> <span class="ty">ProductState</span> <span class="fn">empty</span>(<span class="ty">String</span> id) {
+    <span class="kw">return new</span> <span class="ty">ProductState</span>(id, <span class="kw">null</span>,
+        <span class="kw">null</span>, <span class="ty">Instant</span>.EPOCH);
+  }
+
+  <span class="kw">public boolean</span> <span class="fn">hasActiveProof</span>() {
+    <span class="kw">return</span> cachedProof != <span class="kw">null</span>
+        &amp;&amp; !cachedProof.isExpired();
+  }
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="do-event">
+            <span class="comp-row-dot" style="background:#82AAFF"></span>
+            <span class="comp-row-name">ProductEvent</span>
+            <span class="comp-row-type">Sealed Interface</span>
+            <span class="comp-row-desc">5 event types for product lifecycle</span>
+          </div>
+          <div class="comp-detail" data-detail="do-event">
+            <div class="comp-detail-desc">Sealed event hierarchy ensures compiler-enforced exhaustive handling across all consumers and event handlers.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">ProductEvent.java</div>
+              <div class="comp-detail-code-body"><span class="kw">public sealed interface</span> <span class="ty">ProductEvent</span> {
+
+  <span class="kw">record</span> <span class="ty">SignalsAggregated</span>(
+      <span class="ty">ProductSignals</span> signals
+  ) <span class="kw">implements</span> <span class="ty">ProductEvent</span> {}
+
+  <span class="kw">record</span> <span class="ty">ProofGenerated</span>(
+      <span class="ty">Strategy</span> strategy,
+      <span class="ty">String</span> message,
+      <span class="ty">Instant</span> generatedAt
+  ) <span class="kw">implements</span> <span class="ty">ProductEvent</span> {}
+
+  <span class="kw">record</span> <span class="ty">ProofCached</span>(
+      <span class="ty">CachedSocialProof</span> proof
+  ) <span class="kw">implements</span> <span class="ty">ProductEvent</span> {}
+
+  <span class="kw">record</span> <span class="ty">ProofSuppressed</span>(
+      <span class="ty">String</span> reason
+  ) <span class="kw">implements</span> <span class="ty">ProductEvent</span> {}
+
+  <span class="kw">record</span> <span class="ty">ProofExpired</span>(
+      <span class="ty">String</span> productId
+  ) <span class="kw">implements</span> <span class="ty">ProductEvent</span> {}
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="do-cached">
+            <span class="comp-row-dot" style="background:#82AAFF"></span>
+            <span class="comp-row-name">CachedSocialProof</span>
+            <span class="comp-row-type">Record</span>
+            <span class="comp-row-desc">Cached message with TTL and strategy</span>
+          </div>
+          <div class="comp-detail" data-detail="do-cached">
+            <div class="comp-detail-desc">The generated social proof message stored in entity state. Includes the strategy used, the copy text, and expiration for automatic refresh.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">CachedSocialProof.java</div>
+              <div class="comp-detail-code-body"><span class="kw">public record</span> <span class="ty">CachedSocialProof</span>(
+    <span class="ty">Strategy</span> strategy,
+    <span class="ty">String</span> message,
+    <span class="ty">Instant</span> generatedAt,
+    <span class="ty">Instant</span> expiresAt
+) {
+  <span class="kw">public boolean</span> <span class="fn">isExpired</span>() {
+    <span class="kw">return</span> <span class="ty">Instant</span>.now().isAfter(expiresAt);
+  }
+
+  <span class="kw">public static</span> <span class="ty">CachedSocialProof</span> <span class="fn">create</span>(
+      <span class="ty">Strategy</span> s, <span class="ty">String</span> msg,
+      <span class="ty">Duration</span> ttl) {
+    <span class="kw">var</span> now = <span class="ty">Instant</span>.now();
+    <span class="kw">return new</span> <span class="ty">CachedSocialProof</span>(
+        s, msg, now, now.plus(ttl));
+  }
+}</div>
+            </div>
+          </div>
+
+          <!-- Event Sourced Entities -->
+          <div class="comp-group-header"><span class="dot" style="background:var(--yellow)"></span><span class="comp-group-count">(1)</span><span style="color:var(--yellow)">Event Sourced Entities</span></div>
+
+          <div class="comp-row" data-comp="ese-product">
+            <span class="comp-row-dot" style="background:var(--yellow)"></span>
+            <span class="comp-row-name">ProductEntity</span>
+            <span class="comp-row-type">ESE</span>
+            <span class="comp-row-desc">5 events, 6 commands</span>
+          </div>
+          <div class="comp-detail" data-detail="ese-product">
+            <div class="comp-detail-desc">Core entity keyed by productId. Ingests aggregated signals, stores cached social proof messages, and serves reads with zero LLM calls. Full audit trail of every signal and proof generation.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">ProductEntity.java</div>
+              <div class="comp-detail-code-body"><span class="an">@ComponentId</span>(<span class="st">"product"</span>)
+<span class="kw">public class</span> <span class="ty">ProductEntity</span>
+    <span class="kw">extends</span> <span class="ty">EventSourcedEntity</span>&lt;<span class="ty">ProductState</span>, <span class="ty">ProductEvent</span>&gt; {
+
+  <span class="an">@CommandHandler</span>
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">String</span>&gt; <span class="fn">aggregateSignals</span>(
+      <span class="ty">ProductSignals</span> signals) {
+    <span class="kw">return</span> effects()
+        .persistEvent(<span class="kw">new</span> <span class="ty">SignalsAggregated</span>(signals))
+        .thenReply(__ -&gt; <span class="st">"OK"</span>);
+  }
+
+  <span class="an">@CommandHandler</span>
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">String</span>&gt; <span class="fn">cacheProof</span>(
+      <span class="ty">CachedSocialProof</span> proof) {
+    <span class="kw">return</span> effects()
+        .persistEvent(<span class="kw">new</span> <span class="ty">ProofCached</span>(proof))
+        .thenReply(__ -&gt; <span class="st">"OK"</span>);
+  }
+
+  <span class="an">@CommandHandler</span>
+  <span class="kw">public readonly</span> <span class="ty">Effect</span>&lt;<span class="ty">CachedSocialProof</span>&gt; <span class="fn">getProof</span>() {
+    <span class="kw">var</span> state = currentState();
+    <span class="kw">if</span> (state.hasActiveProof())
+      <span class="kw">return</span> effects().reply(state.cachedProof());
+    <span class="kw">return</span> effects().error(<span class="st">"No active proof"</span>);
+  }
+
+  <span class="an">@EventHandler</span>
+  <span class="kw">public</span> <span class="ty">ProductState</span> <span class="fn">onSignalsAggregated</span>(
+      <span class="ty">SignalsAggregated</span> evt) {
+    <span class="kw">return new</span> <span class="ty">ProductState</span>(
+        commandContext().entityId(),
+        evt.signals(), currentState().cachedProof(),
+        <span class="ty">Instant</span>.now());
+  }
+
+  <span class="an">@EventHandler</span>
+  <span class="kw">public</span> <span class="ty">ProductState</span> <span class="fn">onProofCached</span>(
+      <span class="ty">ProofCached</span> evt) {
+    <span class="kw">return new</span> <span class="ty">ProductState</span>(
+        currentState().productId(),
+        currentState().latestSignals(),
+        evt.proof(), <span class="ty">Instant</span>.now());
+  }
+}</div>
+            </div>
+          </div>
+
+          <!-- Agents -->
+          <div class="comp-group-header"><span class="dot" style="background:#E879F9"></span><span class="comp-group-count">(1)</span><span style="color:#E879F9">Agents</span></div>
+
+          <div class="comp-row" data-comp="agent-proof">
+            <span class="comp-row-dot" style="background:#E879F9"></span>
+            <span class="comp-row-name">SocialProofAgent</span>
+            <span class="comp-row-type">Agent</span>
+            <span class="comp-row-desc">Strategy selection + copy generation</span>
+          </div>
+          <div class="comp-detail" data-detail="agent-proof">
+            <div class="comp-detail-desc">AI agent that evaluates product signals, selects the optimal social proof strategy (URGENCY, VALIDATION, SCARCITY, TRENDING), and generates natural category-aware copy under 60 characters. Only invoked on signal changes — never on reads.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">SocialProofAgent.java</div>
+              <div class="comp-detail-code-body"><span class="an">@ComponentId</span>(<span class="st">"social-proof-agent"</span>)
+<span class="kw">public class</span> <span class="ty">SocialProofAgent</span> <span class="kw">extends</span> <span class="ty">Agent</span> {
+
+  <span class="kw">private final</span> <span class="ty">ComponentClient</span> client;
+
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">CachedSocialProof</span>&gt; <span class="fn">evaluate</span>(
+      <span class="ty">String</span> productId,
+      <span class="ty">ProductSignals</span> signals) {
+
+    <span class="kw">if</span> (!signals.meetsThreshold()) {
+      <span class="kw">return</span> effects().reply(<span class="kw">null</span>);
+    }
+
+    <span class="kw">var</span> strategy = <span class="fn">selectStrategy</span>(signals);
+    <span class="kw">var</span> prompt = <span class="fn">buildPrompt</span>(
+        strategy, signals);
+
+    <span class="kw">return</span> effects()
+        .asyncCall(() -&gt; llm().generate(prompt))
+        .thenApply(copy -&gt; {
+          <span class="kw">var</span> proof = <span class="ty">CachedSocialProof</span>
+              .create(strategy, copy,
+                  <span class="ty">Duration</span>.ofMinutes(<span class="num">15</span>));
+          client.forEventSourcedEntity(productId)
+              .method(<span class="ty">ProductEntity</span>::cacheProof)
+              .invokeAsync(proof);
+          <span class="kw">return</span> proof;
+        });
+  }
+
+  <span class="kw">private</span> <span class="ty">Strategy</span> <span class="fn">selectStrategy</span>(
+      <span class="ty">ProductSignals</span> s) {
+    <span class="kw">if</span> (s.inventoryRemaining() &lt; <span class="num">5</span>)
+      <span class="kw">return</span> <span class="ty">Strategy</span>.SCARCITY;
+    <span class="kw">if</span> (s.trend() == RISING)
+      <span class="kw">return</span> <span class="ty">Strategy</span>.TRENDING;
+    <span class="kw">if</span> (s.ordersLastHour() &gt; <span class="num">20</span>)
+      <span class="kw">return</span> <span class="ty">Strategy</span>.VALIDATION;
+    <span class="kw">return</span> <span class="ty">Strategy</span>.URGENCY;
+  }
+}</div>
+            </div>
+          </div>
+
+          <!-- Consumers -->
+          <div class="comp-group-header"><span class="dot" style="background:var(--orange)"></span><span class="comp-group-count">(1)</span><span style="color:var(--orange)">Consumers</span></div>
+
+          <div class="comp-row" data-comp="cons-proof">
+            <span class="comp-row-dot" style="background:var(--orange)"></span>
+            <span class="comp-row-name">SocialProofConsumer</span>
+            <span class="comp-row-type">Consumer</span>
+            <span class="comp-row-desc">Reacts to SignalsAggregated</span>
+          </div>
+          <div class="comp-detail" data-detail="cons-proof">
+            <div class="comp-detail-desc">Listens for SignalsAggregated events from ProductEntity and invokes the SocialProofAgent to evaluate signals and generate new social proof copy. Bridges the event stream to the AI pipeline.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">SocialProofConsumer.java</div>
+              <div class="comp-detail-code-body"><span class="an">@ComponentId</span>(<span class="st">"social-proof-consumer"</span>)
+<span class="kw">public class</span> <span class="ty">SocialProofConsumer</span>
+    <span class="kw">extends</span> <span class="ty">Consumer</span> {
+
+  <span class="kw">private final</span> <span class="ty">ComponentClient</span> client;
+
+  <span class="an">@Consume.FromEventSourcedEntity</span>(
+      <span class="ty">ProductEntity</span>.class)
+  <span class="kw">public</span> <span class="ty">Effect</span> <span class="fn">onSignalsAggregated</span>(
+      <span class="ty">ProductEvent.SignalsAggregated</span> evt) {
+
+    <span class="kw">var</span> productId =
+        messageContext().eventSubject().get();
+
+    <span class="kw">return</span> effects().asyncEffect(
+        client.forAgent()
+            .method(<span class="ty">SocialProofAgent</span>::evaluate)
+            .invokeAsync(productId, evt.signals())
+            .thenApply(__ -&gt; effects().done()));
+  }
+}</div>
+            </div>
+          </div>
+
+          <!-- Views -->
+          <div class="comp-group-header"><span class="dot" style="background:var(--purple)"></span><span class="comp-group-count">(1)</span><span style="color:var(--purple)">Views</span></div>
+
+          <div class="comp-row" data-comp="view-proof">
+            <span class="comp-row-dot" style="background:var(--purple)"></span>
+            <span class="comp-row-name">SocialProofView</span>
+            <span class="comp-row-type">View</span>
+            <span class="comp-row-desc">Projections + SSE streaming</span>
+          </div>
+          <div class="comp-detail" data-detail="view-proof">
+            <div class="comp-detail-desc">Read-optimized projection that consumes ProofCached events and serves them via SSE for real-time UI updates. Supports query by productId and category-level aggregations.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">SocialProofView.java</div>
+              <div class="comp-detail-code-body"><span class="an">@ComponentId</span>(<span class="st">"social-proof-view"</span>)
+<span class="kw">public class</span> <span class="ty">SocialProofView</span>
+    <span class="kw">extends</span> <span class="ty">View</span> {
+
+  <span class="kw">public record</span> <span class="ty">ProofRow</span>(
+      <span class="ty">String</span> productId,
+      <span class="ty">String</span> message,
+      <span class="ty">Strategy</span> strategy,
+      <span class="ty">Instant</span> generatedAt,
+      <span class="ty">Instant</span> expiresAt
+  ) {}
+
+  <span class="an">@Consume.FromEventSourcedEntity</span>(
+      <span class="ty">ProductEntity</span>.class)
+  <span class="kw">public</span> <span class="ty">UpdateEffect</span>&lt;<span class="ty">ProofRow</span>&gt; <span class="fn">onProofCached</span>(
+      <span class="ty">ProductEvent.ProofCached</span> evt) {
+    <span class="kw">var</span> p = evt.proof();
+    <span class="kw">return</span> effects().updateRow(
+        <span class="kw">new</span> <span class="ty">ProofRow</span>(
+            updateContext().eventSubject().get(),
+            p.message(), p.strategy(),
+            p.generatedAt(), p.expiresAt()));
+  }
+
+  <span class="an">@Query</span>(<span class="st">"SELECT * FROM social_proofs WHERE productId = :id"</span>)
+  <span class="kw">public</span> <span class="ty">QueryEffect</span>&lt;<span class="ty">ProofRow</span>&gt; <span class="fn">getByProduct</span>(
+      <span class="ty">String</span> id) {
+    <span class="kw">return</span> queryResult();
+  }
+}</div>
+            </div>
+          </div>
+
+          <!-- Endpoints -->
+          <div class="comp-group-header"><span class="dot" style="background:var(--white)"></span><span class="comp-group-count">(4)</span><span style="color:var(--white)">Endpoints</span></div>
+
+          <div class="comp-row" data-comp="ep-demo">
+            <span class="comp-row-dot" style="background:var(--white)"></span>
+            <span class="comp-row-name">DemoUIEndpoint</span>
+            <span class="comp-row-type">Endpoint</span>
+            <span class="comp-row-desc">Serves the live demo HTML page</span>
+          </div>
+          <div class="comp-detail" data-detail="ep-demo">
+            <div class="comp-detail-desc">Serves the interactive demo UI that displays product cards with live social proof messages. Connects to SSE endpoint for real-time updates.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">DemoUIEndpoint.java</div>
+              <div class="comp-detail-code-body"><span class="an">@HttpEndpoint</span>(<span class="st">"/"</span>)
+<span class="kw">public class</span> <span class="ty">DemoUIEndpoint</span> {
+
+  <span class="an">@Get</span>(<span class="st">"/"</span>)
+  <span class="kw">public</span> <span class="ty">HttpResponse</span> <span class="fn">index</span>() {
+    <span class="kw">return</span> <span class="ty">HttpResponses</span>.ok()
+        .withContentType(<span class="st">"text/html"</span>)
+        .withBody(renderDemoPage());
+  }
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="ep-product">
+            <span class="comp-row-dot" style="background:var(--white)"></span>
+            <span class="comp-row-name">ProductEndpoint</span>
+            <span class="comp-row-type">Endpoint</span>
+            <span class="comp-row-desc">Product entity CRUD + proof reads</span>
+          </div>
+          <div class="comp-detail" data-detail="ep-product">
+            <div class="comp-detail-desc">HTTP API for reading product state and cached social proof messages. Sub-10ms reads from entity state with no LLM involvement.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">ProductEndpoint.java</div>
+              <div class="comp-detail-code-body"><span class="an">@HttpEndpoint</span>(<span class="st">"/api/products"</span>)
+<span class="kw">public class</span> <span class="ty">ProductEndpoint</span> {
+
+  <span class="kw">private final</span> <span class="ty">ComponentClient</span> client;
+
+  <span class="an">@Get</span>(<span class="st">"/{productId}/proof"</span>)
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">CachedSocialProof</span>&gt; <span class="fn">getProof</span>(
+      <span class="ty">String</span> productId) {
+    <span class="kw">return</span> client
+        .forEventSourcedEntity(productId)
+        .method(<span class="ty">ProductEntity</span>::getProof)
+        .invokeAsync();
+  }
+
+  <span class="an">@Get</span>(<span class="st">"/{productId}/state"</span>)
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">ProductState</span>&gt; <span class="fn">getState</span>(
+      <span class="ty">String</span> productId) {
+    <span class="kw">return</span> client
+        .forEventSourcedEntity(productId)
+        .method(<span class="ty">ProductEntity</span>::getState)
+        .invokeAsync();
+  }
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="ep-ingest">
+            <span class="comp-row-dot" style="background:var(--white)"></span>
+            <span class="comp-row-name">IngestionEndpoint</span>
+            <span class="comp-row-type">Endpoint</span>
+            <span class="comp-row-desc">Signal ingestion from analytics</span>
+          </div>
+          <div class="comp-detail" data-detail="ep-ingest">
+            <div class="comp-detail-desc">Accepts pre-aggregated view counts and order events from external analytics pipelines. Routes signals to the appropriate ProductEntity by productId.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">IngestionEndpoint.java</div>
+              <div class="comp-detail-code-body"><span class="an">@HttpEndpoint</span>(<span class="st">"/api/ingest"</span>)
+<span class="kw">public class</span> <span class="ty">IngestionEndpoint</span> {
+
+  <span class="kw">private final</span> <span class="ty">ComponentClient</span> client;
+
+  <span class="an">@Post</span>(<span class="st">"/{productId}/signals"</span>)
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">String</span>&gt; <span class="fn">ingestSignals</span>(
+      <span class="ty">String</span> productId,
+      <span class="ty">ProductSignals</span> signals) {
+    <span class="kw">return</span> client
+        .forEventSourcedEntity(productId)
+        .method(<span class="ty">ProductEntity</span>::aggregateSignals)
+        .invokeAsync(signals);
+  }
+}</div>
+            </div>
+          </div>
+
+          <div class="comp-row" data-comp="ep-socialproof">
+            <span class="comp-row-dot" style="background:var(--white)"></span>
+            <span class="comp-row-name">SocialProofEndpoint</span>
+            <span class="comp-row-type">Endpoint</span>
+            <span class="comp-row-desc">SSE streaming + view queries</span>
+          </div>
+          <div class="comp-detail" data-detail="ep-socialproof">
+            <div class="comp-detail-desc">Exposes SSE streaming for real-time social proof updates and query endpoints for bulk retrieval. Powers the live demo UI.</div>
+            <div class="comp-detail-code">
+              <div class="comp-detail-code-bar">SocialProofEndpoint.java</div>
+              <div class="comp-detail-code-body"><span class="an">@HttpEndpoint</span>(<span class="st">"/api/social-proof"</span>)
+<span class="kw">public class</span> <span class="ty">SocialProofEndpoint</span> {
+
+  <span class="kw">private final</span> <span class="ty">ComponentClient</span> client;
+
+  <span class="an">@Get</span>(<span class="st">"/stream"</span>)
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">ServerSentEvents</span>&gt; <span class="fn">stream</span>() {
+    <span class="kw">return</span> client.forView()
+        .method(<span class="ty">SocialProofView</span>::streamAll)
+        .invokeServerSentEvents();
+  }
+
+  <span class="an">@Get</span>(<span class="st">"/{productId}"</span>)
+  <span class="kw">public</span> <span class="ty">Effect</span>&lt;<span class="ty">ProofRow</span>&gt; <span class="fn">getByProduct</span>(
+      <span class="ty">String</span> productId) {
+    <span class="kw">return</span> client.forView()
+        .method(<span class="ty">SocialProofView</span>::getByProduct)
+        .invokeAsync(productId);
+  }
+}</div>
+            </div>
+          </div>
+
+        </div><!-- /comp-table -->
+      </div><!-- /arch-layout -->
+    </div>
+
+    <!-- TAB 4: THE PLATFORM -->
+    <div class="tab-panel" data-panel="3">
+      <div class="tab-eyebrow reveal">The Platform</div>
+      <div class="tab-headline reveal">One demo becomes your team's <span class="accent">new velocity</span></div>
+      <div class="tab-desc reveal">This isn't a one-off. Every service your team builds runs on the same platform — shared compute, shared operations, shared best practices. The marginal cost of the next service approaches zero.</div>
+
+      <div class="platform-grid reveal">
+        <!-- Multi-Tenant -->
+        <div class="platform-card">
+          <div class="platform-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/></svg></div>
+          <div class="platform-card-stat">1 platform, N services</div>
+          <div class="platform-card-title">Multi-Tenant by Default</div>
+          <div class="platform-card-desc">Ship service #2, #3, #4 onto the same shared compute. Full isolation — no noisy neighbor. No new infrastructure provisioning. Marginal cost of each new service approaches zero.</div>
+        </div>
+
+        <!-- API Control Plane -->
+        <div class="platform-card">
+          <div class="platform-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+          <div class="platform-card-stat">100% API-driven</div>
+          <div class="platform-card-title">API-First Control Plane</div>
+          <div class="platform-card-desc">Every operation is an API call. Wire into your internal developer portal — Backstage, Cortex, whatever you run.</div>
+          <div class="mini-term">
+            <div><span class="prompt">$ </span><span class="cmd">akka service list</span></div>
+            <div><span class="prompt">$ </span><span class="cmd">akka service deploy social-proof-svc --region us-east-1</span></div>
+            <div><span class="prompt">$ </span><span class="cmd">akka metrics get social-proof-svc --window 1h</span></div>
+          </div>
+        </div>
+
+        <!-- Extensible SDLC -->
+        <div class="platform-card">
+          <div class="platform-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+          <div class="platform-card-stat">Plugs into your flow</div>
+          <div class="platform-card-title">Extensible SDLC Integration</div>
+          <div class="platform-card-desc">Specify doesn't replace your process — it plugs into it. Custom templates, custom checks, your team's conventions baked in.</div>
+          <div class="flow-steps">
+            <div class="flow-step">Specify</div><div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">Generate</div><div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">Review</div><div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">Test</div><div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">Gate</div><div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">Deploy</div>
+          </div>
+        </div>
+
+        <!-- Living Best Practices -->
+        <div class="platform-card">
+          <div class="platform-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          <div class="platform-card-stat">Weekly platform updates</div>
+          <div class="platform-card-title">Living Best Practices</div>
+          <div class="platform-card-desc">Every app gets smarter over time. Akka ships best practices weekly — they flow into existing services, not just new ones.</div>
+          <div class="changelog">
+            <div class="changelog-item"><div class="changelog-week">Wk 16</div><div class="changelog-text">Optimized sharding for high-cardinality entities</div></div>
+            <div class="changelog-item"><div class="changelog-week">Wk 15</div><div class="changelog-text">New workflow compensation patterns</div></div>
+            <div class="changelog-item"><div class="changelog-week">Wk 14</div><div class="changelog-text">EU AI Act governance templates added</div></div>
+            <div class="changelog-item"><div class="changelog-week">Wk 13</div><div class="changelog-text">Event serialization perf improvements</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: SHIP IT -->
+    <div class="tab-panel" data-panel="4">
+      <div class="tab-eyebrow reveal">Ship It</div>
+      <div class="tab-headline reveal">Production-ready. <span class="accent">Right now.</span></div>
+      <div class="tab-desc reveal">Everything generated by Specify is ship-ready — push it into your company's GitOps flow or deploy directly to Akka Cloud with full HA/DR. No hardening sprint. No architecture review. It's already done.</div>
+
+      <div class="ship-options reveal">
+        <div class="ship-option">
+          <div class="ship-option-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+          <div class="ship-option-title">Akka Cloud</div>
+          <div class="ship-option-desc">One-click deploy with managed infrastructure, auto-scaling, and built-in observability.</div>
+        </div>
+        <div class="ship-option">
+          <div class="ship-option-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3l-4 4-4-4"/></svg></div>
+          <div class="ship-option-title">Container Export</div>
+          <div class="ship-option-desc">OCI-compliant container image. Runs on any Kubernetes — EKS, GKE, AKS, on-prem.</div>
+        </div>
+        <div class="ship-option">
+          <div class="ship-option-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg></div>
+          <div class="ship-option-title">GitOps Pipeline</div>
+          <div class="ship-option-desc">Generated CI/CD config. Push to main, pipeline handles build, test, gate, and deploy.</div>
+        </div>
+      </div>
+
+      <div class="ship-bottom reveal">
+        <div class="ship-bottom-left">
+          <div class="card">
+            <div class="card-label">Compliance &amp; Certifications</div>
+            <div class="card-text" style="margin-bottom:12px;">19 certifications covered out of the box. Your security team will thank you.</div>
+            <div class="ship-certs">
+              <div class="ship-cert">SOC 2</div>
+              <div class="ship-cert">ISO 27001</div>
+              <div class="ship-cert">GDPR</div>
+              <div class="ship-cert">HIPAA</div>
+              <div class="ship-cert">PCI DSS</div>
+              <div class="ship-cert">FedRAMP</div>
+              <div class="ship-cert">EU AI Act</div>
+              <div class="ship-cert">+12 more</div>
+            </div>
+          </div>
+        </div>
+        <div class="ship-bottom-right">
+          <div class="card">
+            <div class="card-label">Cost Comparison</div>
+            <table class="ship-cost-table">
+              <thead>
+                <tr><th>Dimension</th><th>Build It Yourself</th><th>Akka Specify</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Team size</td><td>5 engineers</td><td>1 engineer</td></tr>
+                <tr><td>Time to production</td><td>6-8 weeks</td><td>&lt; 1 hour</td></tr>
+                <tr><td>Monthly infra</td><td>$12,000</td><td>$800</td></tr>
+                <tr><td>Maintenance</td><td>2 FTEs ongoing</td><td>Platform-managed</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: TRY IT YOURSELF -->
+    <div class="tab-panel" data-panel="5">
+      <div class="tab-eyebrow reveal">Try It Yourself</div>
+      <div class="tab-headline reveal">Run this on <span class="accent">your machine</span> in 10 minutes</div>
+      <div class="tab-desc reveal">Everything you just saw is yours to explore. Clone the repo, start the runtime, and interact with a production-grade distributed system running locally. No cloud account needed.</div>
+
+      <div class="try-steps reveal">
+
+        <div class="try-step">
+          <div class="try-step-num">01</div>
+          <div class="try-step-content">
+            <div class="try-step-title">Install an AI coding assistant</div>
+            <div class="try-step-desc">Pick your tool. Akka Specify works with any AI assistant that supports plugins or MCP.</div>
+            <div class="try-os-tabs" id="toolTabs">
+              <button class="try-os-tab active" data-tool="claude">Claude Code</button>
+              <button class="try-os-tab" data-tool="copilot">GitHub Copilot</button>
+              <button class="try-os-tab" data-tool="gemini">Gemini CLI</button>
+              <button class="try-os-tab" data-tool="windsurf">Windsurf</button>
+            </div>
+            <div class="try-tool-content active" data-tool-panel="claude">
+              <div class="mini-term"><div><span class="prompt">$ </span><span class="cmd">npm install -g @anthropic-ai/claude-code</span></div></div>
+            </div>
+            <div class="try-tool-content" data-tool-panel="copilot">
+              <div class="mini-term"><div><span class="cmd">VS Code &gt; Extensions &gt; search "GitHub Copilot" &gt; Install</span></div></div>
+            </div>
+            <div class="try-tool-content" data-tool-panel="gemini">
+              <div class="mini-term"><div><span class="prompt">$ </span><span class="cmd">npm install -g @anthropic-ai/gemini-cli</span></div></div>
+            </div>
+            <div class="try-tool-content" data-tool-panel="windsurf">
+              <div class="mini-term"><div><span class="cmd">Download from windsurf.com &gt; Install &gt; Launch</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="try-step">
+          <div class="try-step-num">02</div>
+          <div class="try-step-content">
+            <div class="try-step-title">Install Akka Specify</div>
+            <div class="try-step-desc">Get the Akka Specify plugin into your AI tool. Choose your method:</div>
+            <div class="try-os-tabs">
+              <button class="try-os-tab active" data-os="plugin">Plugin Install</button>
+              <button class="try-os-tab" data-os="manual">Manual / No Plugin</button>
+            </div>
+            <div class="try-os-content active" data-os-panel="plugin">
+              <div class="try-step-desc" style="margin-bottom:10px;font-size:12px;color:#888;">For Claude Code and any AI tool with plugin marketplace support. Other tools will follow this pattern as plugin support expands.</div>
+              <div class="mini-term">
+                <div><span class="prompt">&gt; </span><span class="cmd">/plugin marketplace add akka/ai-marketplace</span></div>
+                <div><span class="prompt">&gt; </span><span class="cmd">/plugin install akka@ai-marketplace</span></div>
+                <div><span class="prompt">&gt; </span><span class="cmd">/reload-plugins</span></div>
+                <div style="color:#28C840">  Akka Specify skills installed</div>
+              </div>
+            </div>
+            <div class="try-os-content" data-os-panel="manual">
+              <div class="try-step-desc" style="margin-bottom:10px;font-size:12px;color:#888;">For any MCP-compatible AI tool. Clone the Specify plugin repo to get the MCP config, then open your assistant from the project directory.</div>
+              <div class="mini-term">
+                <div><span class="prompt">$ </span><span class="cmd">akka specify init my-project</span></div>
+                <div><span class="prompt">$ </span><span class="cmd">cd my-project</span></div>
+                <div><span class="cm"># Project includes _mcp.json for auto-registration</span></div>
+                <div><span class="cm"># Open your AI assistant from this directory</span></div>
+              </div>
+            </div>
+            <div class="try-step-alt"><a href="https://doc.akka.io/sdk/spec-driven-development.html" style="color:var(--yellow);">doc.akka.io/sdk/spec-driven-development.html</a></div>
+          </div>
+        </div>
+
+        <div class="try-step">
+          <div class="try-step-num">03</div>
+          <div class="try-step-content">
+            <div class="try-step-title">Run the demo</div>
+            <div class="try-step-desc">One command does everything — installs Java/Maven if needed, clones the demo repo, compiles, starts the runtime, and generates your personalized presentation.</div>
+            <div class="mini-term">
+              <div><span class="prompt">&gt; </span><span class="cmd">/akka:demo https://github.com/akka/demo-social-proofing</span></div>
+              <div>&nbsp;</div>
+              <div style="color:#888">  Checking environment...</div>
+              <div style="color:#28C840">  Java 21 &amp; Maven verified</div>
+              <div style="color:#888">  Cloning demo-social-proofing...</div>
+              <div style="color:#28C840">  15 components discovered</div>
+              <div style="color:#888">  Building &amp; starting service...</div>
+              <div style="color:#28C840">  Service running on localhost:9000</div>
+              <div style="color:#888">  Generating presentation...</div>
+              <div style="color:#28C840">  Done.</div>
+              <div>&nbsp;</div>
+              <div style="color:var(--yellow);font-weight:600">  What's next:</div>
+              <div>&nbsp;</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Presentation</span>   open demo-presentation.html</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Live App</span>        http://localhost:9000</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Console</span>         http://localhost:9889</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Resilience</span>      /akka:reliability</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Deploy</span>          /akka:deploy</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /showcase -->
+
+<script>
+/* ── Tab Navigation ── */
+var tabs = document.querySelectorAll('.nav-tab');
+var panels = document.querySelectorAll('.tab-panel');
+
+function switchTab(idx) {
+  tabs.forEach(function(t, i) {
+    t.classList.toggle('active', i === idx);
+  });
+  panels.forEach(function(p, i) {
+    p.classList.toggle('active', i === idx);
+  });
+}
+
+tabs.forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    switchTab(+this.dataset.tab);
+  });
+});
+
+/* Keyboard navigation */
+document.addEventListener('keydown', function(e) {
+  // Number keys 1-6
+  if (e.key >= '1' && e.key <= '6') {
+    e.preventDefault();
+    switchTab(+e.key - 1);
+  }
+  // Arrow keys
+  var current = -1;
+  tabs.forEach(function(t, i) { if (t.classList.contains('active')) current = i; });
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (current < tabs.length - 1) switchTab(current + 1);
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (current > 0) switchTab(current - 1);
+  }
+});
+
+/* ── Architecture: expandable row toggle ── */
+var compRows = document.querySelectorAll('.comp-row');
+
+// Inject chevrons into every row
+compRows.forEach(function(row) {
+  var chev = document.createElement('span');
+  chev.className = 'comp-row-chevron';
+  chev.innerHTML = '&#9654;';
+  row.appendChild(chev);
+});
+
+compRows.forEach(function(row) {
+  row.addEventListener('click', function() {
+    var key = this.dataset.comp;
+    var detail = document.querySelector('[data-detail="' + key + '"]');
+    var isExpanded = this.classList.contains('expanded');
+
+    // Close all
+    compRows.forEach(function(r) { r.classList.remove('expanded'); });
+    document.querySelectorAll('.comp-detail').forEach(function(d) { d.classList.remove('open'); });
+
+    // Toggle (only open if it wasn't already expanded)
+    if (!isExpanded && detail) {
+      this.classList.add('expanded');
+      detail.classList.add('open');
+      // Scroll into view
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+});
+
+/* ── Step 1: tool tab switching ── */
+document.querySelectorAll('#toolTabs .try-os-tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    var tool = this.dataset.tool;
+    document.querySelectorAll('#toolTabs .try-os-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.try-tool-content').forEach(function(p) { p.classList.remove('active'); });
+    this.classList.add('active');
+    document.querySelector('[data-tool-panel="' + tool + '"]').classList.add('active');
+  });
+});
+
+/* ── Step 2: install method tab switching ── */
+document.querySelectorAll('[data-os]').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    var os = this.dataset.os;
+    this.parentElement.querySelectorAll('.try-os-tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.try-os-content').forEach(function(p) { p.classList.remove('active'); });
+    this.classList.add('active');
+    document.querySelector('[data-os-panel="' + os + '"]').classList.add('active');
+  });
+});
+
+/* ── Draw SVG connector lines for component graph ── */
+document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
+  var branches = tree.querySelectorAll('.dg-conn-branch');
+  var n = branches.length;
+  if (n === 0) return;
+  var ROW = 24, MID = ROW / 2, TRUNK_X = 12, ARROW_X = 28, SRC_X = 0;
+  var fromEl = tree.parentElement.querySelector('.dg-conn-from');
+  if (fromEl) {
+    var fromRect = fromEl.getBoundingClientRect();
+    var treeRect = tree.getBoundingClientRect();
+    if (treeRect.left > 0 && fromRect.right > 0) {
+      SRC_X = -(treeRect.left - fromRect.right + 6);
+    }
+  }
+  var svgH = n * ROW;
+  var ns = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', 'dg-lines');
+  svg.setAttribute('height', svgH);
+  svg.style.left = SRC_X + 'px';
+  svg.style.width = (ARROW_X - SRC_X + 8) + 'px';
+  function line(x1,y1,x2,y2) {
+    var l = document.createElementNS(ns,'line');
+    l.setAttribute('x1',x1-SRC_X); l.setAttribute('y1',y1);
+    l.setAttribute('x2',x2-SRC_X); l.setAttribute('y2',y2);
+    l.setAttribute('stroke','#444'); l.setAttribute('stroke-width','1');
+    l.setAttribute('shape-rendering','crispEdges');
+    svg.appendChild(l);
+  }
+  function arrow(x,y) {
+    var p = document.createElementNS(ns,'polygon');
+    var ax = x - SRC_X;
+    p.setAttribute('points',(ax-4)+','+(y-3)+' '+ax+','+y+' '+(ax-4)+','+(y+3));
+    p.setAttribute('fill','#444');
+    svg.appendChild(p);
+  }
+  line(SRC_X, MID, TRUNK_X, MID);
+  if (n === 1) { line(TRUNK_X, MID, ARROW_X, MID); arrow(ARROW_X, MID); }
+  else {
+    var lastY = (n-1)*ROW + MID;
+    line(TRUNK_X, MID, TRUNK_X, lastY);
+    for (var i = 0; i < n; i++) { var y = i*ROW+MID; line(TRUNK_X,y,ARROW_X,y); arrow(ARROW_X,y); }
+  }
+  tree.insertBefore(svg, tree.firstChild);
+});
+
+/* ── Render sequence diagram as SVG with lifelines ── */
+(function() {
+  var participants = [
+    { id: 'gatling', name: 'Gatling', ext: true },
+    { id: 'iep',     name: 'Ingestion\nEP', ext: false },
+    { id: 'pe',      name: 'Product\nEntity', ext: false, color: '#F5C518' },
+    { id: 'co',      name: 'Consumer', ext: false, color: '#F97316' },
+    { id: 'ag',      name: 'Agent', ext: false, color: '#7EC8E3' },
+    { id: 'llm',     name: 'LLM', ext: true },
+    { id: 'spep',    name: 'SocialProof\nEP', ext: false },
+    { id: 'browser', name: 'Browser', ext: true }
+  ];
+
+  // Messages: [fromIdx, toIdx, label, dashed, regionColor]
+  // regionColor: null = continue previous region
+  var messages = [
+    // Region: Signal Ingestion (blue)
+    { region: 'Signal Ingestion', color: '#2196F3' },
+    { from: 0, to: 1, label: 'POST /ingestion/views', dashed: false },
+    { from: 1, to: 2, label: 'recordViews(50)', dashed: false },
+    { from: 2, to: 1, label: 'viewCount: 247', dashed: true },
+    // Region: Aggregation + Agent (amber)
+    { region: 'Aggregation + Agent', color: '#FF9800' },
+    { from: 2, to: 3, label: 'SignalsAggregated', dashed: true },
+    { from: 3, to: 4, label: 'generateMessage(signals)', dashed: false },
+    { from: 4, to: 2, label: 'getProductDetails', dashed: false },
+    { from: 2, to: 4, label: '{Electronics, stock: 3}', dashed: true },
+    { from: 4, to: 5, label: 'prompt + signals', dashed: false },
+    { from: 5, to: 4, label: '"Only 3 left!"', dashed: true },
+    { from: 3, to: 2, label: 'cacheSocialProof', dashed: false },
+    // Region: Cached Read (green)
+    { region: 'Cached Read (no LLM)', color: '#4CAF50' },
+    { from: 7, to: 6, label: 'GET /social-proof', dashed: false },
+    { from: 6, to: 2, label: 'getSocialProof()', dashed: false },
+    { from: 2, to: 6, label: '{msg, SCARCITY}', dashed: true },
+    { from: 6, to: 7, label: '200 OK', dashed: true }
+  ];
+
+  var N = participants.length;
+  var COL_W = 90;
+  var W = N * COL_W;
+  var HDR_H = 44;
+  var ROW_H = 26;
+  var REGION_GAP = 10;
+  var REGION_TITLE_H = 18;
+  var PAD_X = COL_W / 2;
+
+  // Calculate total height
+  var y = HDR_H + 8;
+  var regionStarts = [];
+  messages.forEach(function(m) {
+    if (m.region) { y += REGION_GAP + REGION_TITLE_H; regionStarts.push(y - REGION_TITLE_H); }
+    else { y += ROW_H; }
+  });
+  var TOTAL_H = y + 20;
+
+  var ns = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', TOTAL_H);
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + TOTAL_H);
+  svg.style.fontFamily = "'Instrument Sans', sans-serif";
+
+  function text(x, yy, str, size, color, anchor, weight) {
+    var lines = str.split('\n');
+    lines.forEach(function(line, i) {
+      var t = document.createElementNS(ns, 'text');
+      t.setAttribute('x', x); t.setAttribute('y', yy + i * (size + 2));
+      t.setAttribute('text-anchor', anchor || 'middle');
+      t.setAttribute('fill', color); t.setAttribute('font-size', size);
+      if (weight) t.setAttribute('font-weight', weight);
+      t.textContent = line;
+      svg.appendChild(t);
+    });
+  }
+
+  function colX(i) { return i * COL_W + PAD_X; }
+
+  // Draw participant headers
+  participants.forEach(function(p, i) {
+    var x = colX(i);
+    var rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', x - 38); rect.setAttribute('y', 4);
+    rect.setAttribute('width', 76); rect.setAttribute('height', HDR_H - 8);
+    rect.setAttribute('rx', 4);
+    rect.setAttribute('fill', p.ext ? '#1A1A1A' : '#141414');
+    rect.setAttribute('stroke', p.ext ? '#666' : (p.color || '#555'));
+    rect.setAttribute('stroke-width', '1');
+    if (p.ext) rect.setAttribute('stroke-dasharray', '4 3');
+    svg.appendChild(rect);
+
+    var lines = p.name.split('\n');
+    var textY = lines.length > 1 ? 22 : 28;
+    text(x, textY, p.name, 9, p.ext ? '#999' : (p.color || '#fff'), 'middle', '700');
+  });
+
+  // Draw lifelines
+  participants.forEach(function(p, i) {
+    var x = colX(i);
+    var line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', x); line.setAttribute('y1', HDR_H);
+    line.setAttribute('x2', x); line.setAttribute('y2', TOTAL_H - 10);
+    line.setAttribute('stroke', '#222'); line.setAttribute('stroke-width', '1');
+    line.setAttribute('stroke-dasharray', '3 3');
+    svg.appendChild(line);
+  });
+
+  // Draw messages
+  var curY = HDR_H + 8;
+  var curRegionColor = null;
+
+  messages.forEach(function(m) {
+    if (m.region) {
+      curY += REGION_GAP;
+      curRegionColor = m.color;
+      // Region title
+      text(8, curY + 10, m.region, 8, m.color, 'start', '700');
+      // Region background line
+      var rline = document.createElementNS(ns, 'line');
+      rline.setAttribute('x1', 0); rline.setAttribute('y1', curY + 14);
+      rline.setAttribute('x2', W); rline.setAttribute('y2', curY + 14);
+      rline.setAttribute('stroke', m.color); rline.setAttribute('stroke-width', '0.5');
+      rline.setAttribute('opacity', '0.2');
+      svg.appendChild(rline);
+      curY += REGION_TITLE_H;
+      return;
+    }
+
+    curY += ROW_H;
+    var fromX = colX(m.from);
+    var toX = colX(m.to);
+    var leftToRight = toX > fromX;
+    var lineY = curY;
+
+    // Arrow line
+    var aline = document.createElementNS(ns, 'line');
+    aline.setAttribute('x1', fromX); aline.setAttribute('y1', lineY);
+    aline.setAttribute('x2', toX); aline.setAttribute('y2', lineY);
+    aline.setAttribute('stroke', '#555'); aline.setAttribute('stroke-width', '1');
+    aline.setAttribute('shape-rendering', 'crispEdges');
+    if (m.dashed) aline.setAttribute('stroke-dasharray', '4 3');
+    svg.appendChild(aline);
+
+    // Arrow head
+    var head = document.createElementNS(ns, 'polygon');
+    if (leftToRight) {
+      head.setAttribute('points', (toX-5)+','+(lineY-3)+' '+toX+','+lineY+' '+(toX-5)+','+(lineY+3));
+    } else {
+      head.setAttribute('points', (toX+5)+','+(lineY-3)+' '+toX+','+lineY+' '+(toX+5)+','+(lineY+3));
+    }
+    head.setAttribute('fill', '#555');
+    svg.appendChild(head);
+
+    // Label above arrow
+    var midX = (fromX + toX) / 2;
+    var bg = document.createElementNS(ns, 'rect');
+    var labelLen = m.label.length * 4.5 + 8;
+    bg.setAttribute('x', midX - labelLen/2); bg.setAttribute('y', lineY - 12);
+    bg.setAttribute('width', labelLen); bg.setAttribute('height', 11);
+    bg.setAttribute('fill', '#070707'); bg.setAttribute('rx', 2);
+    svg.appendChild(bg);
+    text(midX, lineY - 3, m.label, 8, '#888', 'middle', '500');
+  });
+
+  var container = document.getElementById('seqDiagram');
+  if (container) container.appendChild(svg);
+})();
+
+// Re-draw lines when a detail panel opens (since they're hidden initially)
+var compObserver = new MutationObserver(function() {
+  setTimeout(function() {
+    document.querySelectorAll('.dg-conn-tree svg.dg-lines').forEach(function(s) { s.remove(); });
+    document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
+      var branches = tree.querySelectorAll('.dg-conn-branch');
+      var n = branches.length;
+      if (n === 0) return;
+      var ROW = 24, MID = ROW / 2, TRUNK_X = 12, ARROW_X = 28, SRC_X = 0;
+      var svgH = n * ROW;
+      var ns = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('class', 'dg-lines');
+      svg.setAttribute('height', svgH);
+      svg.style.left = '0px';
+      svg.style.width = (ARROW_X + 8) + 'px';
+      function line(x1,y1,x2,y2) {
+        var l = document.createElementNS(ns,'line');
+        l.setAttribute('x1',x1); l.setAttribute('y1',y1);
+        l.setAttribute('x2',x2); l.setAttribute('y2',y2);
+        l.setAttribute('stroke','#444'); l.setAttribute('stroke-width','1');
+        l.setAttribute('shape-rendering','crispEdges');
+        svg.appendChild(l);
+      }
+      function arrow(x,y) {
+        var p = document.createElementNS(ns,'polygon');
+        p.setAttribute('points',(x-4)+','+(y-3)+' '+x+','+y+' '+(x-4)+','+(y+3));
+        p.setAttribute('fill','#444');
+        svg.appendChild(p);
+      }
+      line(0, MID, TRUNK_X, MID);
+      if (n === 1) { line(TRUNK_X, MID, ARROW_X, MID); arrow(ARROW_X, MID); }
+      else {
+        var lastY = (n-1)*ROW + MID;
+        line(TRUNK_X, MID, TRUNK_X, lastY);
+        for (var i = 0; i < n; i++) { var y = i*ROW+MID; line(TRUNK_X,y,ARROW_X,y); arrow(ARROW_X,y); }
+      }
+      tree.insertBefore(svg, tree.firstChild);
+    });
+  }, 50);
+});
+document.querySelectorAll('.comp-detail').forEach(function(d) {
+  compObserver.observe(d, { attributes: true, attributeFilter: ['class'] });
+});
+
+</script>
+
+</body>
+</html>
