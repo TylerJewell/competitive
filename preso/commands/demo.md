@@ -356,13 +356,13 @@ If environment is ready and user wants the live app embedded:
 
 ## Step 5: Load Templates
 
-Read all four template files. These files live at `preso/templates/` relative to the repo root. If running from a different location, adjust the path.
+Read all four template files from the plugin installation directory:
 
 ```
-preso/templates/base.html   — full Akka sales deck with 5 insertion markers
-preso/templates/demo.css    — all #demo-section scoped CSS (~400 lines)
-preso/templates/demo.html   — demo section HTML with {{PLACEHOLDER}} markers + TAB6 markers
-preso/templates/demo.js     — tab switching, SVG diagrams, keyboard nav (~240 lines)
+~/.claude/plugins/akka/templates/base.html   — full Akka sales deck with 5 insertion markers
+~/.claude/plugins/akka/templates/demo.css    — all #demo-section scoped CSS (~400 lines)
+~/.claude/plugins/akka/templates/demo.html   — demo section HTML with {{PLACEHOLDER}} markers + TAB6 markers
+~/.claude/plugins/akka/templates/demo.js     — tab switching, SVG diagrams, keyboard nav (~240 lines)
 ```
 
 Read all four files in full before beginning assembly.
@@ -545,26 +545,16 @@ output = output.replace('<!-- DEMO_HTML_MARKER -->', '')
 output = output.replace('/* DEMO_JS_MARKER */',      '')
 ```
 
-### 6f. Fix resilience iframe path
+### 6f. Resilience iframe path
 
-The base template uses `src="resilience/resilience.html"` — a path relative to `preso/`.
-If the output file is written anywhere other than the `preso/` directory, adjust this path:
-
-```python
-output = output.replace(
-    'src="resilience/resilience.html"',
-    f'src="{relative_path_to_preso}/resilience/resilience.html"'
-)
-```
-
-For output at `samples/PROJECT/demo-presentation.html`, the relative path is `../../preso`.
+No path substitution needed. The plugin assets (including `resilience/`) are copied to the output directory in Step 7, so `src="resilience/resilience.html"` resolves correctly from wherever the output file lives.
 
 ### 6g. Verify before writing
 
 Before writing the output file, verify:
 1. No unreplaced `{{...}}` placeholders remain
 2. `id="demo-wrapper"` is present (for non-overview modes)
-3. The resilience path matches the actual file location
+3. `src="resilience/resilience.html"` is still present (not accidentally removed)
 4. For hands-on: `data-tab="5"` is absent (Tab 6 successfully removed)
 5. For live: `src="http://localhost` is present (iframe injected)
 6. For shareable: no `iframe` pointing to localhost
@@ -574,6 +564,18 @@ Before writing the output file, verify:
 ## Step 7: Write Output and Report
 
 Write the assembled HTML with UTF-8 encoding to the output path.
+
+Then copy the plugin's static assets into the same directory so all relative paths in the presentation resolve correctly:
+
+```bash
+PLUGIN=~/.claude/plugins/akka
+OUT=$(dirname OUTPUT_PATH)
+cp -r "$PLUGIN/images"     "$OUT/"
+cp -r "$PLUGIN/logos"      "$OUT/"
+cp -r "$PLUGIN/resilience" "$OUT/"
+```
+
+If any of those directories already exist in `OUT`, skip (do not overwrite).
 
 Report to the user:
 
