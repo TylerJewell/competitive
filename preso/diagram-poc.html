@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagram Rendering POC — Component Graph</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --yellow: #F5C518;
+  --black: #000;
+  --white: #fff;
+  --green: #28C840;
+  --blue: #1E90FF;
+  --purple: #A855F7;
+  --orange: #F97316;
+  --teal: #7EC8E3;
+}
+html { background: #000; }
+body {
+  font-family: 'Instrument Sans', -apple-system, sans-serif;
+  background: #0A0A0A;
+  color: #fff;
+  max-width: 860px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+h2 {
+  font-size: 24px; font-weight: 700; margin-bottom: 8px;
+  color: #fff;
+}
+h2 .accent { color: var(--yellow); }
+.subtitle {
+  font-size: 13px; color: #888; margin-bottom: 32px;
+}
+
+/* ═══════════════════════════════════
+   DIAGRAM FRAME
+═══════════════════════════════════ */
+.dg-frame {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 48px;
+}
+.dg-frame-bar {
+  background: #0D0D0D;
+  padding: 8px 16px;
+  border-bottom: 1px solid #1C1C1C;
+  display: flex; align-items: center; gap: 8px;
+}
+.dg-frame-dots { display: flex; gap: 5px; }
+.dg-frame-dot { width: 8px; height: 8px; border-radius: 4px; }
+.dg-frame-dot.r { background: #FF5F57; }
+.dg-frame-dot.y { background: #FEBC2E; }
+.dg-frame-dot.g { background: #28C840; }
+.dg-frame-file {
+  font-size: 11px; color: #666; margin-left: 8px;
+  font-family: 'SF Mono', 'Consolas', monospace;
+}
+.dg-frame-badge {
+  font-size: 10px; color: #444; margin-left: auto;
+  text-transform: uppercase; letter-spacing: 1px; font-weight: 600;
+}
+
+.dg-body {
+  padding: 28px 24px;
+}
+
+/* ═══════════════════════════════════
+   COMPONENT GRAPH — LAYERED BANDS
+═══════════════════════════════════ */
+.dg-layer {
+  padding: 20px 0;
+  border-bottom: 1px solid #1C1C1C;
+  position: relative;
+}
+.dg-layer:last-child { border-bottom: none; }
+
+.dg-layer-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2.5px;
+  font-weight: 700; color: var(--yellow);
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.dg-layer-label::before {
+  content: ''; width: 20px; height: 1.5px; background: var(--yellow);
+}
+
+.dg-layer-nodes {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════
+   NODES
+═══════════════════════════════════ */
+.dg-node {
+  border-radius: 8px;
+  padding: 10px 16px;
+  min-width: 140px;
+  max-width: 200px;
+  text-align: center;
+  position: relative;
+}
+
+.dg-node-type {
+  font-size: 8px; text-transform: uppercase; letter-spacing: 1.5px;
+  font-weight: 600; margin-bottom: 3px;
+}
+.dg-node-name {
+  font-size: 12px; font-weight: 700; color: #fff;
+  line-height: 1.25;
+}
+
+/* Type variants */
+.dg-node-ext {
+  background: #1A1A1A; border: 1.5px dashed #666;
+}
+.dg-node-ext .dg-node-type { color: #666; }
+.dg-node-ext .dg-node-name { color: #999; }
+
+.dg-node-ep {
+  background: #141414; border: 1.5px solid #fff;
+}
+.dg-node-ep .dg-node-type { color: #888; }
+
+.dg-node-ese {
+  background: #1A1600; border: 1.5px solid var(--yellow);
+}
+.dg-node-ese .dg-node-type { color: var(--yellow); }
+
+.dg-node-agent {
+  background: #001A1A; border: 1.5px solid var(--teal);
+}
+.dg-node-agent .dg-node-type { color: var(--teal); }
+
+.dg-node-consumer {
+  background: #1A0A00; border: 1.5px solid var(--orange);
+}
+.dg-node-consumer .dg-node-type { color: var(--orange); }
+
+.dg-node-view {
+  background: #0D001A; border: 1.5px solid var(--purple);
+}
+.dg-node-view .dg-node-type { color: var(--purple); }
+
+/* ═══════════════════════════════════
+   CONNECTIONS (between layers)
+═══════════════════════════════════ */
+.dg-connections {
+  padding: 10px 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+/* A connection group: one source, one or more targets */
+.dg-conn-group {
+  display: flex; align-items: flex-start; gap: 0;
+  font-size: 11px;
+  border-left: 2px solid transparent;
+  padding-left: 10px;
+  position: relative;
+}
+
+/* Flow color coding */
+.dg-conn-group.ingest { border-left-color: #2196F3; }
+.dg-conn-group.process { border-left-color: #FF9800; }
+.dg-conn-group.deliver { border-left-color: #4CAF50; }
+
+.dg-conn-step {
+  font-size: 10px; font-weight: 700; color: var(--yellow);
+  width: 24px; flex-shrink: 0; text-align: center;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  line-height: 28px;
+}
+
+.dg-conn-from {
+  font-weight: 600; color: #ccc;
+  flex-shrink: 0;
+  height: 28px;
+  display: flex; align-items: center;
+  white-space: nowrap;
+}
+/* Line fills remaining space from text to tree edge */
+.dg-conn-from::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #444;
+  margin-left: 6px;
+}
+
+/* Tree container: holds all branches, draws trunk + source connector via SVG */
+.dg-conn-tree {
+  flex: 1; min-width: 0;
+  position: relative;
+}
+
+/* SVG connector lines — injected by JS */
+.dg-conn-tree svg.dg-lines {
+  position: absolute;
+  left: 0; top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Branch rows sit on top of the SVG lines */
+.dg-conn-branch {
+  display: flex; align-items: center; gap: 0;
+  height: 28px;
+  padding-left: 40px;
+}
+
+/* Action label between arrow and target */
+.dg-conn-action {
+  font-size: 10px; color: #888;
+  padding: 0 8px;
+  flex-shrink: 0;
+  font-style: italic;
+}
+
+/* Target component name */
+.dg-conn-to {
+  font-weight: 600; color: #ccc;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════
+   FLOW LEGEND
+═══════════════════════════════════ */
+.dg-legend {
+  display: flex; gap: 20px;
+  padding: 14px 0 4px;
+  border-top: 1px solid #1C1C1C;
+  margin-top: 8px;
+}
+.dg-legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: #888;
+}
+.dg-legend-bar {
+  width: 16px; height: 3px; border-radius: 1px;
+}
+
+/* ═══════════════════════════════════
+   SEQUENCE DIAGRAM
+═══════════════════════════════════ */
+.dg-seq { width: 100%; }
+
+.dg-seq-participants {
+  display: flex; gap: 0;
+  border-bottom: 1px solid #1C1C1C;
+  padding-bottom: 12px;
+  margin-bottom: 0;
+}
+.dg-seq-p {
+  flex: 1; text-align: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+  padding: 6px 4px;
+  background: #141414;
+  border: 1px solid #333;
+  border-radius: 6px;
+  margin: 0 3px;
+  line-height: 1.2;
+}
+.dg-seq-p-ext {
+  background: #1A1A1A; border-style: dashed; border-color: #666;
+  color: #999;
+}
+
+/* Sequence regions */
+.dg-seq-region {
+  border-left: 3px solid;
+  padding: 12px 16px;
+  margin: 6px 0;
+  border-radius: 0 6px 6px 0;
+}
+.dg-seq-region-blue { border-color: #2196F3; background: rgba(33,150,243,0.04); }
+.dg-seq-region-amber { border-color: #FF9800; background: rgba(255,152,0,0.04); }
+.dg-seq-region-green { border-color: #4CAF50; background: rgba(76,175,80,0.04); }
+
+.dg-seq-region-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; margin-bottom: 10px;
+}
+.dg-seq-region-blue .dg-seq-region-title { color: #2196F3; }
+.dg-seq-region-amber .dg-seq-region-title { color: #FF9800; }
+.dg-seq-region-green .dg-seq-region-title { color: #4CAF50; }
+
+.dg-seq-msg {
+  display: flex; align-items: center; gap: 0;
+  padding: 3px 0;
+  font-size: 11px;
+}
+.dg-seq-msg-from {
+  width: 130px; flex-shrink: 0; text-align: right;
+  font-weight: 600; color: #ccc; padding-right: 10px;
+}
+.dg-seq-msg-arrow {
+  flex: 1; display: flex; align-items: center; gap: 0;
+  position: relative; height: 18px;
+}
+.dg-seq-msg-line {
+  flex: 1; height: 1.5px; background: #555;
+}
+.dg-seq-msg-line.dashed { background: none; border-top: 1.5px dashed #555; height: 0; }
+.dg-seq-msg-head {
+  width: 0; height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid #555;
+  flex-shrink: 0;
+}
+.dg-seq-msg-text {
+  position: absolute; top: -10px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px; color: #888;
+  white-space: nowrap;
+  background: #0A0A0A;
+  padding: 0 6px;
+}
+.dg-seq-msg-to {
+  width: 130px; flex-shrink: 0; text-align: left;
+  font-weight: 600; color: #ccc; padding-left: 10px;
+}
+.dg-seq-msg-return .dg-seq-msg-from { text-align: left; padding-left: 10px; padding-right: 0; }
+.dg-seq-msg-return .dg-seq-msg-to { text-align: right; padding-right: 10px; padding-left: 0; }
+.dg-seq-msg-return .dg-seq-msg-head {
+  border-left: none;
+  border-right: 6px solid #555;
+}
+.dg-seq-msg-return .dg-seq-msg-line { background: none; border-top: 1.5px dashed #444; height: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════
+     COMPONENT GRAPH
+═══════════════════════════════ -->
+<h2>Component <span class="accent">Graph</span></h2>
+<div class="subtitle">Social Proofing Agent — component-graph.mmd</div>
+
+<div class="dg-frame">
+  <div class="dg-frame-bar">
+    <div class="dg-frame-dots"><div class="dg-frame-dot r"></div><div class="dg-frame-dot y"></div><div class="dg-frame-dot g"></div></div>
+    <span class="dg-frame-file">component-graph.mmd</span>
+    <span class="dg-frame-badge">rendered</span>
+  </div>
+  <div class="dg-body">
+
+    <!-- Layer: External -->
+    <div class="dg-layer">
+      <div class="dg-layer-label">External / Out of Scope</div>
+      <div class="dg-layer-nodes">
+        <div class="dg-node dg-node-ext">
+          <div class="dg-node-type">Simulation</div>
+          <div class="dg-node-name">Gatling</div>
+        </div>
+        <div class="dg-node dg-node-ext">
+          <div class="dg-node-type">AI Provider</div>
+          <div class="dg-node-name">LLM Provider</div>
+        </div>
+        <div class="dg-node dg-node-ext">
+          <div class="dg-node-type">Client</div>
+          <div class="dg-node-name">Browser</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connections: External → API -->
+    <div class="dg-connections">
+      <div class="dg-conn-group ingest">
+        <div class="dg-conn-step">①②</div>
+        <div class="dg-conn-from">Gatling</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">PUT /products</div><div class="dg-conn-to">ProductEndpoint</div></div>
+          <div class="dg-conn-branch"><div class="dg-conn-action">POST /ingestion</div><div class="dg-conn-to">IngestionEndpoint</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer: API -->
+    <div class="dg-layer">
+      <div class="dg-layer-label">API Layer</div>
+      <div class="dg-layer-nodes">
+        <div class="dg-node dg-node-ep">
+          <div class="dg-node-type">Endpoint</div>
+          <div class="dg-node-name">ProductEndpoint</div>
+        </div>
+        <div class="dg-node dg-node-ep">
+          <div class="dg-node-type">Endpoint</div>
+          <div class="dg-node-name">IngestionEndpoint</div>
+        </div>
+        <div class="dg-node dg-node-ep">
+          <div class="dg-node-type">Endpoint</div>
+          <div class="dg-node-name">SocialProofEndpoint</div>
+        </div>
+        <div class="dg-node dg-node-ep">
+          <div class="dg-node-type">Endpoint</div>
+          <div class="dg-node-name">DemoUIEndpoint</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connections: API → Application -->
+    <div class="dg-connections">
+      <div class="dg-conn-group ingest">
+        <div class="dg-conn-step">③</div>
+        <div class="dg-conn-from">ProductEndpoint</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">updateProduct</div><div class="dg-conn-to">ProductEntity</div></div>
+        </div>
+      </div>
+      <div class="dg-conn-group ingest">
+        <div class="dg-conn-step">④</div>
+        <div class="dg-conn-from">IngestionEndpoint</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">recordViews / recordOrder</div><div class="dg-conn-to">ProductEntity</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layer: Application -->
+    <div class="dg-layer">
+      <div class="dg-layer-label">Application Layer</div>
+      <div class="dg-layer-nodes">
+        <div class="dg-node dg-node-ese">
+          <div class="dg-node-type">Event Sourced Entity</div>
+          <div class="dg-node-name">ProductEntity</div>
+        </div>
+        <div class="dg-node dg-node-consumer">
+          <div class="dg-node-type">Consumer</div>
+          <div class="dg-node-name">SocialProofConsumer</div>
+        </div>
+        <div class="dg-node dg-node-agent">
+          <div class="dg-node-type">Agent</div>
+          <div class="dg-node-name">SocialProofAgent</div>
+        </div>
+        <div class="dg-node dg-node-view">
+          <div class="dg-node-type">View</div>
+          <div class="dg-node-name">SocialProofView</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connections: Internal application flows -->
+    <div class="dg-connections">
+      <div class="dg-conn-group process">
+        <div class="dg-conn-step">⑤</div>
+        <div class="dg-conn-from">ProductEntity</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">events</div><div class="dg-conn-to">SocialProofConsumer</div></div>
+          <div class="dg-conn-branch"><div class="dg-conn-action">events</div><div class="dg-conn-to">SocialProofView</div></div>
+        </div>
+      </div>
+      <div class="dg-conn-group process">
+        <div class="dg-conn-step">⑥</div>
+        <div class="dg-conn-from">SocialProofConsumer</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">generateMessage</div><div class="dg-conn-to">SocialProofAgent</div></div>
+        </div>
+      </div>
+      <div class="dg-conn-group process">
+        <div class="dg-conn-step">⑦⑧</div>
+        <div class="dg-conn-from">SocialProofAgent</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">getProductDetails</div><div class="dg-conn-to">ProductEntity</div></div>
+          <div class="dg-conn-branch"><div class="dg-conn-action">prompt + signals</div><div class="dg-conn-to">LLM Provider</div></div>
+        </div>
+      </div>
+      <div class="dg-conn-group process">
+        <div class="dg-conn-step">⑨</div>
+        <div class="dg-conn-from">SocialProofConsumer</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">cacheSocialProof</div><div class="dg-conn-to">ProductEntity</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connections: Delivery -->
+    <div class="dg-connections">
+      <div class="dg-conn-group deliver">
+        <div class="dg-conn-step">⑩</div>
+        <div class="dg-conn-from">Browser</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">GET /social-proof</div><div class="dg-conn-to">SocialProofEndpoint</div></div>
+          <div class="dg-conn-branch"><div class="dg-conn-action">GET /</div><div class="dg-conn-to">DemoUIEndpoint</div></div>
+        </div>
+      </div>
+      <div class="dg-conn-group deliver">
+        <div class="dg-conn-step">⑪</div>
+        <div class="dg-conn-from">SocialProofEndpoint</div>
+        <div class="dg-conn-tree">
+          <div class="dg-conn-branch"><div class="dg-conn-action">getSocialProof</div><div class="dg-conn-to">ProductEntity</div></div>
+          <div class="dg-conn-branch"><div class="dg-conn-action">list + stream</div><div class="dg-conn-to">SocialProofView</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="dg-legend">
+      <div class="dg-legend-item"><div class="dg-legend-bar" style="background:#2196F3"></div>Ingestion</div>
+      <div class="dg-legend-item"><div class="dg-legend-bar" style="background:#FF9800"></div>Processing</div>
+      <div class="dg-legend-item"><div class="dg-legend-bar" style="background:#4CAF50"></div>Delivery</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     SEQUENCE DIAGRAM
+═══════════════════════════════ -->
+<h2>Sequence <span class="accent">Diagram</span></h2>
+<div class="subtitle">Social Proofing Agent — order-flow-sequence.mmd</div>
+
+<div class="dg-frame">
+  <div class="dg-frame-bar">
+    <div class="dg-frame-dots"><div class="dg-frame-dot r"></div><div class="dg-frame-dot y"></div><div class="dg-frame-dot g"></div></div>
+    <span class="dg-frame-file">order-flow-sequence.mmd</span>
+    <span class="dg-frame-badge">rendered</span>
+  </div>
+  <div class="dg-body">
+
+    <!-- Participants -->
+    <div class="dg-seq-participants">
+      <div class="dg-seq-p dg-seq-p-ext">Gatling</div>
+      <div class="dg-seq-p">Product EP</div>
+      <div class="dg-seq-p">Ingestion EP</div>
+      <div class="dg-seq-p" style="border-color:var(--yellow);color:var(--yellow)">Product Entity</div>
+      <div class="dg-seq-p" style="border-color:var(--orange);color:var(--orange)">Consumer</div>
+      <div class="dg-seq-p" style="border-color:var(--teal);color:var(--teal)">Agent</div>
+      <div class="dg-seq-p dg-seq-p-ext">LLM</div>
+      <div class="dg-seq-p" style="border-color:var(--purple);color:var(--purple)">View</div>
+      <div class="dg-seq-p">SP EP</div>
+      <div class="dg-seq-p dg-seq-p-ext">Browser</div>
+    </div>
+
+    <!-- Region: Product Setup -->
+    <div class="dg-seq-region dg-seq-region-blue">
+      <div class="dg-seq-region-title">Product Setup</div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Gatling</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">PUT /products/ps6-console</div></div>
+        <div class="dg-seq-msg-to">Product EP</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Product EP</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">updateProduct()</div></div>
+        <div class="dg-seq-msg-to">Product Entity</div>
+      </div>
+    </div>
+
+    <!-- Region: Signal Ingestion -->
+    <div class="dg-seq-region dg-seq-region-blue">
+      <div class="dg-seq-region-title">Signal Ingestion</div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Gatling</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">POST /ingestion/views {count: 50}</div></div>
+        <div class="dg-seq-msg-to">Ingestion EP</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Ingestion EP</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">recordViews(50)</div></div>
+        <div class="dg-seq-msg-to">Product Entity</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">Product Entity</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">viewCount: 247</div></div>
+        <div class="dg-seq-msg-from">Ingestion EP</div>
+      </div>
+    </div>
+
+    <!-- Region: Aggregation + Agent -->
+    <div class="dg-seq-region dg-seq-region-amber">
+      <div class="dg-seq-region-title">Aggregation + Agent Processing</div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Product Entity</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">SignalsAggregated (views=247, orders=31)</div></div>
+        <div class="dg-seq-msg-to">Consumer</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Product Entity</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">event → updates view row</div></div>
+        <div class="dg-seq-msg-to">View</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Consumer</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">generateMessage(signals)</div></div>
+        <div class="dg-seq-msg-to">Agent</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Agent</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">@FunctionTool getProductDetails</div></div>
+        <div class="dg-seq-msg-to">Product Entity</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">Product Entity</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">{category: Electronics, stockLevel: 3}</div></div>
+        <div class="dg-seq-msg-from">Agent</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Agent</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">prompt + signals</div></div>
+        <div class="dg-seq-msg-to">LLM</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">LLM</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">"Only 3 left - selling fast!"</div></div>
+        <div class="dg-seq-msg-from">Agent</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">Agent</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">{message, SCARCITY}</div></div>
+        <div class="dg-seq-msg-from">Consumer</div>
+      </div>
+    </div>
+
+    <!-- Region: Cache Result -->
+    <div class="dg-seq-region dg-seq-region-amber">
+      <div class="dg-seq-region-title">Cache Result</div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Consumer</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">cacheSocialProof(message, SCARCITY)</div></div>
+        <div class="dg-seq-msg-to">Product Entity</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Product Entity</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">SocialProofCached event</div></div>
+        <div class="dg-seq-msg-to">View</div>
+      </div>
+    </div>
+
+    <!-- Region: Cached Read -->
+    <div class="dg-seq-region dg-seq-region-green">
+      <div class="dg-seq-region-title">Cached Read (no LLM)</div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Browser</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">GET /social-proof/ps6-console</div></div>
+        <div class="dg-seq-msg-to">SP EP</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">SP EP</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">getSocialProof()</div></div>
+        <div class="dg-seq-msg-to">Product Entity</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">Product Entity</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">{message, SCARCITY}</div></div>
+        <div class="dg-seq-msg-from">SP EP</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">SP EP</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">200 OK</div></div>
+        <div class="dg-seq-msg-from">Browser</div>
+      </div>
+    </div>
+
+    <!-- Region: Real-Time Streaming -->
+    <div class="dg-seq-region dg-seq-region-green">
+      <div class="dg-seq-region-title">Real-Time Streaming</div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">Browser</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">GET /social-proof/stream (SSE)</div></div>
+        <div class="dg-seq-msg-to">SP EP</div>
+      </div>
+      <div class="dg-seq-msg">
+        <div class="dg-seq-msg-from">SP EP</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-line"></div><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-text">streaming query</div></div>
+        <div class="dg-seq-msg-to">View</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">View</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">updated row</div></div>
+        <div class="dg-seq-msg-from">SP EP</div>
+      </div>
+      <div class="dg-seq-msg dg-seq-msg-return">
+        <div class="dg-seq-msg-to">SP EP</div>
+        <div class="dg-seq-msg-arrow"><div class="dg-seq-msg-head"></div><div class="dg-seq-msg-line dashed"></div><div class="dg-seq-msg-text">SSE event</div></div>
+        <div class="dg-seq-msg-from">Browser</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// First pass: measure all source names and set uniform column width
+(function() {
+  var allFroms = document.querySelectorAll('.dg-conn-from');
+  var maxW = 0;
+  allFroms.forEach(function(el) {
+    // Temporarily remove fixed width to measure natural text width
+    el.style.width = 'auto';
+  });
+  allFroms.forEach(function(el) {
+    var w = el.offsetWidth;
+    if (w > maxW) maxW = w;
+  });
+  // Set all to widest + 30px gap for the connecting line
+  var colW = maxW + 30;
+  allFroms.forEach(function(el) {
+    el.style.width = colW + 'px';
+  });
+})();
+
+// Draw SVG connector lines for each connection tree
+document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
+  var branches = tree.querySelectorAll('.dg-conn-branch');
+  var n = branches.length;
+  if (n === 0) return;
+
+  var ROW = 28;
+  var MID = ROW / 2;
+  var TRUNK_X = 12;
+  var ARROW_X = 32;
+
+  // Line starts at the tree's left edge (x=0), no overlap with source text
+  var SRC_X = 0;
+
+  var svgH = n * ROW;
+  var ns = 'http://www.w3.org/2000/svg';
+  var svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', 'dg-lines');
+  svg.setAttribute('height', svgH);
+  svg.style.left = SRC_X + 'px';
+  svg.style.width = (ARROW_X - SRC_X + 8) + 'px';
+
+  function line(x1, y1, x2, y2) {
+    var l = document.createElementNS(ns, 'line');
+    l.setAttribute('x1', x1 - SRC_X);
+    l.setAttribute('y1', y1);
+    l.setAttribute('x2', x2 - SRC_X);
+    l.setAttribute('y2', y2);
+    l.setAttribute('stroke', '#444');
+    l.setAttribute('stroke-width', '1');
+    l.setAttribute('shape-rendering', 'crispEdges');
+    svg.appendChild(l);
+  }
+
+  function arrow(x, y) {
+    var p = document.createElementNS(ns, 'polygon');
+    var ax = x - SRC_X;
+    p.setAttribute('points', (ax - 5) + ',' + (y - 3) + ' ' + ax + ',' + y + ' ' + (ax - 5) + ',' + (y + 3));
+    p.setAttribute('fill', '#444');
+    svg.appendChild(p);
+  }
+
+  // Horizontal line from source text end to trunk
+  line(SRC_X, MID, TRUNK_X, MID);
+
+  if (n === 1) {
+    line(TRUNK_X, MID, ARROW_X, MID);
+    arrow(ARROW_X, MID);
+  } else {
+    var lastY = (n - 1) * ROW + MID;
+    line(TRUNK_X, MID, TRUNK_X, lastY);
+
+    for (var i = 0; i < n; i++) {
+      var y = i * ROW + MID;
+      line(TRUNK_X, y, ARROW_X, y);
+      arrow(ARROW_X, y);
+    }
+  }
+
+  tree.insertBefore(svg, tree.firstChild);
+});
+</script>
+</body>
+</html>

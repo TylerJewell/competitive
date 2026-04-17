@@ -1270,7 +1270,7 @@ body {
           <div class="try-step-num">03</div>
           <div class="try-step-content">
             <div class="try-step-title">Run the demo</div>
-            <div class="try-step-desc">One command does everything — installs Java/Maven if needed, clones the demo repo, compiles, starts the runtime, launches resilience testing, and generates your personalized presentation.</div>
+            <div class="try-step-desc">One command does everything — installs Java/Maven if needed, clones the demo repo, compiles, starts the runtime, and generates your personalized presentation.</div>
             <div class="mini-term">
               <div><span class="prompt">&gt; </span><span class="cmd">/akka:demo https://github.com/akka/demo-order-orchestration</span></div>
               <div>&nbsp;</div>
@@ -1280,21 +1280,16 @@ body {
               <div style="color:#28C840">  23 components discovered</div>
               <div style="color:#888">  Building &amp; starting service...</div>
               <div style="color:#28C840">  Service running on localhost:9000</div>
-              <div style="color:#888">  Launching resilience dashboard...</div>
-              <div style="color:#28C840">  Dashboard at localhost:9889/resilience</div>
               <div style="color:#888">  Generating presentation...</div>
-              <div style="color:#28C840">  Demo ready at ./demo-presentation.html</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="try-step">
-          <div class="try-step-num">04</div>
-          <div class="try-step-content">
-            <div class="try-step-title">Present</div>
-            <div class="try-step-desc">Open the generated presentation in your browser. The full Akka story with your live demo integrated — architecture explorer, running app, resilience dashboard, all in one view.</div>
-            <div class="mini-term">
-              <div><span class="prompt">$ </span><span class="cmd">open demo-presentation.html</span></div>
+              <div style="color:#28C840">  Done.</div>
+              <div>&nbsp;</div>
+              <div style="color:var(--yellow);font-weight:600">  What's next:</div>
+              <div>&nbsp;</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Presentation</span>   open demo-presentation.html</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Live App</span>        http://localhost:9000</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Console</span>         http://localhost:9889</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Resilience</span>      /akka:reliability</div>
+              <div style="color:#B8B8B8">  <span style="color:var(--yellow)">Deploy</span>          /akka:deploy</div>
             </div>
           </div>
         </div>
