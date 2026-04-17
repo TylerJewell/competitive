@@ -1905,12 +1905,16 @@ document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
   ];
 
   var N = participants.length;
-  var COL_W = 90;
+  // Measure available width from the container
+  var container = document.getElementById('seqDiagram');
+  var availW = container ? container.offsetWidth : 900;
+  if (availW < 600) availW = 900; // fallback if hidden
+  var COL_W = Math.floor(availW / N);
   var W = N * COL_W;
-  var HDR_H = 44;
-  var ROW_H = 26;
-  var REGION_GAP = 10;
-  var REGION_TITLE_H = 18;
+  var HDR_H = 48;
+  var ROW_H = 32;
+  var REGION_GAP = 14;
+  var REGION_TITLE_H = 22;
   var PAD_X = COL_W / 2;
 
   // Calculate total height
@@ -1948,8 +1952,9 @@ document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
   participants.forEach(function(p, i) {
     var x = colX(i);
     var rect = document.createElementNS(ns, 'rect');
-    rect.setAttribute('x', x - 38); rect.setAttribute('y', 4);
-    rect.setAttribute('width', 76); rect.setAttribute('height', HDR_H - 8);
+    var boxW = Math.min(COL_W - 12, 120);
+    rect.setAttribute('x', x - boxW/2); rect.setAttribute('y', 4);
+    rect.setAttribute('width', boxW); rect.setAttribute('height', HDR_H - 8);
     rect.setAttribute('rx', 4);
     rect.setAttribute('fill', p.ext ? '#1A1A1A' : '#141414');
     rect.setAttribute('stroke', p.ext ? '#666' : (p.color || '#555'));
@@ -1958,8 +1963,8 @@ document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
     svg.appendChild(rect);
 
     var lines = p.name.split('\n');
-    var textY = lines.length > 1 ? 22 : 28;
-    text(x, textY, p.name, 9, p.ext ? '#999' : (p.color || '#fff'), 'middle', '700');
+    var textY = lines.length > 1 ? 24 : 30;
+    text(x, textY, p.name, 11, p.ext ? '#999' : (p.color || '#fff'), 'middle', '700');
   });
 
   // Draw lifelines
@@ -1982,7 +1987,7 @@ document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
       curY += REGION_GAP;
       curRegionColor = m.color;
       // Region title
-      text(8, curY + 10, m.region, 8, m.color, 'start', '700');
+      text(8, curY + 12, m.region, 10, m.color, 'start', '700');
       // Region background line
       var rline = document.createElementNS(ns, 'line');
       rline.setAttribute('x1', 0); rline.setAttribute('y1', curY + 14);
@@ -2022,12 +2027,12 @@ document.querySelectorAll('.dg-conn-tree').forEach(function(tree) {
     // Label above arrow
     var midX = (fromX + toX) / 2;
     var bg = document.createElementNS(ns, 'rect');
-    var labelLen = m.label.length * 4.5 + 8;
-    bg.setAttribute('x', midX - labelLen/2); bg.setAttribute('y', lineY - 12);
-    bg.setAttribute('width', labelLen); bg.setAttribute('height', 11);
+    var labelLen = m.label.length * 5.5 + 12;
+    bg.setAttribute('x', midX - labelLen/2); bg.setAttribute('y', lineY - 14);
+    bg.setAttribute('width', labelLen); bg.setAttribute('height', 14);
     bg.setAttribute('fill', '#070707'); bg.setAttribute('rx', 2);
     svg.appendChild(bg);
-    text(midX, lineY - 3, m.label, 8, '#888', 'middle', '500');
+    text(midX, lineY - 3, m.label, 10, '#B8B8B8', 'middle', '500');
   });
 
   var container = document.getElementById('seqDiagram');
