@@ -20,12 +20,14 @@
   --white:  #fff;
   --gray:   #555;
 }
-html { scroll-behavior: auto; }
+html { scroll-behavior: auto; background: var(--black); }
 body {
   font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--black);
   color: var(--white);
   overflow-x: hidden;
+  max-width: 1920px;
+  margin: 0 auto;
 }
 
 @keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
@@ -315,13 +317,14 @@ body {
 }
 /* ── section-3-complexity ── */
 #s2-wrapper {
-  height: 115vh;          /* minimal dead scroll after content appears */
+  height: 200vh;          /* longer dead scroll so view anchors for more clicks */
   position: relative;
 }
 #s2-sticky {
   position: sticky; top: 0;
   height: 100vh;
   display: flex; flex-direction: column; justify-content: center;
+  align-items: center;
   padding: 0 8vw;
   background: var(--black);
   overflow: hidden;
@@ -335,6 +338,7 @@ body {
   font-size:11px; text-transform:uppercase; letter-spacing:3px;
   color:var(--yellow); font-weight:600; margin-bottom:28px;
   position:relative; z-index:1;
+  width: 100%; max-width: 1400px;
   opacity:0; transform: translateY(16px);
   transition: opacity .5s ease, transform .5s cubic-bezier(0.16,1,0.3,1);
 }
@@ -344,7 +348,7 @@ body {
 .s2-headline {
   font-size: clamp(30px, 4vw, 56px); font-weight:700;
   line-height:1.08; letter-spacing:-0.03em; color:var(--white);
-  max-width: 900px; margin-bottom: 32px;
+  width: 100%; max-width: 1400px; margin-bottom: 32px;
   position:relative; z-index:1;
   opacity:0; transform:translateY(24px);
   transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
@@ -353,7 +357,7 @@ body {
 .s2-headline .accent { color:var(--yellow); }
 
 .s2-content {
-  display: flex; gap: 28px; align-items: flex-start; justify-content: center;
+  display: flex; gap: 72px; align-items: flex-start; justify-content: center;
   max-width: 1400px; width: 100%;
   position:relative; z-index:1;
   margin-top: 50px;
@@ -445,7 +449,6 @@ body {
   display: flex; flex-direction: column; gap: 0;
   border-right: 2px solid var(--yellow);
   padding-right: 20px;
-  margin-right: -100px;
   opacity: 0; transform: translateX(20px);
   transition: opacity .6s ease .3s, transform .6s cubic-bezier(0.16,1,0.3,1) .3s;
 }
@@ -519,7 +522,7 @@ body {
 
 .s4-image {
   margin-left: calc(-3vw - 40px);
-  margin-top: 90px;
+  margin-top: 50px;
 }
 .s4-image img {
   width: 100%;
@@ -532,24 +535,28 @@ body {
   display: flex; flex-direction: column;
   gap: 0;
   padding-left: 32px;
-  margin-top: 30px;
+  margin-top: 210px;
 }
 
 .s4-prop {
-  padding: 20px 0;
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #1A1A1A;
 }
+.s4-prop:last-child { border-bottom: none; }
 
 .s4-prop-num {
-  font-size: clamp(32px, 3.5vw, 48px); font-weight: 700;
+  font-size: clamp(24px, 2.2vw, 34px); font-weight: 700;
   color: #28C840; letter-spacing: -0.04em; line-height: 1;
-  margin-bottom: 6px;
+  flex-shrink: 0; width: 160px;
 }
+.s4-prop-text { flex: 1; min-width: 0; }
 .s4-prop-title {
-  font-size: clamp(15px, 1.4vw, 20px); font-weight: 700; color: var(--white);
-  letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 5px;
+  font-size: clamp(14px, 1.2vw, 17px); font-weight: 700; color: var(--white);
+  letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 3px;
 }
 .s4-prop-desc {
-  font-size: 13px; color: #888; line-height: 1.5;
+  font-size: 12px; color: #888; line-height: 1.45;
 }
 /* ── section-5-devzero ── */
 #s5-wrapper {
@@ -1194,11 +1201,11 @@ body {
   content: ''; position: absolute; inset: 0;
   background-size: cover; background-position: center;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.75;
 }
 .cust-slide::after {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 45%, rgba(0,0,0,0.15) 100%);
+  background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.05) 100%);
   pointer-events: none;
 }
 .cust-slide > * { position: relative; z-index: 1; }
@@ -1934,28 +1941,38 @@ body {
     <div class="s4-props">
       <div class="s4-prop">
         <div class="s4-prop-num">$-</div>
-        <div class="s4-prop-title">Virtually Free Dev</div>
-        <div class="s4-prop-desc">Spec-driven development — describe what you want, the platform builds it.</div>
+        <div class="s4-prop-text">
+          <div class="s4-prop-title">Virtually Free Dev</div>
+          <div class="s4-prop-desc">Spec-driven development — describe what you want, the platform builds it.</div>
+        </div>
       </div>
       <div class="s4-prop">
         <div class="s4-prop-num">99.9999%</div>
-        <div class="s4-prop-title">Agents With No Downtime</div>
-        <div class="s4-prop-desc">Active-active HA/DR — six nines of availability for long-running agents.</div>
+        <div class="s4-prop-text">
+          <div class="s4-prop-title">Agents With No Downtime</div>
+          <div class="s4-prop-desc">Active-active HA/DR — six nines of availability for long-running agents.</div>
+        </div>
       </div>
       <div class="s4-prop">
         <div class="s4-prop-num">100%</div>
-        <div class="s4-prop-title">Self-Governing Agents</div>
-        <div class="s4-prop-desc">Embedded eval, policies, and governance — compliance built in, not bolted on.</div>
+        <div class="s4-prop-text">
+          <div class="s4-prop-title">Self-Governing Agents</div>
+          <div class="s4-prop-desc">Embedded eval, policies, and governance — compliance built in, not bolted on.</div>
+        </div>
       </div>
       <div class="s4-prop">
         <div class="s4-prop-num">90%</div>
-        <div class="s4-prop-title">Less Infra Cost</div>
-        <div class="s4-prop-desc">Fewer CPUs from actor-based concurrency &amp; shared compute. Fewer tokens from durable execution &amp; intelligent context.</div>
+        <div class="s4-prop-text">
+          <div class="s4-prop-title">Less Infra Cost</div>
+          <div class="s4-prop-desc">Fewer CPUs from actor-based concurrency &amp; shared compute. Fewer tokens from durable execution &amp; intelligent context.</div>
+        </div>
       </div>
       <div class="s4-prop">
         <div class="s4-prop-num">10&times;</div>
-        <div class="s4-prop-title">Higher Change Velocity</div>
-        <div class="s4-prop-desc">Internal dev portal, multi-tenant ops, and golden path SDLC best practices.</div>
+        <div class="s4-prop-text">
+          <div class="s4-prop-title">Higher Change Velocity</div>
+          <div class="s4-prop-desc">Internal dev portal, multi-tenant ops, and golden path SDLC best practices.</div>
+        </div>
       </div>
     </div>
   </div>
