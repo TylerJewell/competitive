@@ -270,19 +270,13 @@ body {
   box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 120px rgba(245,197,24,0.03);
 }
 .app-chrome {
-  background: #141414;
-  padding: 10px 16px;
-  display: flex; align-items: center; gap: 8px;
+  background: #0D0D0D;
+  padding: 8px 16px;
+  display: flex; align-items: center;
   border-bottom: 1px solid #1C1C1C;
 }
-.app-dot { width: 10px; height: 10px; border-radius: 5px; }
-.app-dot.r { background: #FF5F57; }
-.app-dot.y { background: #FEBC2E; }
-.app-dot.g { background: #28C840; }
 .app-url {
-  flex: 1; margin-left: 12px;
-  background: #0A0A0A; border-radius: 4px;
-  padding: 5px 12px; font-size: 11px; color: #666;
+  font-size: 11px; color: #555;
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
 }
 .app-body {
@@ -442,11 +436,6 @@ body {
   border-bottom: 1px solid #1C1C1C;
   display: flex; align-items: center; gap: 8px;
 }
-.arch-code-dots { display: flex; gap: 5px; }
-.arch-code-dot { width: 8px; height: 8px; border-radius: 4px; }
-.arch-code-dot.r { background: #FF5F57; }
-.arch-code-dot.y { background: #FEBC2E; }
-.arch-code-dot.g { background: #28C840; }
 .arch-code-filename {
   font-size: 11px; color: #666; margin-left: 8px;
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
@@ -939,9 +928,6 @@ body {
 
       <div class="app-frame reveal">
         <div class="app-chrome">
-          <div class="app-dot r"></div>
-          <div class="app-dot y"></div>
-          <div class="app-dot g"></div>
           <div class="app-url">https://order-service.akka.app/dashboard</div>
         </div>
         <div class="app-body">
@@ -1053,7 +1039,6 @@ body {
             <div class="arch-diagram-desc" id="archDiagramDesc"></div>
             <div class="arch-diagram-frame">
               <div class="arch-diagram-bar">
-                <div class="arch-code-dots"><div class="arch-code-dot r"></div><div class="arch-code-dot y"></div><div class="arch-code-dot g"></div></div>
                 <span class="arch-diagram-filename" id="archDiagramFile"></span>
                 <span class="arch-diagram-source">mermaid</span>
               </div>
@@ -1071,7 +1056,6 @@ body {
             <div class="arch-code-desc" id="archCodeDesc"></div>
             <div class="arch-code-block">
               <div class="arch-code-bar">
-                <div class="arch-code-dots"><div class="arch-code-dot r"></div><div class="arch-code-dot y"></div><div class="arch-code-dot g"></div></div>
                 <span class="arch-code-filename" id="archCodeFile"></span>
               </div>
               <div class="arch-code-body" id="archCodeBody"></div>
