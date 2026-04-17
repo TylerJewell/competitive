@@ -1,5 +1,5 @@
 ---
-description: Generate a personalized demo presentation from an Akka project. Introspects the project, builds the app, and produces an interactive HTML sales presentation with the demo embedded.
+description: Generate personalized Akka sales presentations. Supports 4 modes — generic pitch, sales leave-behind, live SA demo, customer self-serve. Run `/akka:demo help` for usage.
 handoffs:
   - label: Check Setup
     agent: akka.setup
@@ -21,8 +21,84 @@ handoffs:
 $ARGUMENTS
 ```
 
-You **MUST** consider the user input before proceeding (if not empty).
-If the user provides a GitHub repo URL, clone it first, then run the demo generation from that directory.
+You **MUST** consider the user input before proceeding.
+
+### Help Mode
+
+If `$ARGUMENTS` is `help` or `--help`, print this usage guide and stop:
+
+```
+/akka:demo — Generate interactive Akka presentations
+
+MODES:
+  --mode overview       Standard Akka platform presentation
+  --mode shareable      Offline-ready presentation with project showcase
+  --mode live           Presentation with embedded running app (default)
+  --mode hands-on       Presentation with setup guide for the recipient to run it
+
+OPTIONS:
+  --presenter NAME      Your name on the title slide
+  --presenter-title T   Your title
+  --for NAME            Who this presentation is for
+  --logo PATH           Their logo image
+  --project PATH        Path to Akka project (default: current directory)
+  --repo URL            Git repo URL (for hands-on mode)
+  --output PATH         Output file (default: ./demo-presentation.html)
+  --port PORT           Override service port detection
+
+EXAMPLES:
+  /akka:demo                                    Interactive setup
+  /akka:demo --mode overview                    Standard platform presentation
+  /akka:demo --for "NTT Data"                   Live demo for NTT Data
+  /akka:demo --mode shareable --for "Manulife"  Shareable with screenshots
+  /akka:demo --mode hands-on --repo <url>       Hands-on package
+```
+
+### Interactive Mode
+
+If `$ARGUMENTS` is empty or missing required values, prompt the user interactively:
+
+First, briefly explain what `/akka:demo` does:
+
+> This skill generates an interactive presentation showcasing Akka and (optionally) a specific project you've built. You can personalize it, include a live app, or package it for someone else to explore on their own.
+
+Then ask:
+
+1. **"What kind of presentation do you need?"**
+   - **Overview** — The standard Akka platform presentation, no project-specific content → `--mode generic`
+   - **Shareable** — A presentation with a project showcase someone can browse offline (screenshots, architecture, code) → `--mode leave-behind`
+   - **Live** — A presentation with your running app embedded for a live walkthrough → `--mode live`
+   - **Hands-on** — A presentation packaged for the recipient to clone the project and run it themselves → `--mode customer`
+
+2. **"Your name?"** (skip for overview) — default: git user name
+3. **"Your title?"** (skip for overview) — default: blank
+4. **"Who is this for?"** (skip for overview) — the person or team receiving the presentation
+5. **"Their logo?"** (optional) — path to an image file
+6. **"Project directory?"** (skip for overview) — default: current directory
+7. **"Repository URL?"** (hands-on mode only) — the repo the recipient will clone
+
+### Argument Parsing
+
+If `$ARGUMENTS` contains flags, parse them:
+- `--mode VALUE` — one of: overview, shareable, live, hands-on
+- `--presenter VALUE` — your name
+- `--presenter-title VALUE` — your title
+- `--for VALUE` — who this presentation is for
+- `--logo VALUE` — path to their logo image
+- `--project VALUE` — path to Akka project directory
+- `--repo VALUE` — git repo URL (hands-on mode)
+- `--output VALUE` — output file path
+- `--port VALUE` — service port override
+
+A bare path argument (no flag) is treated as `--project`.
+A bare URL argument (starts with http) is treated as `--repo` and implies cloning.
+
+**Legacy flag aliases** (for backward compatibility):
+- `--customer` → `--for`
+- `--customer-logo` → `--logo`
+- `generic` → `overview`
+- `leave-behind` → `shareable`
+- `customer` → `hands-on`
 
 ## Purpose
 
