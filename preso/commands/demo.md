@@ -359,10 +359,10 @@ If environment is ready and user wants the live app embedded:
 Read all four template files from the plugin installation directory:
 
 ```
-~/.claude/plugins/akka-specify-demo-plugin/templates/base.html   — full Akka sales deck with 5 insertion markers
-~/.claude/plugins/akka-specify-demo-plugin/templates/demo.css    — all #demo-section scoped CSS (~400 lines)
-~/.claude/plugins/akka-specify-demo-plugin/templates/demo.html   — demo section HTML with {{PLACEHOLDER}} markers + TAB6 markers
-~/.claude/plugins/akka-specify-demo-plugin/templates/demo.js     — tab switching, SVG diagrams, keyboard nav (~240 lines)
+~/.claude/plugins/akka/templates/base.html   — full Akka sales deck with 5 insertion markers
+~/.claude/plugins/akka/templates/demo.css    — all #demo-section scoped CSS (~400 lines)
+~/.claude/plugins/akka/templates/demo.html   — demo section HTML with {{PLACEHOLDER}} markers + TAB6 markers
+~/.claude/plugins/akka/templates/demo.js     — tab switching, SVG diagrams, keyboard nav (~240 lines)
 ```
 
 Read all four files in full before beginning assembly.
