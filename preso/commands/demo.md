@@ -60,22 +60,38 @@ If `$ARGUMENTS` is empty or missing required values, prompt the user interactive
 
 First, briefly explain what `/akka:demo` does:
 
-> This skill generates an interactive presentation showcasing Akka and (optionally) a specific project you've built. You can personalize it, include a live app, or package it for someone else to explore on their own.
+> This skill generates an interactive presentation showcasing Akka and (optionally) a specific project you've built. You can personalize it, include a live app, or package it for someone else to explore — without the live app — on their own.
 
 Then ask:
 
 1. **"What kind of presentation do you need?"**
-   - **Overview** — The standard Akka platform presentation, no project-specific content → `--mode generic`
+   - **Overview** — "What is Akka?" presentation, no project-specific content → `--mode overview`
    - **Shareable** — A presentation with a project showcase someone can browse offline (screenshots, architecture, code) → `--mode leave-behind`
    - **Live** — A presentation with your running app embedded for a live walkthrough → `--mode live`
    - **Hands-on** — A presentation packaged for the recipient to clone the project and run it themselves → `--mode customer`
 
 2. **"Your name?"** (skip for overview) — default: git user name
 3. **"Your title?"** (skip for overview) — default: blank
-4. **"Who is this for?"** (skip for overview) — the person or team receiving the presentation
-5. **"Their logo?"** (optional) — path to an image file
+4. **"Who are you presenting to?"** (skip for overview) — the person or team receiving the presentation
+5. **"Recipient's logo?"** (optional) — path to an image file
 6. **"Project directory?"** (skip for overview) — default: current directory
 7. **"Repository URL?"** (hands-on mode only) — the repo the recipient will clone
+
+After collecting all answers, show a confirmation summary before generating:
+
+```
+Ready to generate:
+
+  Mode        Live
+  Presenter   Alex Klikic, Solutions Architect, Akka
+  For         NTT Data
+  Project     ./samples/social-proofing-agent
+  Output      ./demo-presentation.html
+
+Generate? [Y/n]
+```
+
+If the user confirms (or presses Enter), proceed. If they say no, cancel and let them re-run with different options.
 
 ### Argument Parsing
 
@@ -213,97 +229,65 @@ If the user doesn't want to build now, the presentation is still generated — t
 
 ### Step 5: Generate the Presentation HTML
 
-This is the main output step. Generate a single HTML file by following the **integration recipe**.
+This is the main output step. Assemble a single HTML file from the template files in `preso/templates/`. Do **not** synthesize CSS, JS, or structural HTML from scratch — read the templates and substitute placeholders.
 
-#### 5a. Load the base presentation
+#### 5a. Load the base template
 
-Read the base sales presentation template. This is the `akka-sales-presentation.html` file which contains the full Akka story (title, hero, social proof, complexity, platform, dev zero, resilience, governance, customers, packages, partners, closing).
+Read `preso/templates/base.html`. This is the full sales presentation with these markers already in place:
+- `{{PRESENTER_NAME}}` / `{{PRESENTER_TITLE}}` / `{{PRESENTER_LINKEDIN}}` — title slide
+- `<!-- DEMO_CSS_MARKER -->` — just before `</style>`
+- `<!-- DEMO_HTML_MARKER -->` — between s9-wrapper and `<section id="closing">`
+- `document.getElementById('demo-wrapper'),` — already in the views array
+- `/* DEMO_JS_MARKER */` — just before `</script>`
 
-#### 5b. Generate the demo CSS
+#### 5b. Substitute presenter info
 
-Take all CSS from the demo showcase template. Scope every selector under `#demo-section` to prevent bleed into the main presentation:
+Replace in the loaded HTML:
+- `{{PRESENTER_NAME}}` → presenter name (from `--presenter` or git user)
+- `{{PRESENTER_TITLE}}` → presenter title (from `--presenter-title` or blank)
+- `{{PRESENTER_LINKEDIN}}` → LinkedIn URL if known, else `#`
 
-```css
-#demo-section .showcase { display: flex; height: 100vh; position: relative; }
-#demo-section .nav { width: 180px; flex-shrink: 0; /* ... */ }
-#demo-section .content { flex: 1; min-width: 0; /* ... */ }
-/* ... all other demo styles scoped ... */
-```
+For **overview mode**: remove the entire `.title-presenter` div (no presenter on generic deck).
 
-Append this CSS at the end of the presentation's `<style>` block.
+#### 5c. Build the demo section substitutions
 
-#### 5c. Generate the demo HTML
+Read `preso/templates/demo.html`. Replace these placeholders with project-specific content from the introspection in Step 2:
 
-Build the demo section HTML with these tabs:
+| Placeholder | Source |
+|-------------|--------|
+| `{{DEMO_TITLE}}` | Project name HTML, e.g. `Social Proofing <span class="accent">Agent</span>` |
+| `{{DEMO_DESCRIPTION}}` | spec.md first paragraph, or project name + component summary |
+| `{{REQUIREMENTS_HTML}}` | `<li>` items from spec.md bullet lists |
+| `{{BUILD_TIME}}` | Measured build time, or estimate (e.g. `"35m"`) |
+| `{{LOC}}` | Total Java line count (formatted with comma) |
+| `{{APP_HEADLINE}}` | Mode-specific headline HTML |
+| `{{APP_DESCRIPTION}}` | Mode-specific one-sentence description |
+| `{{APP_CONTENT_HTML}}` | Mode-specific app frame (see below) |
+| `{{APP_STATS_HTML}}` | `.app-stat` divs: endpoints, entities, events, agents, views, LOC |
+| `{{ARCH_SUMMARY_HTML}}` | Six `.arch-summary-stat` divs: components, events, endpoints, design views, agents, LOC |
+| `{{COMPONENTS_TABLE_HTML}}` | Full component table HTML (groups + rows + details with syntax-highlighted code) |
+| `{{REPO_URL}}` | Git repo URL for Try It Yourself step 3 |
+| `{{SEQUENCE_DATA_JSON}}` | JSON `{participants:[...], messages:[...]}` from plan-diagrams.md sequence data |
 
-**Tab 1: The Brief**
-- Title from spec.md first heading
-- Description from spec.md first paragraph
-- Requirements from spec.md bullet lists
-- Stats: build time (measured or estimated), "1 engineer", LOC count
+**`{{APP_CONTENT_HTML}}` by mode:**
+- **live**: `<div class="app-frame">` with iframe to `{{SERVICE_URL}}` if running, or boot terminal with polling if not
+- **shareable**: `<div class="app-frame">` with screenshot gallery placeholder
+- **hands-on**: Run It Yourself step-by-step guide replacing the app frame entirely
+- **overview**: Tab 2 is omitted
 
-**Tab 2: The App**
-- If service is running: embed iframe to the service URL
-- If not running: show two buttons:
-  - "Check Setup" — styled button that tells user to run `/akka:setup`
-  - "Start App" — styled button that tells user to run `/akka:build`
-  - Status indicator showing current state (not started / building / running / error)
-- Stats bar: endpoint count, entity types, event types, agent count, view count, LOC
+#### 5d. Assemble the output HTML
 
-**Tab 3: The Architecture**
-- Summary stats grid (component count, event types, endpoints, design views, LOC)
-- Expandable component table with all components grouped by type
-- Each row expands to show description + syntax-highlighted source code
-- Design views show rendered diagrams:
-  - User Journey: phase-priority flow nodes
-  - Actor-Goal: styled table (Actor | Goal | Components | External)
-  - Entity Map: entity relationship boxes with arrows
-  - Component Graph: layered bands (External → API → Application) with SVG connector lines
-  - Sequence Diagram: full SVG lifeline diagram with participants and colored regions
+1. Replace `<!-- DEMO_CSS_MARKER -->` with the full contents of `preso/templates/demo.css`
+2. Replace `<!-- DEMO_HTML_MARKER -->` with the substituted `demo.html` content
+3. Replace `/* DEMO_JS_MARKER */` with the full contents of `preso/templates/demo.js`
 
-**Tab 4: The Platform** — same as template (multi-tenant, API control plane, SDLC, best practices)
+The views array already contains `demo-wrapper` — no further JS changes needed.
 
-**Tab 5: Ship It** — same as template (deploy options, certifications, cost comparison)
+#### 5e. Mode-specific tab adjustments
 
-**Tab 6: Try It Yourself** — customized with the project's repo URL in step 3
-
-#### 5d. Insert the demo HTML
-
-Insert between the last presentation section (`</div>` after s9-wrapper) and `<section id="closing">`:
-
-```html
-<div id="demo-wrapper" style="height:200vh; position:relative;">
-<div id="demo-section" style="position:sticky; top:0; height:100vh; overflow:hidden;">
-<div class="showcase" style="display:flex; height:100%;">
-  <!-- nav + content -->
-</div>
-</div>
-</div>
-```
-
-**CRITICAL integration rules** (from integration-recipe.md):
-- Wrapper height: `200vh` (one viewport of scroll anchor)
-- Sticky top: `0` (NO top nav bar offset)
-- Showcase: `display: flex` (NOT block — sidebar breaks otherwise)
-- Nav: regular sidebar (NOT floating — floating overlaps content)
-- Nav footer: `display: none` (saves vertical space)
-- Nav tabs: compact padding (`10px 16px`) so all 6 fit in viewport
-- Do NOT add a top navigation bar (breaks all sticky sections)
-
-#### 5e. Generate the demo JS
-
-Append to the presentation's `<script>` block:
-1. Demo tab switching (scoped to `#demo-section`)
-2. Component expandable row toggle with chevron injection
-3. Sequence diagram SVG rendering (measures container width dynamically)
-4. Component graph SVG connector line drawing with auto-measured source widths
-5. MutationObserver to re-draw SVG when detail panels open
-6. Install method tab switching (for Try It Yourself tab)
-7. Demo keyboard handling (1-6 keys when demo is in viewport)
-
-#### 5f. Update view-jump navigation
-
-Add `document.getElementById('demo-wrapper')` to the `views` array, between `s9-wrapper` and `closing`.
+- **overview**: No demo section at all — skip steps 5c/5d entirely. Output is just `base.html` with presenter info substituted.
+- **hands-on**: Remove Tab 6 (Try It Yourself) from the nav and panels — it's redundant with the run guide in Tab 2.
+- **shareable** / **live**: All 6 tabs included as-is.
 
 ### Step 6: Write Output and Report
 
