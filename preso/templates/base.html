@@ -1657,11 +1657,10 @@ body {
 
 /* Quote panel */
 .s9-quote-panel {
-  width: 380px; flex-shrink: 0;
-  display: flex; flex-direction: column;
-  justify-content: center;
-  padding-left: 28px;
+  display: flex; align-items: center; gap: 24px;
+  padding: 16px 24px;
   border-left: 3px solid #86BC25;
+  margin-top: 16px;
 }
 .s9-quote-text {
   font-size: clamp(18px, 1.8vw, 26px); font-weight: 600;
@@ -2524,7 +2523,7 @@ body {
         <div class="pkg-tier" data-tier="2">
           <div class="pkg-tier-name">Day 2 Ops</div>
           <div class="pkg-tier-price">Your VPC</div>
-          <div class="pkg-tier-price-note">annual bundle</div>
+
           <div class="pkg-tier-position">First production deployment in your VPC.<br>Replaces 6-8 separately billed services.</div>
           <div class="pkg-tier-infra">
             <div class="pkg-infra-row"><span class="pkg-infra-pill">2 Akka VPCs</span></div>
@@ -2534,7 +2533,7 @@ body {
         <div class="pkg-tier" data-tier="3">
           <div class="pkg-tier-name">Business Continuity</div>
           <div class="pkg-tier-price">Your VPC</div>
-          <div class="pkg-tier-price-note">annual bundle</div>
+
           <div class="pkg-tier-position">Mission-critical systems that cannot tolerate outages. Managed active-active HA/DR.</div>
           <div class="pkg-tier-infra">
             <div class="pkg-infra-row"><span class="pkg-infra-spacer"></span><span class="pkg-infra-pill">3 Akka VPCs</span></div>
@@ -2545,7 +2544,7 @@ body {
         <div class="pkg-tier" data-tier="4">
           <div class="pkg-tier-name">Sovereign Cloud</div>
           <div class="pkg-tier-price">Your VPC</div>
-          <div class="pkg-tier-price-note">annual bundle</div>
+
           <div class="pkg-tier-position">Country isolated data, networking, and operations.</div>
           <div class="pkg-tier-infra">
             <div class="pkg-infra-row"><span class="pkg-infra-spacer"></span><span class="pkg-infra-pill">3 Akka VPCs</span></div>
@@ -2607,11 +2606,11 @@ body {
         <div class="s9-partner-desc">Akka-native engineering. Hands-on implementation, migration, and production ops.</div>
       </div>
     </div>
+  </div>
 
-    <div class="s9-quote-panel">
-      <div class="s9-quote-text">&ldquo;Akka is hands-down the best AI platform available.&rdquo;</div>
-      <div class="s9-quote-attr">&mdash; Deloitte</div>
-    </div>
+  <div class="s9-quote-panel s9-reveal">
+    <div class="s9-quote-text">&ldquo;Akka provides the industry&rsquo;s best way to build agentic AI systems that scale in the enterprise and ensure stability, performance, and outcomes.&rdquo;</div>
+    <div class="s9-quote-attr">&mdash; Anand Nimkar, Partner - AI Practice Lead, Deloitte</div>
   </div>
 </section>
 </div>
