@@ -329,7 +329,7 @@ body {
 }
 /* ── section-3-complexity ── */
 #s2-wrapper {
-  height: 200vh;          /* longer dead scroll so view anchors for more clicks */
+  height: 300vh;          /* longer dead scroll so view anchors for more clicks */
   position: relative;
 }
 #s2-sticky {
@@ -484,7 +484,7 @@ body {
 }
 /* ── section-4-platform ── */
 #s4-wrapper {
-  height: 140vh;
+  height: 180vh;
   position: relative;
 }
 #s4 {
@@ -552,7 +552,7 @@ body {
 }
 
 .s4-prop {
-  display: flex; align-items: baseline; gap: 16px;
+  display: flex; align-items: flex-start; gap: 16px;
   padding: 14px 0;
   border-bottom: 1px solid #1A1A1A;
 }
@@ -561,7 +561,7 @@ body {
 .s4-prop-num {
   font-size: clamp(24px, 2.2vw, 34px); font-weight: 700;
   color: #28C840; letter-spacing: -0.04em; line-height: 1;
-  flex-shrink: 0; width: 160px;
+  flex-shrink: 0; width: 160px; text-align: right;
 }
 .s4-prop-text { flex: 1; min-width: 0; }
 .s4-prop-title {
@@ -620,9 +620,9 @@ body {
 .s5-headline .accent { color:var(--yellow); }
 
 .s5-props {
-  display: flex; gap: 36px; flex-shrink: 0;
+  display: flex; gap: 20px; flex-shrink: 0; max-width: 49%;
 }
-.s5-prop { border-left: 3px solid #222; padding-left: 18px; max-width: 220px; }
+.s5-prop { border-left: 3px solid #222; padding-left: 18px; flex: 1; min-width: 0; }
 .s5-prop-title {
   font-size: 18px; font-weight: 700; color: var(--white);
   letter-spacing: -0.02em; margin-bottom: 4px; line-height: 1.2;
@@ -662,14 +662,16 @@ body {
   border-bottom: 1px solid #1C1C1C;
   flex-shrink: 0;
 }
-.s5-term-dot { width: 10px; height: 10px; border-radius: 50%; }
-.s5-term-dot.r { background: #FF5F57; }
-.s5-term-dot.y { background: #FEBC2E; }
-.s5-term-dot.g { background: #28C840; }
-.s5-term-title {
+.s5-term-prompt {
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-  font-size: 11px; color: #555; margin-left: 8px;
+  font-size: 12px;
 }
+.s5-term-prompt .p-bracket { color: #555; }
+.s5-term-prompt .p-user { color: #28C840; font-weight: 600; }
+.s5-term-prompt .p-at { color: #555; }
+.s5-term-prompt .p-host { color: #5BA3F5; font-weight: 600; }
+.s5-term-prompt .p-dir { color: #555; }
+.s5-term-prompt .p-dollar { color: var(--yellow); font-weight: 700; margin-left: 2px; }
 .s5-term-body {
   padding: 16px 24px;
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
@@ -1284,7 +1286,7 @@ body {
 
 .pkg-sub {
   font-size: clamp(14px, 1.2vw, 18px); color: #888;
-  max-width: 700px; line-height: 1.5; margin-bottom: 64px;
+  max-width: 700px; line-height: 1.5; margin-bottom: 32px;
   position:relative; z-index:1;
 }
 
@@ -1310,53 +1312,70 @@ body {
   width: 1px; height: 24px; background: #222;
 }
 
-/* ── Sandbox card (full-width horizontal) ── */
-.pkg-sandbox {
-  display: flex; align-items: center; gap: 40px;
-  background: #0A0A0A;
-  border: 1px dashed #333;
-  border-radius: 12px;
-  padding: 14px 28px;
-  margin-top: 16px;
-  margin-bottom: 16px;
+/* ── Two-column split: Eval | Production ── */
+.pkg-split {
+  display: flex; gap: 20px; align-items: stretch;
   position: relative; z-index: 1;
-}
-.pkg-sandbox-left {
-  display: flex; align-items: center; gap: 16px;
-  flex-shrink: 0;
-}
-.pkg-sandbox-badge {
-  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
-  color: var(--white); font-weight: 600;
-}
-.pkg-sandbox-name {
-  font-size: 26px; font-weight: 700; color: var(--yellow);
-}
-.pkg-sandbox-desc {
-  font-size: 15px; color: #bbb; line-height: 1.5; flex: 1; min-width: 0;
-}
-.pkg-sandbox-specs {
-  list-style: none; padding: 0;
-  display: flex; gap: 28px; flex-shrink: 0;
-}
-.pkg-sandbox-specs li {
-  font-size: 14px; color: #888;
-}
-.pkg-sandbox-specs li span { color: var(--yellow); font-weight: 600; }
-.pkg-sandbox-convert {
-  font-size: 13px; color: #999; flex-shrink: 0; max-width: 220px; line-height: 1.45;
-  border-left: 2px solid var(--yellow); padding-left: 14px;
+  margin-bottom: 20px;
 }
 
-/* ── Production SRE banner ── */
+/* Eval column (9×5) */
+.pkg-eval-col {
+  width: 210px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+.pkg-sla-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+.pkg-sla-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+  color: #666; font-weight: 600;
+}
+.pkg-sla-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  color: #666; border: 1px solid #333; border-radius: 4px; padding: 2px 6px;
+}
+.pkg-eval-card {
+  background: #0A0A0A; border: 1px dashed #333; border-radius: 10px;
+  padding: 18px; flex: 1; display: flex; flex-direction: column;
+}
+.pkg-eval-name {
+  font-size: 22px; font-weight: 700; color: var(--yellow); margin-bottom: 8px;
+}
+.pkg-eval-desc {
+  font-size: 12px; color: #888; line-height: 1.5; margin-bottom: 14px;
+}
+.pkg-eval-specs {
+  list-style: none; padding: 0; margin: 0 0 14px;
+  border-top: 1px solid #1A1A1A;
+}
+.pkg-eval-specs li {
+  font-size: 11px; color: #888; padding: 5px 0;
+  border-bottom: 1px solid #111;
+  display: flex; justify-content: space-between;
+}
+.pkg-eval-specs li:last-child { border-bottom: none; }
+.pkg-eval-specs .spec-val { color: var(--white); font-weight: 600; }
+.pkg-eval-convert {
+  font-size: 11px; color: #555; line-height: 1.45; margin-top: auto;
+  border-top: 1px solid #1A1A1A; padding-top: 10px;
+}
+
+/* Production column (24/7) */
+.pkg-prod-col {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+/* SRE banner (inside prod col) */
 .pkg-sre-banner {
   display: flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 8px 24px;
+  padding: 7px 24px;
   background: linear-gradient(90deg, transparent, rgba(40,200,64,0.08), transparent);
   border-top: 1px solid #28C840;
-  border-bottom: 1px solid rgba(40,200,64,0.2);
-  margin-bottom: 14px;
-  position: relative; z-index: 1;
+  border-bottom: 1px solid #28C840;
+  flex-shrink: 0;
 }
 .pkg-sre-banner-text {
   font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
@@ -1371,13 +1390,50 @@ body {
   50% { opacity: 0.3; }
 }
 
-/* ── Production tier cards ── */
+/* Starter card — emphasized compact banner */
+.pkg-starter {
+  background: #0A0A0A; border: 1px solid #2a2a2a; border-radius: 10px;
+  padding: 12px 20px; position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
+}
+.pkg-starter::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 3px; background: var(--yellow);
+}
+.pkg-starter-top {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.pkg-starter-meta {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+}
+.pkg-akka-badge {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: var(--yellow); border: 1px solid rgba(245,197,24,0.5); border-radius: 4px;
+  padding: 3px 10px; background: rgba(245,197,24,0.07);
+}
+.pkg-starter-billing { font-size: 11px; color: #555; margin-left: 4px; }
+.pkg-starter-regions {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid #1A1A1A;
+}
+.pkg-region-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; font-weight: 600; white-space: nowrap;
+}
+.pkg-region-chips { display: flex; gap: 5px; }
+.pkg-chip {
+  font-size: 10px; font-weight: 600; color: #aaa;
+  border: 1px solid #2a2a2a; border-radius: 3px; padding: 2px 6px;
+  background: #111;
+}
+.pkg-region-divider { width: 1px; height: 14px; background: #2a2a2a; }
+
+/* ── Production tier cards (3 columns) ── */
 .pkg-tiers {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
   position: relative; z-index: 1;
-  margin-bottom: 20px;
+  flex: 1;
 }
 .pkg-tier {
   background: #0A0A0A;
@@ -1396,8 +1452,6 @@ body {
 }
 .pkg-tier.visible::before { transform: scaleX(1); }
 
-/* Tier progression — wider yellow bar for higher tiers */
-.pkg-tier[data-tier="1"]::before { height: 3px; }
 .pkg-tier[data-tier="2"]::before { height: 4px; }
 .pkg-tier[data-tier="3"]::before { height: 5px; }
 .pkg-tier[data-tier="4"]::before { height: 6px; }
@@ -1412,8 +1466,7 @@ body {
   font-size: 11px; color: #555; margin-bottom: 10px;
 }
 .pkg-tier-position {
-  font-size: 12px; color: #ccc; line-height: 1.4; margin-bottom: 12px;
-  min-height: 48px;
+  font-size: 12px; color: #ccc; line-height: 1.4; margin-bottom: 0;
 }
 .pkg-tier-specs {
   list-style: none; padding: 0; margin: 0;
@@ -1428,7 +1481,28 @@ body {
 .pkg-tier-specs li:last-child { border-bottom: none; }
 .pkg-tier-specs .spec-val { color: var(--white); font-weight: 600; text-align: right; }
 
-/* Highlight the unique differentiators */
+.pkg-tier-infra {
+  display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid #1A1A1A;
+}
+.pkg-infra-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.pkg-infra-spacer {
+  width: 24px; flex-shrink: 0;
+}
+.pkg-infra-plus {
+  font-size: 26px; font-weight: 800; color: var(--yellow);
+  line-height: 1; width: 24px; text-align: center; flex-shrink: 0;
+  text-shadow: 0 0 12px rgba(245,197,24,0.4);
+}
+.pkg-infra-pill {
+  font-size: 14px; font-weight: 600; color: var(--yellow);
+  border: 1px solid rgba(245,197,24,0.25); border-radius: 4px;
+  padding: 5px 12px; background: rgba(245,197,24,0.05);
+  display: inline-block; width: fit-content;
+}
+
 .pkg-tier-diff {
   margin-top: 14px; padding-top: 12px;
   border-top: 1px solid var(--yellow);
@@ -1948,7 +2022,7 @@ body {
   <div class="s4-layout s4-reveal">
     <div class="s4-left">
       <div class="s4-eyebrow">The answer</div>
-      <div class="s4-headline">Akka is an <span class="accent">Agentic AI Platform</span> that tames AI complexity.</div>
+      <div class="s4-headline">Akka is an <span class="accent">Agentic AI Platform</span><br>that tames AI complexity.</div>
       <div class="s4-image">
         <img src="images/akka-platform.png" alt="Akka Agentic AI Platform">
       </div>
@@ -1972,7 +2046,7 @@ body {
         <div class="s4-prop-num">100%</div>
         <div class="s4-prop-text">
           <div class="s4-prop-title">Self-Governing Agents</div>
-          <div class="s4-prop-desc">Embedded eval, policies, and governance — compliance built in, not bolted on.</div>
+          <div class="s4-prop-desc">Embedded governance - compliance built in not bolted on.</div>
         </div>
       </div>
       <div class="s4-prop">
@@ -2021,10 +2095,7 @@ body {
     <div class="s5-term-col">
       <div class="s5-terminal">
         <div class="s5-term-header">
-          <div class="s5-term-dot r"></div>
-          <div class="s5-term-dot y"></div>
-          <div class="s5-term-dot g"></div>
-          <span class="s5-term-title">claude-code ~ loyalty-service</span>
+          <span class="s5-term-prompt"><span class="p-bracket">[</span><span class="p-user">akka</span><span class="p-at">@</span><span class="p-host">my-dev</span> <span class="p-dir">~</span><span class="p-bracket">]</span><span class="p-dollar">$</span></span>
         </div>
         <div class="s5-term-body" id="s5TermBody"></div>
       </div>
@@ -2377,7 +2448,7 @@ body {
 <section id="pkg">
 <div class="pkg-inner">
   <div class="pkg-eyebrow pkg-reveal">The packages</div>
-  <div class="pkg-headline pkg-reveal pkg-reveal-d1">One platform. <span class="accent">Five ways in.</span></div>
+  <div class="pkg-headline pkg-reveal pkg-reveal-d1">One platform. <span class="accent">Start free.</span></div>
   <div class="pkg-sub pkg-reveal pkg-reveal-d2">Every configuration runs the full Akka platform — the same runtime, the same APIs, the same developer experience. You choose where it runs and how much you need.</div>
 
   <!-- Infrastructure bar -->
@@ -2398,89 +2469,94 @@ body {
     </div>
   </div>
 
-  <!-- ════ SANDBOX (full-width horizontal) ════ -->
-  <div class="pkg-sandbox pkg-reveal pkg-reveal-d4">
-    <div class="pkg-sandbox-left">
-      <div>
-        <div class="pkg-sandbox-badge">Evaluation</div>
-        <div class="pkg-sandbox-name">Sandbox</div>
+  <!-- ════ SPLIT: EVAL | PRODUCTION ════ -->
+  <div class="pkg-split pkg-reveal pkg-reveal-d4">
+
+    <!-- Left: Evaluation Sandbox (9×5) -->
+    <div class="pkg-eval-col">
+      <div class="pkg-sla-header">
+        <span class="pkg-sla-label">Evaluation</span>
+        <span class="pkg-sla-badge">9&times;5 Monitoring</span>
+      </div>
+      <div class="pkg-eval-card">
+        <div class="pkg-eval-name">Sandbox</div>
+        <div class="pkg-eval-desc">Build, experiment, validate — no production overhead.</div>
+        <ul class="pkg-eval-specs">
+          <li>Region <span class="spec-val">1 Akka VPC</span></li>
+          <li>Cores <span class="spec-val">5 / 5</span></li>
+          <li>SLA <span class="spec-val">Degraded</span></li>
+        </ul>
+        <div class="pkg-eval-convert">Convertible to any production tier with in-place upgrade.</div>
       </div>
     </div>
-    <div class="pkg-sandbox-desc">Great developer experience at the lowest cost. Build, experiment, validate — no production overhead.</div>
-    <ul class="pkg-sandbox-specs">
-      <li><span>Region:</span> 1 Akka VPC</li>
-      <li><span>Cores:</span> 5 / 5</li>
-      <li><span>Support:</span> 9&times;5</li>
-      <li><span>SLA:</span> Degraded</li>
-    </ul>
-    <div class="pkg-sandbox-convert">Convertible to full Akka VPC Region with 24/7 SRE SLA.</div>
-  </div>
 
-  <!-- ════ 24/7 SRE BANNER ════ -->
-  <div class="pkg-sre-banner pkg-reveal pkg-reveal-d5">
-    <div class="pkg-sre-dot"></div>
-    <div class="pkg-sre-banner-text">24/7 SRE Management &amp; Monitoring &mdash; All production tiers</div>
-    <div class="pkg-sre-dot"></div>
-  </div>
+    <!-- Right: Production (24/7) -->
+    <div class="pkg-prod-col">
 
-  <!-- ════ PRODUCTION TIERS (4 cards) ════ -->
-  <div class="pkg-tiers">
-    <div class="pkg-tier pkg-reveal pkg-reveal-d5" data-tier="1">
-      <div class="pkg-tier-name">Starter</div>
-      <div class="pkg-tier-price">Akka-hosted</div>
-      <div class="pkg-tier-price-note">consumption-based</div>
-      <div class="pkg-tier-position">Ship to production today. Akka-hosted, fully resilient, no procurement cycles. Monthly billing.</div>
-      <ul class="pkg-tier-specs">
-        <li>Regions <span class="spec-val">1 Akka Cloud</span></li>
-        <li>Cores <span class="spec-val">5 service</span></li>
-        <li>HA/DR <span class="spec-val">—</span></li>
-        <li>SLA <span class="spec-val">99.99%</span></li>
-        <li>TAM <span class="spec-val">—</span></li>
-      </ul>
-    </div>
+      <!-- SRE banner -->
+      <div class="pkg-sre-banner">
+        <div class="pkg-sre-dot"></div>
+        <div class="pkg-sre-banner-text">24/7 SRE Management &amp; Monitoring &mdash; All production tiers</div>
+        <div class="pkg-sre-dot"></div>
+      </div>
 
-    <div class="pkg-tier pkg-reveal pkg-reveal-d6" data-tier="2">
-      <div class="pkg-tier-name">Day 2 Ops</div>
-      <div class="pkg-tier-price">Your VPC</div>
-      <div class="pkg-tier-price-note">annual bundle</div>
-      <div class="pkg-tier-position">First production deployment in your VPC. Replaces 6-8 separately billed services with one platform.</div>
-      <ul class="pkg-tier-specs">
-        <li>Regions <span class="spec-val">2 Akka VPC</span></li>
-        <li>Cores <span class="spec-val">25 service</span></li>
-        <li>HA/DR <span class="spec-val">—</span></li>
-        <li>SLA <span class="spec-val">99.99%</span></li>
-        <li>TAM <span class="spec-val">1/4 time</span></li>
-      </ul>
-    </div>
+      <!-- Starter — emphasized, hosted at akka.io -->
+      <div class="pkg-starter">
+        <div class="pkg-starter-top">
+          <div class="pkg-tier-name">Starter</div>
+          <div class="pkg-starter-meta">
+            <span class="pkg-akka-badge">akka.io</span>
+            <span class="pkg-region-divider"></span>
+            <span class="pkg-chip">NA</span>
+            <span class="pkg-chip">EU</span>
+            <span class="pkg-chip">APAC</span>
+            <span class="pkg-region-divider"></span>
+            <span class="pkg-chip">AWS</span>
+            <span class="pkg-chip">GCP</span>
+            <span class="pkg-chip">Azure</span>
+          </div>
+        </div>
+        <div class="pkg-tier-position">Ship to production today. Akka-hosted, fully resilient, no procurement cycles.</div>
+      </div>
 
-    <div class="pkg-tier pkg-reveal pkg-reveal-d7" data-tier="3">
-      <div class="pkg-tier-name">Business Continuity</div>
-      <div class="pkg-tier-price">Your VPC</div>
-      <div class="pkg-tier-price-note">annual bundle</div>
-      <div class="pkg-tier-position">Revenue-bearing systems that cannot tolerate outages. Managed active-active HA/DR.</div>
-      <ul class="pkg-tier-specs">
-        <li>Regions <span class="spec-val">3 Akka VPC</span></li>
-        <li>Cores <span class="spec-val">100 service</span></li>
-        <li>HA/DR <span class="spec-val">Active-active</span></li>
-        <li>SLA <span class="spec-val">99.9999%</span></li>
-        <li>TAM <span class="spec-val">1/2 time</span></li>
-      </ul>
-    </div>
+      <!-- Three production tiers -->
+      <div class="pkg-tiers">
+        <div class="pkg-tier" data-tier="2">
+          <div class="pkg-tier-name">Day 2 Ops</div>
+          <div class="pkg-tier-price">Your VPC</div>
+          <div class="pkg-tier-price-note">annual bundle</div>
+          <div class="pkg-tier-position">First production deployment in your VPC.<br>Replaces 6-8 separately billed services.</div>
+          <div class="pkg-tier-infra">
+            <div class="pkg-infra-row"><span class="pkg-infra-pill">2 Akka VPCs</span></div>
+          </div>
+        </div>
 
-    <div class="pkg-tier pkg-reveal pkg-reveal-d8" data-tier="4">
-      <div class="pkg-tier-name">Sovereign Cloud</div>
-      <div class="pkg-tier-price">Your VPC</div>
-      <div class="pkg-tier-price-note">annual bundle</div>
-      <div class="pkg-tier-position">Country-isolated, fully regulated. Inherit 19+ compliance certifications instead of building them.</div>
-      <ul class="pkg-tier-specs">
-        <li>Regions <span class="spec-val">3 Akka VPC</span></li>
-        <li>Cores <span class="spec-val">100 service</span></li>
-        <li>HA/DR <span class="spec-val">Sovereign active</span></li>
-        <li>SLA <span class="spec-val">99.9999%</span></li>
-        <li>TAM <span class="spec-val">2 dedicated</span></li>
-      </ul>
-    </div>
-  </div>
+        <div class="pkg-tier" data-tier="3">
+          <div class="pkg-tier-name">Business Continuity</div>
+          <div class="pkg-tier-price">Your VPC</div>
+          <div class="pkg-tier-price-note">annual bundle</div>
+          <div class="pkg-tier-position">Mission-critical systems that cannot tolerate outages. Managed active-active HA/DR.</div>
+          <div class="pkg-tier-infra">
+            <div class="pkg-infra-row"><span class="pkg-infra-spacer"></span><span class="pkg-infra-pill">3 Akka VPCs</span></div>
+            <div class="pkg-infra-row"><span class="pkg-infra-plus">+</span><span class="pkg-infra-pill">Active-Active HA/DR</span></div>
+          </div>
+        </div>
+
+        <div class="pkg-tier" data-tier="4">
+          <div class="pkg-tier-name">Sovereign Cloud</div>
+          <div class="pkg-tier-price">Your VPC</div>
+          <div class="pkg-tier-price-note">annual bundle</div>
+          <div class="pkg-tier-position">Country isolated data, networking, and operations.</div>
+          <div class="pkg-tier-infra">
+            <div class="pkg-infra-row"><span class="pkg-infra-spacer"></span><span class="pkg-infra-pill">3 Akka VPCs</span></div>
+            <div class="pkg-infra-row"><span class="pkg-infra-plus">+</span><span class="pkg-infra-pill">Active-Active HA/DR</span></div>
+            <div class="pkg-infra-row"><span class="pkg-infra-plus">+</span><span class="pkg-infra-pill">Sovereign Plane</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pkg-prod-col -->
+  </div><!-- /pkg-split -->
 
   <!-- ════ UPGRADE PATH ════ -->
   <div class="pkg-upgrade pkg-reveal pkg-reveal-d8">
