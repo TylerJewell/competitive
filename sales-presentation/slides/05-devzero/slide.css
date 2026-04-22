@@ -1,0 +1,218 @@
+#s5-wrapper {
+  height: 140vh;
+  position: relative;
+}
+#s5 {
+  background: var(--black);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 0 24px;
+  overflow: hidden;
+}
+#s5::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(245,197,24,0.03) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events:none; z-index:0;
+}
+
+.s5-reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+  position: relative; z-index: 1;
+}
+.s5-reveal.visible { opacity: 1; transform: none; }
+
+.s5-top {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding: 0 var(--pad-6); margin-bottom: 24px;
+  gap: 40px; flex-shrink: 0;
+}
+.s5-top-left { flex: 1; }
+
+.s5-eyebrow {
+  font-size:11px; text-transform:uppercase; letter-spacing:3px;
+  color:var(--yellow); font-weight:600; margin-bottom:10px;
+}
+.s5-eyebrow::before { content:''; display:inline-block; width:28px; height:2px; background:var(--yellow); margin-right:10px; vertical-align:middle; }
+
+.s5-headline {
+  font-size: clamp(26px, 3.5vw, 50px); font-weight:700;
+  line-height:1.08; letter-spacing:-0.03em; color:var(--white);
+  max-width: 700px;
+}
+.s5-headline .accent { color:var(--yellow); }
+
+.s5-props {
+  display: flex; gap: 20px; flex-shrink: 0; max-width: 49%;
+}
+.s5-prop { border-left: 3px solid #222; padding-left: 18px; flex: 1; min-width: 0; }
+.s5-prop-title {
+  font-size: 18px; font-weight: 700; color: var(--white);
+  letter-spacing: -0.02em; margin-bottom: 4px; line-height: 1.2;
+}
+.s5-prop-desc { font-size: 14px; color: #888; line-height: 1.45; }
+.s5-prop.active { border-left-color: var(--yellow); }
+.s5-prop.active .s5-prop-title { color: var(--yellow); }
+
+/* ── Main area: terminal left, artifacts right ── */
+.s5-main {
+  flex: 1; min-height: 0;
+  display: flex; gap: 28px;
+  padding-left: 0;
+  padding-right: var(--pad-6);
+}
+
+/* Terminal — left-aligned to screen edge */
+.s5-term-col {
+  width: 52%; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.s5-terminal {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 120px rgba(245,197,24,0.05);
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column;
+}
+.s5-term-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid #1C1C1C;
+  flex-shrink: 0;
+}
+.s5-term-prompt {
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 12px;
+}
+.s5-term-prompt .p-bracket { color: #555; }
+.s5-term-prompt .p-user { color: #28C840; font-weight: 600; }
+.s5-term-prompt .p-at { color: #555; }
+.s5-term-prompt .p-host { color: #5BA3F5; font-weight: 600; }
+.s5-term-prompt .p-dir { color: #555; }
+.s5-term-prompt .p-dollar { color: var(--yellow); font-weight: 700; margin-left: 2px; }
+.s5-term-body {
+  padding: 16px 24px;
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  flex: 1; min-height: 0;
+  overflow-y: auto;
+}
+.s5-term-body::-webkit-scrollbar { width: 4px; }
+.s5-term-body::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+.s5-tline { white-space: pre-wrap; }
+.s5-tline .prompt { color: var(--yellow); user-select: none; }
+.s5-tline .cmd { color: var(--white); }
+.s5-tline .ai { color: #999; font-style: italic; }
+.s5-tline .success { color: #28C840; }
+.s5-tline .warn { color: var(--yellow); font-weight: 600; }
+
+.s5-cursor {
+  display: inline-block; width: 7px; height: 13px;
+  background: var(--yellow); vertical-align: middle;
+  animation: s5blink 1s step-end infinite;
+}
+
+@keyframes s5blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ── Artifacts panel (right) ── */
+.s5-artifacts {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; gap: 20px;
+  min-height: 0;
+}
+
+/* Shared artifact card style */
+.s5-artifact {
+  background: #0D0D0D;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+  transition: opacity .8s ease, transform .8s cubic-bezier(0.16,1,0.3,1);
+}
+.s5-artifact.show {
+  opacity: 1;
+  transform: none;
+}
+
+.s5-artifact-header {
+  padding: 10px 16px;
+  border-bottom: 1px solid #1C1C1C;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.02);
+}
+.s5-artifact-icon {
+  width: 16px; height: 16px; fill: var(--yellow); flex-shrink: 0;
+}
+.s5-artifact-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--yellow); font-weight: 600;
+}
+.s5-artifact-file {
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px; color: #555; margin-left: auto;
+}
+
+/* Spec document */
+.s5-spec-body {
+  padding: 16px 20px;
+  font-size: 12px; line-height: 1.7; color: #999;
+}
+.s5-spec-body h3 {
+  font-size: 14px; color: var(--white); font-weight: 700;
+  margin-bottom: 8px; letter-spacing: -0.02em;
+}
+.s5-spec-body h4 {
+  font-size: 11px; color: var(--yellow); font-weight: 600;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin: 12px 0 6px;
+}
+.s5-spec-body p { margin-bottom: 6px; }
+.s5-spec-body ul {
+  list-style: none; padding: 0;
+}
+.s5-spec-body li {
+  padding-left: 14px; position: relative; margin-bottom: 3px;
+}
+.s5-spec-body li::before {
+  content: '\2022'; position: absolute; left: 0; color: #444;
+}
+.s5-spec-fade {
+  position: relative;
+}
+.s5-spec-fade::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 48px;
+  background: linear-gradient(transparent, #0D0D0D);
+  pointer-events: none;
+}
+
+/* Architecture diagram */
+.s5-arch-body {
+  padding: 16px 20px 20px;
+}
+.s5-arch-body svg {
+  width: 100%; height: auto; display: block;
+}
+
+@media (max-width: 1000px) {
+  .s5-main { flex-direction: column; padding-left: var(--pad-6); }
+  .s5-term-col { width: 100%; }
+  .s5-terminal { border-radius: 12px; }
+  .s5-top { flex-direction: column; align-items: flex-start; }
+  .s5-props { flex-direction: column; gap: 12px; }
+}

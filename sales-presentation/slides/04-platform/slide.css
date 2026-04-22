@@ -1,0 +1,88 @@
+#s4-wrapper {
+  height: 180vh;
+  position: relative;
+}
+#s4 {
+  background: var(--black);
+  padding: 80px var(--pad-6) 60px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+#s4::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(245,197,24,0.03) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events:none; z-index:0;
+}
+
+.s4-reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+  position: relative; z-index: 1;
+}
+.s4-reveal.visible { opacity: 1; transform: none; }
+
+.s4-eyebrow {
+  font-size:11px; text-transform:uppercase; letter-spacing:3px;
+  color:var(--yellow); font-weight:600; margin-bottom:14px;
+}
+.s4-eyebrow::before { content:''; display:inline-block; width:28px; height:2px; background:var(--yellow); margin-right:10px; vertical-align:middle; }
+
+.s4-headline {
+  font-size: clamp(30px, 4vw, 58px); font-weight:700;
+  line-height:1.08; letter-spacing:-0.03em; color:var(--white);
+  max-width: 900px; margin-bottom: 48px;
+}
+.s4-headline .accent { color:var(--yellow); }
+
+/* Two-column layout: header+image left, value props right */
+.s4-layout {
+  display: flex; gap: 0; align-items: flex-start;
+}
+
+.s4-left {
+  flex: 1.4; min-width: 0;
+}
+
+.s4-image {
+  margin-left: calc(-1 * var(--pad-3) - 40px);
+  margin-top: 50px;
+}
+.s4-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.s4-props {
+  flex: 0.6; min-width: 0;
+  display: flex; flex-direction: column;
+  gap: 0;
+  padding-left: 32px;
+  margin-top: 210px;
+}
+
+.s4-prop {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #1A1A1A;
+}
+.s4-prop:last-child { border-bottom: none; }
+
+.s4-prop-num {
+  font-size: clamp(24px, 2.2vw, 34px); font-weight: 700;
+  color: #28C840; letter-spacing: -0.04em; line-height: 1;
+  flex-shrink: 0; width: 160px; text-align: right;
+}
+.s4-prop-text { flex: 1; min-width: 0; }
+.s4-prop-title {
+  font-size: clamp(14px, 1.2vw, 17px); font-weight: 700; color: var(--white);
+  letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 3px;
+}
+.s4-prop-desc {
+  font-size: 12px; color: #888; line-height: 1.45;
+}

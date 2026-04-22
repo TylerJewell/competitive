@@ -1,0 +1,185 @@
+<div id="s2-wrapper">
+  <div id="s2-sticky">
+    <div class="s2-eyebrow" data-s2="0">The challenge</div>
+    <div class="s2-headline" data-s2="0">Along came <span class="accent">agentic&nbsp;AI</span>, amplifying complexity.</div>
+    <div class="s2-content">
+      <div class="s2-blocks" data-s2="1">
+        <div class="s2-block-label">Agentic Complexity</div>
+        <div class="s2-block">
+          <div class="s2-block-body">
+            <div class="s2-block-title">Architecture</div>
+            <div class="s2-block-desc">Many moving parts to wire together.</div>
+          </div>
+        </div>
+        <div class="s2-block">
+          <div class="s2-block-body">
+            <div class="s2-block-title">Reasoning</div>
+            <div class="s2-block-desc">Ambiguous context, handoff failures, cost/accuracy trade-offs.</div>
+          </div>
+        </div>
+        <div class="s2-block">
+          <div class="s2-block-body">
+            <div class="s2-block-title">Governance</div>
+            <div class="s2-block-desc">29 AI regulations demand new<br>controls, explainability, and HITL.</div>
+          </div>
+        </div>
+        <div class="s2-block">
+          <div class="s2-block-body">
+            <div class="s2-block-title">Ops</div>
+            <div class="s2-block-desc">HA/DR, petabyte-scale logging,<br>hallucination retries, Python limits.</div>
+          </div>
+        </div>
+        <div class="s2-block">
+          <div class="s2-block-body">
+            <div class="s2-block-title">Organizational</div>
+            <div class="s2-block-desc">Fragmented teams, lost domain<br>knowledge, no shared velocity.</div>
+          </div>
+        </div>
+      </div>
+      <div class="s2-diagram" data-s2="1">
+        <div class="s2-diagram-label">Multi-agent reference architecture</div>
+        <svg viewBox="0 0 700 495" fill="none" xmlns="http://www.w3.org/2000/svg" style="font-family:'Instrument Sans',sans-serif">
+
+          <!-- ═══ ROW 1: Inputs ═══ -->
+          <g class="draw-box" style="animation-delay:0.1s">
+            <rect x="70" y="10" width="120" height="46" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="130" y="38" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">Sensors</text>
+          </g>
+          <g class="draw-box" style="animation-delay:0.15s">
+            <rect x="220" y="10" width="100" height="46" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="270" y="38" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">Agent</text>
+          </g>
+          <g class="draw-box" style="animation-delay:0.2s">
+            <rect x="350" y="10" width="100" height="46" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="400" y="38" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">Client</text>
+          </g>
+          <g class="draw-box" style="animation-delay:0.25s">
+            <rect x="480" y="10" width="130" height="46" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="545" y="38" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">Human in Loop</text>
+          </g>
+
+          <!-- ═══ ROW 2: Auth bar (gap 21px) ═══ -->
+          <g class="draw-box" style="animation-delay:0.4s">
+            <rect x="30" y="77" width="650" height="34" rx="4" fill="#1A1A0A" stroke="#F5C518" stroke-width="1"/>
+            <text x="355" y="99" text-anchor="middle" fill="#F5C518" font-size="12" font-weight="600">Auth &middot; Zero Trust</text>
+          </g>
+
+          <!-- ═══ ROW 3: Core — 5 boxes (gap 27px) ═══ -->
+          <g class="draw-box" style="animation-delay:0.6s">
+            <rect x="30" y="138" width="120" height="52" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="90" y="158" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Stream</text>
+            <text x="90" y="173" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Processing</text>
+          </g>
+          <g class="draw-box" style="animation-delay:0.7s">
+            <rect x="160" y="138" width="120" height="52" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="220" y="158" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Guardrails</text>
+            <text x="220" y="174" text-anchor="middle" fill="#999" font-size="10">validation &amp; safety</text>
+          </g>
+          <g class="draw-box" style="animation-delay:0.8s">
+            <rect x="290" y="132" width="130" height="64" rx="5" fill="#1A1A0A" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="355" y="159" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">Orchestration</text>
+            <text x="355" y="178" text-anchor="middle" fill="#999" font-size="10">control loop</text>
+          </g>
+          <g class="draw-box" style="animation-delay:0.9s">
+            <rect x="430" y="138" width="120" height="52" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1.5"/>
+            <text x="490" y="158" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Agent(s)</text>
+            <text x="490" y="174" text-anchor="middle" fill="#999" font-size="10">execution</text>
+          </g>
+          <g class="draw-box" style="animation-delay:1.0s">
+            <rect x="560" y="138" width="120" height="52" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="620" y="158" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Governance</text>
+            <text x="620" y="174" text-anchor="middle" fill="#999" font-size="10">workflow catalog</text>
+          </g>
+
+          <!-- ═══ ROW 4: Memory + Registry (gap 39px) ═══ -->
+          <g class="draw-box" style="animation-delay:1.25s">
+            <rect x="180" y="235" width="150" height="52" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="255" y="257" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Agent Memory</text>
+            <text x="255" y="274" text-anchor="middle" fill="#999" font-size="10">sessions, context, history</text>
+          </g>
+          <g class="draw-box" style="animation-delay:1.4s">
+            <rect x="370" y="235" width="150" height="52" rx="5" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="445" y="257" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">AI Asset Registry</text>
+            <text x="445" y="274" text-anchor="middle" fill="#999" font-size="10">prompts, models, tools</text>
+          </g>
+
+          <!-- ═══ ROW 5: Lower auth bar (gap 28px) ═══ -->
+          <g class="draw-box" style="animation-delay:1.6s">
+            <rect x="180" y="315" width="340" height="34" rx="4" fill="#1A1A0A" stroke="#F5C518" stroke-width="1"/>
+            <text x="350" y="337" text-anchor="middle" fill="#F5C518" font-size="12" font-weight="600">Auth &middot; Guardrails</text>
+          </g>
+
+          <!-- ═══ ROW 6: Trace (gap 26px) ═══ -->
+          <g class="draw-box" style="animation-delay:1.8s">
+            <rect x="290" y="375" width="120" height="42" rx="4" fill="#141414" stroke="#F5C518" stroke-width="1"/>
+            <text x="350" y="400" text-anchor="middle" fill="#fff" font-size="12" font-weight="600">Trace</text>
+          </g>
+
+          <!-- ═══ ROW 7: 3rd party zones (gap 26px) ═══ -->
+          <g class="draw-box" style="animation-delay:2.0s">
+            <rect x="20" y="443" width="320" height="46" rx="5" fill="#0A0A0A" stroke="#555" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="180" y="470" text-anchor="middle" fill="#888" font-size="11">3rd party tools, models, agents</text>
+          </g>
+          <g class="draw-box" style="animation-delay:2.1s">
+            <rect x="360" y="443" width="320" height="46" rx="5" fill="#0A0A0A" stroke="#555" stroke-width="1" stroke-dasharray="4 3"/>
+            <text x="520" y="470" text-anchor="middle" fill="#888" font-size="11">3rd party evaluation &amp; observability</text>
+          </g>
+
+          <!-- ═══ CONNECTION LINES ═══ -->
+          <!-- Row 1 → Row 2 -->
+          <line class="draw-line" x1="130" y1="56" x2="130" y2="77" stroke="#F5C518" stroke-width="1" style="animation-delay:0.3s"/>
+          <line class="draw-line" x1="270" y1="56" x2="270" y2="77" stroke="#F5C518" stroke-width="1" style="animation-delay:0.32s"/>
+          <line class="draw-line" x1="400" y1="56" x2="400" y2="77" stroke="#F5C518" stroke-width="1" style="animation-delay:0.35s"/>
+          <line class="draw-line" x1="545" y1="56" x2="545" y2="77" stroke="#F5C518" stroke-width="1" style="animation-delay:0.37s"/>
+
+          <!-- Row 2 → Row 3 -->
+          <line class="draw-line" x1="90" y1="111" x2="90" y2="138" stroke="#F5C518" stroke-width="1" style="animation-delay:0.5s"/>
+          <line class="draw-line" x1="220" y1="111" x2="220" y2="138" stroke="#F5C518" stroke-width="1" style="animation-delay:0.52s"/>
+          <line class="draw-line" x1="355" y1="111" x2="355" y2="132" stroke="#F5C518" stroke-width="1" style="animation-delay:0.55s"/>
+          <line class="draw-line" x1="490" y1="111" x2="490" y2="138" stroke="#F5C518" stroke-width="1" style="animation-delay:0.57s"/>
+          <line class="draw-line" x1="620" y1="111" x2="620" y2="138" stroke="#F5C518" stroke-width="1" style="animation-delay:0.6s"/>
+
+          <!-- Row 3 horizontal — y=164 (center of all Row 3 boxes) -->
+          <line class="draw-line" x1="150" y1="164" x2="160" y2="164" stroke="#F5C518" stroke-width="1" style="animation-delay:0.75s"/>
+          <line class="draw-line" x1="280" y1="164" x2="290" y2="164" stroke="#F5C518" stroke-width="1" style="animation-delay:0.85s"/>
+          <line class="draw-line" x1="420" y1="164" x2="430" y2="164" stroke="#F5C518" stroke-width="1" style="animation-delay:0.95s"/>
+          <line class="draw-line" x1="550" y1="164" x2="560" y2="164" stroke="#F5C518" stroke-width="1" style="animation-delay:1.05s"/>
+
+          <!-- Row 3 → Row 4 -->
+          <polyline class="draw-line" points="330,196 330,215 255,215 255,235" stroke="#F5C518" stroke-width="1" style="animation-delay:1.15s"/>
+          <polyline class="draw-line" points="380,196 380,215 445,215 445,235" stroke="#F5C518" stroke-width="1" style="animation-delay:1.25s"/>
+
+          <!-- Row 4 → Row 5 -->
+          <line class="draw-line" x1="255" y1="287" x2="255" y2="315" stroke="#F5C518" stroke-width="1" style="animation-delay:1.5s"/>
+          <line class="draw-line" x1="445" y1="287" x2="445" y2="315" stroke="#F5C518" stroke-width="1" style="animation-delay:1.55s"/>
+
+          <!-- Row 5 → Row 6 -->
+          <line class="draw-line" x1="350" y1="349" x2="350" y2="375" stroke="#F5C518" stroke-width="1" style="animation-delay:1.7s"/>
+
+          <!-- Row 6 → Row 7 -->
+          <line class="draw-line" x1="320" y1="417" x2="320" y2="443" stroke="#F5C518" stroke-width="1" stroke-dasharray="4 3" style="animation-delay:1.9s"/>
+          <line class="draw-line" x1="380" y1="417" x2="380" y2="443" stroke="#F5C518" stroke-width="1" stroke-dasharray="4 3" style="animation-delay:1.95s"/>
+        </svg>
+      </div>
+      <div class="s2-tco" data-s2="2">
+        <div class="s2-tco-label">The cost of complexity</div>
+        <div class="s2-tco-item">
+          <div class="s2-tco-title">Development</div>
+          <div class="s2-tco-quip">Every integration is a new team,<br>API, and failure mode.</div>
+        </div>
+        <div class="s2-tco-item">
+          <div class="s2-tco-title">Licenses</div>
+          <div class="s2-tco-quip">Costs spiral for evaluation<br>and observability.</div>
+        </div>
+        <div class="s2-tco-item">
+          <div class="s2-tco-title">Downtime</div>
+          <div class="s2-tco-quip">Agent cascading failures<br>bring systems down.</div>
+        </div>
+        <div class="s2-tco-item">
+          <div class="s2-tco-title">Risk</div>
+          <div class="s2-tco-quip">29 AI regulations require HC to manage.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

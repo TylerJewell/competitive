@@ -1,0 +1,52 @@
+{
+  "slides": [
+    {
+      "id": "00-title",
+      "folder": "slides/00-title"
+    },
+    {
+      "id": "01-hero",
+      "folder": "slides/01-hero"
+    },
+    {
+      "id": "02-types",
+      "folder": "slides/02-types"
+    },
+    {
+      "id": "03-complexity",
+      "folder": "slides/03-complexity"
+    },
+    {
+      "id": "04-platform",
+      "folder": "slides/04-platform"
+    },
+    {
+      "id": "05-devzero",
+      "folder": "slides/05-devzero"
+    },
+    {
+      "id": "06-resilience",
+      "folder": "slides/06-resilience"
+    },
+    {
+      "id": "07-governance",
+      "folder": "slides/07-governance"
+    },
+    {
+      "id": "08-customers",
+      "folder": "slides/08-customers"
+    },
+    {
+      "id": "09-packages",
+      "folder": "slides/09-packages"
+    },
+    {
+      "id": "10-partners",
+      "folder": "slides/10-partners"
+    },
+    {
+      "id": "11-closing",
+      "folder": "slides/11-closing"
+    }
+  ]
+}

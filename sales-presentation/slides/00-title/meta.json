@@ -1,0 +1,19 @@
+{
+  "id": "00-title",
+  "nav_id": "title",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "100vh"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": []
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

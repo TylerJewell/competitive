@@ -1,0 +1,110 @@
+{
+  "akka-platform.png": {
+    "path": "assets/images/akka-platform.png",
+    "alt": "Akka Platform",
+    "used_in": [
+      "04-platform"
+    ],
+    "status": "live-screenshot",
+    "notes": ""
+  },
+  "governance-posture.png": {
+    "path": "assets/images/governance-posture.png",
+    "alt": "Governance Posture",
+    "used_in": [
+      "07-governance"
+    ],
+    "status": "live-screenshot",
+    "notes": ""
+  },
+  "interaction-log.png": {
+    "path": "assets/images/interaction-log.png",
+    "alt": "Interaction Log",
+    "used_in": [
+      "07-governance"
+    ],
+    "status": "live-screenshot",
+    "notes": ""
+  },
+  "control-detail.png": {
+    "path": "assets/images/control-detail.png",
+    "alt": "Control Detail",
+    "used_in": [
+      "07-governance"
+    ],
+    "status": "live-screenshot",
+    "notes": ""
+  },
+  "policy-authoring.png": {
+    "path": "assets/images/policy-authoring.png",
+    "alt": "Policy Authoring",
+    "used_in": [
+      "07-governance"
+    ],
+    "status": "live-screenshot",
+    "notes": ""
+  },
+  "policy-sandbox.png": {
+    "path": "assets/images/policy-sandbox.png",
+    "alt": "Policy Sandbox",
+    "used_in": [
+      "07-governance"
+    ],
+    "status": "live-screenshot",
+    "notes": ""
+  },
+  "audit.png": {
+    "path": "assets/images/audit.png",
+    "alt": "Audit",
+    "used_in": [
+      "07-governance"
+    ],
+    "status": "live-screenshot",
+    "notes": ""
+  },
+  "customers/manulife.jpg": {
+    "path": "assets/images/customers/manulife.jpg",
+    "alt": "Customers/Manulife",
+    "used_in": [
+      "08-customers"
+    ],
+    "status": "designed-asset",
+    "notes": ""
+  },
+  "customers/tubi.jpg": {
+    "path": "assets/images/customers/tubi.jpg",
+    "alt": "Customers/Tubi",
+    "used_in": [
+      "08-customers"
+    ],
+    "status": "designed-asset",
+    "notes": ""
+  },
+  "customers/swiggy.png": {
+    "path": "assets/images/customers/swiggy.png",
+    "alt": "Customers/Swiggy",
+    "used_in": [
+      "08-customers"
+    ],
+    "status": "designed-asset",
+    "notes": ""
+  },
+  "customers/johndeere.png": {
+    "path": "assets/images/customers/johndeere.png",
+    "alt": "Customers/Johndeere",
+    "used_in": [
+      "08-customers"
+    ],
+    "status": "designed-asset",
+    "notes": ""
+  },
+  "customers/dojo.png": {
+    "path": "assets/images/customers/dojo.png",
+    "alt": "Customers/Dojo",
+    "used_in": [
+      "08-customers"
+    ],
+    "status": "designed-asset",
+    "notes": ""
+  }
+}

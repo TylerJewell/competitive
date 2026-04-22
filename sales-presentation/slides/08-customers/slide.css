@@ -1,0 +1,145 @@
+#cust-wrapper {
+  height: 200vh; /* 5 customers, ~4 clicks each */
+  position: relative;
+}
+#cust-sticky {
+  position: sticky; top: 0;
+  height: 100vh;
+  background: var(--black);
+  overflow: hidden;
+}
+
+/* Each slide */
+.cust-slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 0 var(--pad-10);
+  opacity: 0;
+  transition: opacity .8s ease;
+  pointer-events: none;
+}
+.cust-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Slide counter */
+.cust-counter {
+  position: absolute; top: 40px; right: var(--pad-10);
+  font-size: 12px; letter-spacing: 2px; color: #444;
+  font-weight: 600;
+  z-index: 10;
+}
+.cust-counter .cust-counter-current { color: var(--yellow); }
+
+/* Progress dots */
+.cust-dots {
+  position: absolute; right: var(--pad-10); top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 10;
+}
+.cust-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #222; border: 1px solid #333;
+  transition: all .4s ease;
+}
+.cust-dot.active {
+  background: var(--yellow); border-color: var(--yellow);
+  height: 20px; border-radius: 3px;
+}
+
+/* Eyebrow */
+.cust-eyebrow {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 3px;
+  color: var(--yellow); font-weight: 600; margin-bottom: 24px;
+}
+.cust-eyebrow::before {
+  content:''; display:inline-block; width:28px; height:2px;
+  background:var(--yellow); margin-right:10px; vertical-align:middle;
+}
+
+/* Customer name */
+.cust-name {
+  font-size: clamp(48px, 7vw, 100px); font-weight: 700;
+  line-height: 1.0; letter-spacing: -0.03em;
+  color: var(--white); margin-bottom: 16px;
+}
+
+/* Headline */
+.cust-headline {
+  font-size: clamp(20px, 2.5vw, 36px); font-weight: 600;
+  color: var(--yellow); line-height: 1.2;
+  margin-bottom: 24px; max-width: 700px;
+}
+
+/* Description */
+.cust-desc {
+  font-size: clamp(15px, 1.3vw, 20px); color: #999;
+  line-height: 1.6; max-width: 650px; margin-bottom: 32px;
+}
+
+/* Quote */
+.cust-quote {
+  font-size: clamp(14px, 1.1vw, 17px); color: #777;
+  font-style: italic; line-height: 1.5; max-width: 600px;
+  padding-left: 20px;
+  border-left: 2px solid var(--yellow);
+}
+.cust-quote-attr {
+  font-size: 12px; color: #555; font-style: normal;
+  margin-top: 8px; font-weight: 600;
+}
+
+/* Stat callout */
+.cust-stat {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  margin-bottom: 20px;
+}
+.cust-stat-num {
+  font-size: clamp(36px, 4vw, 64px); font-weight: 700;
+  color: var(--yellow); letter-spacing: -0.03em; line-height: 1;
+}
+.cust-stat-label {
+  font-size: clamp(14px, 1.2vw, 18px); color: #888; font-weight: 500;
+}
+
+/* Hero background image per slide */
+.cust-slide::before {
+  content: ''; position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  pointer-events: none;
+  opacity: 0.75;
+}
+.cust-slide::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.05) 100%);
+  pointer-events: none;
+}
+.cust-slide > * { position: relative; z-index: 1; }
+.cust-slide[data-slide="0"]::before { background-image: url('images/customers/manulife.jpg'); }
+.cust-slide[data-slide="1"] { background: linear-gradient(135deg, #071420 0%, #0b2538 50%, #0d3040 100%); }
+.cust-slide[data-slide="1"]::before {
+  background-image: url('images/customers/tubi-devices.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.82;
+}
+.cust-slide[data-slide="1"]::after {
+  background: linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.75) 40%, rgba(0,0,0,0.2) 100%);
+}
+.cust-slide[data-slide="2"]::before { background-image: url('images/customers/swiggy.png'); }
+.cust-slide[data-slide="3"]::before { background-image: url('images/customers/johndeere.png'); }
+.cust-slide[data-slide="4"]::before { background-image: url('images/customers/dojo.png'); }
+
+/* Divider line between eyebrow area and content */
+.cust-divider {
+  width: 60px; height: 3px; background: var(--yellow);
+  margin-bottom: 28px; opacity: 0.6;
+}
+
+/* Scroll hint at bottom */
+.cust-scroll-hint {
+  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+  font-size: 9px; text-transform: uppercase; letter-spacing: 3px;
+  color: #333; z-index: 10;
+}

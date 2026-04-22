@@ -1,0 +1,24 @@
+{
+  "id": "02-types",
+  "nav_id": "st-wrapper",
+  "pre_spacer": 20,
+  "scroll": {
+    "envelope_vh": "calc(100vh * 1.6)"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": [
+      {
+        "selector": "#st-sticky",
+        "threshold": 0.0
+      }
+    ]
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

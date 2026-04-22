@@ -1,0 +1,24 @@
+{
+  "id": "11-closing",
+  "nav_id": "closing",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "100vh"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": [
+      {
+        "selector": ".closing-reveal",
+        "threshold": 0.15
+      }
+    ]
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

@@ -1,0 +1,76 @@
+#closing {
+  height: 100vh; min-height: 680px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 0 var(--pad-8); position: relative; background: var(--black); overflow: hidden;
+  text-align: center;
+}
+#closing::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(245,197,24,0.07) 1px, transparent 1px);
+  background-size: 48px 48px; pointer-events: none; z-index: 0;
+}
+#closing::after {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 25%, rgba(0,0,0,0.85) 75%);
+  pointer-events:none; z-index:0;
+}
+
+.closing-reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+  position: relative; z-index: 2;
+}
+.closing-reveal.visible { opacity: 1; transform: none; }
+
+.closing-logo {
+  margin-bottom: 40px;
+}
+.closing-logo svg { height: 48px; width: auto; }
+
+.closing-headline {
+  font-size: clamp(44px, 6.5vw, 96px); font-weight: 700;
+  line-height: 1.02; letter-spacing: -0.03em; color: var(--white);
+  max-width: 1000px; margin-bottom: 24px;
+}
+.closing-headline .accent { color: var(--yellow); }
+
+.closing-sub {
+  font-size: clamp(12px, 1.2vw, 16px);
+  color: var(--gray); font-weight: 600;
+  letter-spacing: 4px; line-height: 1.5;
+  max-width: 600px; margin-bottom: 48px;
+}
+
+.closing-divider {
+  width: 56px; height: 3px; background: var(--yellow); margin-bottom: 40px;
+}
+
+.closing-stats {
+  display: flex; gap: 52px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 48px;
+}
+.closing-stat-number {
+  font-size: 38px; font-weight: 700; color: var(--white);
+  letter-spacing: -0.03em; line-height: 1;
+  display: flex; align-items: baseline; justify-content: center;
+}
+.closing-stat-number .suffix { color: var(--yellow); font-size: 28px; }
+.closing-stat-label {
+  font-size: 11px; color: var(--gray); text-transform: uppercase;
+  letter-spacing: 1.5px; margin-top: 6px; font-weight: 500;
+}
+
+.closing-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 32px;
+  background: var(--yellow); color: var(--black);
+  font-size: 14px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; border-radius: 6px;
+  text-decoration: none;
+  transition: background .2s ease;
+  margin-bottom: 32px;
+}
+.closing-cta:hover { background: #e0b416; }
+
+
+<!-- DEMO_CSS_MARKER -->

@@ -1,0 +1,1 @@
+/* no JS needed — title uses CSS animations on load */

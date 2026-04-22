@@ -1,0 +1,25 @@
+{
+  "id": "06-resilience",
+  "nav_id": "s6-wrapper",
+  "pre_spacer": 30,
+  "scroll": {
+    "envelope_vh": "140vh"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": []
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ],
+  "external_inline": {
+    "source": "../../../preso/resilience/resilience.html",
+    "wrapper_id": "s6-rf",
+    "root_id": "root",
+    "iframe_placeholder": "resilience/resilience.html"
+  }
+}

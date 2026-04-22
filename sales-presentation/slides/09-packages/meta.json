@@ -1,0 +1,28 @@
+{
+  "id": "09-packages",
+  "nav_id": "pkg-wrapper",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "calc(100vh + 300px)"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": [
+      {
+        "selector": ".pkg-reveal",
+        "threshold": 0.15
+      },
+      {
+        "selector": ".pkg-tier",
+        "threshold": 0.15
+      }
+    ]
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

@@ -1,0 +1,43 @@
+/* ═══════════════════════════════════════════════
+   SHARED — variables, resets, fonts, keyframes
+═══════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --yellow: #F5C518;
+  --black:  #000;
+  --dark:   #07070C;
+  --white:  #fff;
+  --gray:   #555;
+  --pad-8:  8vw;
+  --pad-6:  6vw;
+  --pad-10: 10vw;
+  --pad-3:  3vw;
+}
+@media (min-width: 1537px) {
+  :root {
+    --pad-8:  123px;
+    --pad-6:  92px;
+    --pad-10: 154px;
+    --pad-3:  46px;
+  }
+}
+html { scroll-behavior: auto; background: var(--black); }
+body {
+  font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--black);
+  color: var(--white);
+  overflow-x: hidden;
+  max-width: 1536px;
+  margin: 0 auto;
+}
+
+@keyframes fadeUp  { to { opacity:1; transform:translateY(0); } }
+@keyframes slideUp { to { opacity:1; transform:translateY(0); } }
+@keyframes bounceDown {
+  0%,100% { transform:rotate(45deg) translate(0,0); }
+  50%     { transform:rotate(45deg) translate(4px,4px); }
+}
+@keyframes bgSlide {
+  from { background-position:0 0; }
+  to   { background-position:36px 36px; }
+}

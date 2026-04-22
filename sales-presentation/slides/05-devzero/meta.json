@@ -1,0 +1,24 @@
+{
+  "id": "05-devzero",
+  "nav_id": "s5-wrapper",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "140vh"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": [
+      {
+        "selector": ".s5-reveal",
+        "threshold": 0.15
+      }
+    ]
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

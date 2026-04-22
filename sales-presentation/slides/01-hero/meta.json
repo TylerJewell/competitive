@@ -1,0 +1,24 @@
+{
+  "id": "01-hero",
+  "nav_id": "hero",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "140vh"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": [
+      {
+        "selector": ".hero-stats",
+        "threshold": 0.6
+      }
+    ]
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "04-platform",
+  "nav_id": "s4-wrapper",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "180vh"
+  },
+  "reveals": {
+    "scroll_progress": null,
+    "intersection": [
+      {
+        "selector": ".s4-reveal",
+        "threshold": 0.15
+      }
+    ]
+  },
+  "images": [
+    "akka-platform.png"
+  ],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "id": "03-complexity",
+  "nav_id": "s2-wrapper",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "300vh"
+  },
+  "reveals": {
+    "scroll_progress": {
+      "attribute": "data-s2",
+      "max_steps": 2
+    },
+    "intersection": [
+      {
+        "selector": "[data-s2]",
+        "threshold": 0.15
+      },
+      {
+        "selector": ".s2-diagram",
+        "threshold": 0.8
+      }
+    ]
+  },
+  "images": [],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

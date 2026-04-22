@@ -1,0 +1,28 @@
+{
+  "id": "08-customers",
+  "nav_id": "cust-wrapper",
+  "pre_spacer": 0,
+  "scroll": {
+    "envelope_vh": "200vh"
+  },
+  "reveals": {
+    "scroll_progress": {
+      "attribute": null,
+      "note": "custom scroll-driven progress, see slide.js"
+    },
+    "intersection": []
+  },
+  "images": [
+    "customers/manulife.jpg",
+    "customers/tubi.jpg",
+    "customers/swiggy.png",
+    "customers/johndeere.png",
+    "customers/dojo.png"
+  ],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

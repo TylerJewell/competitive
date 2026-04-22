@@ -1,0 +1,35 @@
+{
+  "id": "07-governance",
+  "nav_id": "s7-problem",
+  "pre_spacer": 0,
+  "scroll": {
+    "problem_envelope_vh": "140vh",
+    "answer_envelope_vh": "140vh"
+  },
+  "reveals": {
+    "scroll_progress": {
+      "attribute": "data-s7",
+      "max_steps": 5
+    },
+    "intersection": [
+      {
+        "selector": ".s7-reveal",
+        "threshold": 0.15
+      }
+    ]
+  },
+  "images": [
+    "governance-posture.png",
+    "interaction-log.png",
+    "control-detail.png",
+    "policy-authoring.png",
+    "policy-sandbox.png",
+    "audit.png"
+  ],
+  "include_in": [
+    "overview",
+    "shareable",
+    "live",
+    "hands-on"
+  ]
+}

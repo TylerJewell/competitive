@@ -1,0 +1,119 @@
+#st-wrapper {
+  height: calc(100vh * 1.6);
+  position: relative;
+}
+
+#st-sticky {
+  position: sticky; top: 0;
+  height: 100vh; min-height: 700px;
+  background: var(--dark);
+  padding: 28px 24px 24px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+#st-sticky::before {
+  content:''; position:absolute; inset:0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size:36px 36px;
+  animation: bgSlide 28s linear infinite;
+  pointer-events:none; z-index:0;
+}
+
+/* Header */
+.st-header {
+  display:flex; align-items:center; gap:14px;
+  flex-shrink:0; position:relative; z-index:2;
+  margin-bottom:14px; padding-bottom:14px;
+  border-bottom: 1px solid #1C1C1C;
+}
+.st-eyebrow {
+  font-size:10px; text-transform:uppercase; letter-spacing:3.5px;
+  color:var(--yellow); font-weight:600; flex-shrink:0;
+  white-space:nowrap;
+}
+.st-title {
+  font-size:clamp(18px,2vw,30px); font-weight:700;
+  color:#FFFFFF; letter-spacing:-0.02em; line-height:1.2;
+}
+.st-dots { margin-left:auto; display:flex; gap:6px; align-items:center; flex-shrink:0; }
+.st-dot {
+  width:6px; height:6px; border-radius:3px;
+  background:#1C1C1C; border:1px solid #2A2A2A;
+  transition: all .35s cubic-bezier(.34,1.56,.64,1);
+}
+.st-dot.lit { width:20px; background:var(--yellow); border-color:var(--yellow); }
+
+/* 4x2 grid — fills remaining height */
+.st-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  position: relative; z-index: 2;
+}
+
+/* Card — hidden until column threshold is crossed */
+.st-card {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  padding: 18px 18px 16px;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  min-height: 0;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .4s ease, transform .4s cubic-bezier(0.16,1,0.3,1),
+              border-color .3s ease, background .3s ease;
+}
+.st-card[data-row="1"] { transition-delay: 0.08s; }
+.st-card::before {
+  content:''; position:absolute; top:0; left:0; right:0;
+  height:3px; background:var(--yellow);
+  transform: scaleX(0); transform-origin:left;
+  transition: transform .5s cubic-bezier(0.16,1,0.3,1) .2s;
+}
+.st-card.visible {
+  opacity: 1; transform: none;
+  background: #141414;
+  border-color: #2E2E2E;
+}
+.st-card.visible::before { transform: scaleX(1); }
+.st-card.visible:hover { border-color: #3C3C3C; }
+
+/* Card content */
+.st-card-content { display:flex; flex-direction:column; flex:1; min-height:0; }
+
+.st-num {
+  font-size:11px; font-weight:700; color:var(--yellow);
+  letter-spacing:2px; margin-bottom:6px;
+}
+.st-name {
+  font-size:clamp(15px,1.4vw,22px); font-weight:700;
+  color:#FFFFFF; letter-spacing:-0.02em; line-height:1.15; margin-bottom:5px;
+}
+.st-desc {
+  font-size:10px; text-transform:uppercase; letter-spacing:1.5px;
+  color:#666; font-weight:600; margin-bottom:10px;
+}
+.st-context {
+  font-size:13px; color:#B8B8B8; line-height:1.65;
+  margin-bottom:14px; flex-shrink:0;
+}
+.st-divider { height:1px; background:#222; margin-bottom:12px; flex-shrink:0; }
+
+/* Logo photo tiles from JPG */
+.st-logos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  overflow: hidden;
+  flex: 1; min-height: 0;
+  align-content: start;
+}
+.logo-tile-img {
+  width: 100%; aspect-ratio: 268 / 168;
+  object-fit: cover; border-radius: 5px;
+  display: block;
+}
