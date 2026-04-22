@@ -52,11 +52,12 @@ The output is always a self-contained HTML file (or ZIP with assets) that works 
 
 ### Mode: `live` (default) — SA Live Presentation
 **Persona:** Solution architect presenting a live POC demo to a customer
-**Output:** Presentation with live embedded app
+**Output:** Presentation with live embedded app, self-hosted by the Akka service
 - SA's name/title on the title slide
 - Customer's name/logo on the demo section
-- Demo App tab **auto-detects the running service** and embeds it as an iframe
-- If service isn't running, shows boot terminal with polling + fallback "Start App" flow
+- Demo App tab embeds an **iframe pointing to `http://localhost:PORT/`** — the app's `index.html`, served from the same Akka service's static-resources directory
+- The presentation itself (`demo.html`) is written to the project's `src/main/resources/static-resources/` and served at `http://localhost:PORT/demo.html`
+- Uses `/akka:build` to compile and start the service before generating
 - Architecture tab introspected from the current project
 - 6 tabs: Brief, App (live iframe), Architecture, Platform, Ship It, Try It Yourself
 
@@ -176,7 +177,7 @@ EXAMPLES:
 | `--customer-logo` | No | — | leave-behind, live, customer | Path to logo image |
 | `--project` | No | cwd | leave-behind, live, customer | Path to Akka project |
 | `--repo` | Yes** | — | customer | Git repo URL for clone instructions |
-| `--output` | No | ./demo-presentation.html | all | Output file path |
+| `--output` | No | live: `{project}/src/main/resources/static-resources/demo.html`; other: `./demo-presentation.html` | all | Output file path |
 | `--port` | No | auto-detect | live | Service port override |
 
 \* Required for non-generic modes
@@ -208,10 +209,10 @@ Scan the Akka project and extract:
 - **Totals** — component count, event types, API endpoints, LOC
 
 ### Phase 3: Detect Running Service (live mode only)
-1. Check Akka console at `localhost:9889` for registered services
-2. If found, record service name and port
-3. If not found, scan ports 9000-9009
-4. If nothing running, the App tab shows boot terminal on load
+1. Use the **Build & Run App** handoff to compile and start the service — do not call Maven or Akka runtime tools manually
+2. After the handoff, call `akka_local_status` to confirm the service is running and retrieve the port
+3. Record `SERVICE_URL` (e.g. `http://localhost:9004`) and `STATIC_DIR` = `{PROJECT_DIR}/src/main/resources/static-resources/`
+4. If build failed, continue anyway — App tab will show error and suggest `/akka:build`
 
 ### Phase 4: Generate Presentation
 
@@ -245,8 +246,16 @@ Follow the **integration recipe** (see `integration-recipe.md`):
 - No browser chrome dots (terminal-style headers only)
 
 ### Phase 5: Write Output
+
+**live mode** — write into the project's Akka static-resources directory so the running service can serve the files:
+1. Write `demo.html` to `{PROJECT_DIR}/src/main/resources/static-resources/demo.html`
+2. Copy plugin assets (`images/`, `logos/`, `resilience/`) into `static-resources/`
+3. Call `akka_local_run_service` to restart the service — Akka reads static files from the compiled classpath (`target/classes/`), so a restart is required for the new files to take effect
+4. Presentation is then accessible at `http://localhost:PORT/demo.html`; the app runs at `http://localhost:PORT/`
+
+**All other modes**:
 - Write HTML to `--output` path (default: `./demo-presentation.html`)
-- If customer logo provided, copy it alongside the output
+- Copy plugin assets alongside the output file
 - For leave-behind/customer modes with images, create a zip with HTML + assets
 
 ### Phase 6: Report
@@ -262,11 +271,12 @@ Done.
 
 What's next:
 
-  Presentation    open {path}
-  Live App        http://localhost:{port}     (live mode only)
-  Console         http://localhost:9889       (live mode only)
-  Resilience      /akka:reliability           (live mode only)
-  Deploy          /akka:deploy                (live mode only)
+  Presentation    http://localhost:{port}/demo.html   (live mode — served by Akka)
+  Presentation    open {path}                         (other modes)
+  Live App        http://localhost:{port}/            (live mode only)
+  Console         http://localhost:9889               (live mode only)
+  Resilience      /akka:reliability                   (live mode only)
+  Deploy          /akka:deploy                        (live mode only)
 ```
 
 ---
@@ -276,7 +286,7 @@ What's next:
 | Tab | generic | leave-behind | live | customer |
 |-----|---------|-------------|------|----------|
 | Brief | — | From spec.md | From spec.md | From spec.md |
-| App | — | Screenshots/video | Boot terminal + iframe | Run It Yourself guide |
+| App | — | Screenshots/video | iframe → `http://localhost:PORT/` (app from same static-resources) | Run It Yourself guide |
 | Architecture | — | Component explorer | Component explorer | Component explorer |
 | Platform | — | Multi-tenant, API, SDLC, best practices | Same | Same |
 | Ship It | — | Deploy options, certs, cost | Same | Same |
@@ -335,22 +345,28 @@ When rendering mermaid diagrams to HTML, follow these rules:
 
 ---
 
-## File Structure
+## Template Source — Public Repo
 
-The generator needs these files:
+Templates are not bundled with the plugin install. They live in a public GitHub repo so every `/akka:demo` invocation gets the latest slide content, copy, and design.
 
 ```
-preso/
-├── generator/
-│   ├── generate.mjs              # Node.js generator script
-│   ├── base-template.html        # Sales presentation with insertion markers
-│   ├── demo-css.css              # All scoped demo CSS (extracted once)
-│   ├── demo-js.js                # All demo JS (tabs, boot terminal, SVG)
-│   └── demo-section-template.html # Demo HTML with {{placeholders}}
-├── integration-recipe.md         # What works and what doesn't
-├── diagram-rendering-spec.md     # Diagram rendering rules
-└── commands/
-    └── demo.md                   # Skill definition (calls generator)
+Repo:      https://github.com/tylerjewell/sales-presentation
+Cache:     ~/.akka/sales-presentation/
+```
+
+On every run the plugin does:
+1. `git clone` the repo if not already cached, or `git pull --ff-only` to update
+2. Run `python3 CACHE_DIR/builder/build.py --mode overview` to assemble the current base deck into `~/.akka/sales-presentation/generated/_plugin/base.html`
+3. Python 3 is required — if unavailable the plugin stops with an install prompt
+
+No template files are committed to the plugin. The plugin directory contains only `demo.md` and `SPEC.md`.
+
+**Template file paths (post-clone + build):**
+```
+~/.akka/sales-presentation/generated/_plugin/base.html   — assembled sales deck (markers intact)
+~/.akka/sales-presentation/slides/12-demo/slide.css      — demo section CSS
+~/.akka/sales-presentation/slides/12-demo/slide.html     — demo HTML with {{PLACEHOLDER}} markers
+~/.akka/sales-presentation/slides/12-demo/slide.js       — tab switching, SVG diagrams, keyboard nav
 ```
 
 ## Output Size Expectations

@@ -1,0 +1,6 @@
+{
+  "id": "12-demo",
+  "nav_id": "demo-wrapper",
+  "pre_spacer": 0,
+  "include_in": ["shareable", "live", "hands-on"]
+}
