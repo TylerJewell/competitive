@@ -48,6 +48,10 @@ parser.add_argument('--presenter', default=None,
     help='Presenter JSON file stem in presenters/ (e.g. "tyler")')
 parser.add_argument('--out', default=None,
     help='Output file path (default: generated/<mode>/index.html)')
+parser.add_argument('--keep-presenter-placeholders', action='store_true',
+    help='Leave {{PRESENTER_*}} placeholders in the output instead of clearing them. '
+         'Use when building a base.html template that will be substituted later '
+         '(e.g. for the /akka:demo plugin bundle).')
 args = parser.parse_args()
 
 out_path = args.out or os.path.join(GEN, args.mode, 'index.html')
@@ -296,6 +300,9 @@ def apply_presenter(html, p):
 slides_html_combined = '\n\n'.join(slides_html_parts)
 if presenter:
     slides_html_combined = apply_presenter(slides_html_combined, presenter)
+elif args.keep_presenter_placeholders:
+    # Plugin-template build: keep placeholders intact for downstream substitution.
+    pass
 else:
     # No presenter: clear all PRESENTER_ placeholders so no raw {{...}} leak into output
     slides_html_combined = re.sub(r'\{\{PRESENTER_[A-Z_]+\}\}', '', slides_html_combined)
