@@ -1,0 +1,205 @@
+#s13-wrapper {
+  height: 180vh;
+  position: relative;
+}
+#s13 {
+  background: var(--black);
+  padding: 80px var(--pad-6) 60px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+#s13::before {
+  content: ''; position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(245, 197, 24, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.s13-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 1;
+}
+.s13-reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.s13-eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--yellow);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.s13-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 2px;
+  background: var(--yellow);
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.s13-headline {
+  font-size: clamp(36px, 4.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--white);
+  margin-bottom: 16px;
+}
+.s13-headline .accent { color: var(--yellow); }
+
+.s13-subhead {
+  font-size: clamp(15px, 1.3vw, 19px);
+  color: #888;
+  font-weight: 400;
+  line-height: 1.45;
+  max-width: 880px;
+  margin-bottom: 56px;
+}
+
+/* Three-column grid */
+.s13-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+.s13-grid.s13-reveal {
+  /* Stagger children so each column reveals in turn */
+}
+
+.s13-col {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #1A1A1A;
+  border-radius: 12px;
+  padding: 28px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: border-color .25s ease, background .25s ease, transform .25s ease;
+  min-width: 0;
+}
+.s13-col:hover {
+  border-color: rgba(245, 197, 24, 0.30);
+  background: rgba(245, 197, 24, 0.03);
+  transform: translateY(-2px);
+}
+
+.s13-col-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.s13-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(245, 197, 24, 0.12);
+  color: var(--yellow);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(245, 197, 24, 0.40);
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+}
+
+.s13-title {
+  font-size: clamp(18px, 1.55vw, 24px);
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  min-height: 70px;
+}
+.s13-mem {
+  color: var(--yellow);
+  font-weight: 600;
+  font-style: italic;
+}
+
+.s13-desc {
+  font-size: 13.5px;
+  color: #9A9A9A;
+  line-height: 1.5;
+  font-weight: 400;
+  min-height: 60px;
+}
+
+.s13-caps {
+  margin-top: 6px;
+  border-top: 1px dashed #222;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.s13-cap {
+  font-size: clamp(15px, 1.25vw, 17px);
+  font-weight: 400;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.s13-cap::before {
+  content: '›';
+  color: var(--yellow);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.s13-stats {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px dashed #222;
+  display: grid;
+  gap: 10px;
+  align-items: end;
+}
+.s13-stats-3 { grid-template-columns: repeat(3, 1fr); }
+.s13-stats-2 { grid-template-columns: repeat(2, 1fr); }
+.s13-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+.s13-stat-num {
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 700;
+  color: var(--yellow);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.s13-stat-lbl {
+  font-size: 11px;
+  color: #888;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

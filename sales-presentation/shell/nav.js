@@ -4,6 +4,7 @@ const views = [
     document.getElementById('st-wrapper'),
     document.getElementById('s2-wrapper'),
     document.getElementById('s4-wrapper'),
+    document.getElementById('s13-wrapper'),
     document.getElementById('s5-wrapper'),
     document.getElementById('s6-wrapper'),
     document.getElementById('s7-problem'),
