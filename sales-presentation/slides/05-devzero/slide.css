@@ -99,10 +99,10 @@
 .s5-term-prompt .p-dir { color: #555; }
 .s5-term-prompt .p-dollar { color: var(--yellow); font-weight: 700; margin-left: 2px; }
 .s5-term-body {
-  padding: 16px 24px;
+  padding: 14px 24px;
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
   font-size: 12px;
-  line-height: 1.8;
+  line-height: 1.55;
   flex: 1; min-height: 0;
   overflow-y: auto;
 }
@@ -115,6 +115,8 @@
 .s5-tline .ai { color: #999; font-style: italic; }
 .s5-tline .success { color: #28C840; }
 .s5-tline .warn { color: var(--yellow); font-weight: 600; }
+.s5-tline .ai-prefix { color: #5BA3F5; font-weight: 700; user-select: none; }
+.s5-tline .ai-indent { color: transparent; user-select: none; white-space: pre; }
 
 .s5-cursor {
   display: inline-block; width: 7px; height: 13px;

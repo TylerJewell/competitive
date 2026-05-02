@@ -16,13 +16,9 @@
     { type:'cmd', text:'/akka:tasks && /akka:implement && /akka:build', phase:'implement' },
     { type:'lines', items: [
       { text:'[tasks] 6 tasks generated, dependency-ordered \u2714', cls:'ok' },
-      { text:'[implement] Writing LoyaltyAccount entity...', cls:'ai' },
-      { text:'[implement] Writing RewardsProgram entity...', cls:'ai' },
-      { text:'[implement] Writing REST endpoints + views...', cls:'ai' },
-      { text:'[implement] Writing RedemptionWorkflow...', cls:'ai' },
-      { text:'[implement] Generating 50 unit tests...', cls:'ai' },
+      { text:'[implement] Writing entities, endpoints, views, workflow...', cls:'ai' },
       { text:'[implement] 989 lines across 12 files \u2714  50/50 tests passing', cls:'ok' },
-      { text:'[build] mvn compile \u2714  mvn test \u2714  service running on :8080', cls:'ok' },
+      { text:'[build] mvn compile \u2714  mvn test \u2714  running on :8080', cls:'ok' },
     ], trigger:'arch'},
     { type:'blank' },
 
@@ -30,10 +26,8 @@
     { type:'lines', items: [
       { text:'[review] Spec compliance 100% \u2714  Coverage 94%', cls:'ok' },
       { text:'[analyze] Full cross-artifact traceability \u2714', cls:'ok' },
-      { text:'[deploy] git commit \u2714  git push \u2714', cls:'ai' },
-      { text:'[deploy] Container image built \u2714  Pushed to registry', cls:'ai' },
-      { text:'[deploy] Routes configured \u2714  loyalty.acme.akka.app', cls:'ai' },
-      { text:'[deploy] Deploying to your private Akka cloud \u2714  Active-active HA, 3 replicas', cls:'ok' },
+      { text:'[deploy] Container built \u2714  Routes configured \u2714  loyalty.acme.akka.app', cls:'ai' },
+      { text:'[deploy] Live on your Akka cloud \u2714  Active-active HA, 3 replicas', cls:'ok' },
     ]},
     { type:'blank' },
     { type:'warn', text:'\u2728 loyalty-service is live. Spec to production in 2 hours, 14 minutes.' },
@@ -47,11 +41,9 @@
   var cursorEl = null;
 
   var CMD_CHAR_MS  = 24;
-  var AI_CHAR_MS   = 20;
-  var OK_CHAR_MS   = 18;
-  var LINE_DELAY   = 280;
-  var PAUSE_AFTER_CMD = 500;
-  var PAUSE_AFTER_STEP = 400;
+  var PAUSE_AFTER_CMD = 350;
+  var WAIT_BEFORE_RESPONSE = 450;
+  var PAUSE_AFTER_STEP = 380;
 
   function scroll() { body.scrollTop = body.scrollHeight; }
 
@@ -85,6 +77,7 @@
 
   var s5UpCount = 0;
   var s5State = 'idle'; /* idle | forward | reverse | done */
+  var runToken = 0;     /* incremented on reset to invalidate in-flight typing chains */
 
   function fillTerminalFull() {
     body.innerHTML = '';
@@ -104,18 +97,12 @@
       } else if (step.type === 'lines') {
         for (var j = 0; j < step.items.length; j++) {
           var item = step.items[j];
-          var ld = document.createElement('div');
-          ld.className = 's5-tline';
           var c = item.cls === 'ok' ? 'success' : 'ai';
-          ld.innerHTML = '<span class="' + c + '">' + item.text + '</span>';
-          body.appendChild(ld);
+          instantLine(c, item.text, j === 0);
         }
       } else {
         var cls = step.type === 'ok' ? 'success' : (step.type === 'warn' ? 'warn' : step.type);
-        var d = document.createElement('div');
-        d.className = 's5-tline';
-        d.innerHTML = '<span class="' + cls + '">' + step.text + '</span>';
-        body.appendChild(d);
+        instantLine(cls, step.text, true);
       }
     }
     var end = document.createElement('div');
@@ -126,6 +113,7 @@
   }
 
   function resetS5() {
+    runToken++;
     body.innerHTML = '';
     removeCursor();
     specCard.classList.remove('show');
@@ -176,7 +164,8 @@
         s5State = 'forward';
         s5Anchored = true;
         s5Running = true;
-        setTimeout(function() { run(0); }, 600);
+        var t = runToken;
+        setTimeout(function() { run(0, t); }, 600);
       }
     }
 
@@ -185,7 +174,8 @@
       s5Anchored = true;
       if (!s5Running) {
         s5Running = true;
-        setTimeout(function() { run(0); }, 600);
+        var t2 = runToken;
+        setTimeout(function() { run(0, t2); }, 600);
       }
     }
 
@@ -238,9 +228,10 @@
     }
   }
 
-  function typeText(span, text, charMs, cb) {
+  function typeText(span, text, charMs, cb, token) {
     var i = 0;
     function tick() {
+      if (token !== runToken) return;
       if (i < text.length) {
         span.textContent += text[i]; i++;
         scroll();
@@ -250,28 +241,20 @@
     tick();
   }
 
-  function makeLine(cls) {
+  var AI_PREFIX_HTML = '<span class="ai-prefix">AI &rarr; </span>';
+  var AI_INDENT_HTML = '<span class="ai-indent">       </span>';
+
+  function instantLine(cls, text, isFirst) {
     var div = document.createElement('div');
     div.className = 's5-tline';
-    var span = document.createElement('span');
-    span.className = cls;
-    div.appendChild(span);
+    div.innerHTML = (isFirst ? AI_PREFIX_HTML : AI_INDENT_HTML)
+      + '<span class="' + cls + '">' + text + '</span>';
     body.appendChild(div);
-    return span;
+    scroll();
   }
 
-  function playLines(items, idx, cb) {
-    if (idx >= items.length) { if (cb) cb(); return; }
-    var item = items[idx];
-    var clsMap = { ok:'success', ai:'ai' };
-    var span = makeLine(clsMap[item.cls] || 'success');
-    addCursor(span.parentNode);
-    typeText(span, item.text, OK_CHAR_MS, function() {
-      setTimeout(function() { playLines(items, idx + 1, cb); }, LINE_DELAY);
-    });
-  }
-
-  function run(idx) {
+  function run(idx, token) {
+    if (token !== runToken) return;
     if (idx >= script.length) {
       removeCursor();
       var end = document.createElement('div');
@@ -293,7 +276,7 @@
       bl.innerHTML = '&nbsp;';
       body.appendChild(bl);
       scroll();
-      setTimeout(function() { run(idx + 1); }, 120);
+      setTimeout(function() { run(idx + 1, token); }, 120);
 
     } else if (step.type === 'cmd') {
       var line = document.createElement('div');
@@ -306,39 +289,30 @@
       addCursor(line);
       scroll();
       typeText(cmdSpan, step.text, CMD_CHAR_MS, function() {
-        setTimeout(function() { removeCursor(); run(idx + 1); }, PAUSE_AFTER_CMD);
-      });
-
-    } else if (step.type === 'ai') {
-      var span = makeLine('ai');
-      addCursor(span.parentNode);
-      typeText(span, step.text, AI_CHAR_MS, function() {
-
-        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
-      });
-
-    } else if (step.type === 'ok') {
-      var span = makeLine('success');
-      addCursor(span.parentNode);
-      typeText(span, step.text, OK_CHAR_MS, function() {
-        if (step.trigger) fireTrigger(step.trigger);
-        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
-      });
-
-    } else if (step.type === 'warn') {
-      var span = makeLine('warn');
-      addCursor(span.parentNode);
-      typeText(span, step.text, AI_CHAR_MS, function() {
+        if (token !== runToken) return;
         removeCursor();
+        setTimeout(function() { run(idx + 1, token); }, PAUSE_AFTER_CMD);
+      }, token);
+
+    } else if (step.type === 'ai' || step.type === 'ok' || step.type === 'warn') {
+      var clsMap = { ai:'ai', ok:'success', warn:'warn' };
+      setTimeout(function() {
+        if (token !== runToken) return;
+        instantLine(clsMap[step.type], step.text, true);
         if (step.trigger) fireTrigger(step.trigger);
-        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
-      });
+        setTimeout(function() { run(idx + 1, token); }, PAUSE_AFTER_STEP);
+      }, WAIT_BEFORE_RESPONSE);
 
     } else if (step.type === 'lines') {
-      playLines(step.items, 0, function() {
+      setTimeout(function() {
+        if (token !== runToken) return;
+        var clsMap = { ok:'success', ai:'ai' };
+        step.items.forEach(function(item, i) {
+          instantLine(clsMap[item.cls] || 'success', item.text, i === 0);
+        });
         if (step.trigger) fireTrigger(step.trigger);
-        setTimeout(function() { run(idx + 1); }, PAUSE_AFTER_STEP);
-      });
+        setTimeout(function() { run(idx + 1, token); }, PAUSE_AFTER_STEP);
+      }, WAIT_BEFORE_RESPONSE);
     }
   }
 
