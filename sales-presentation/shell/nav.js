@@ -11,6 +11,7 @@ const views = [
     document.getElementById('s7-answer-wrapper'),
     document.getElementById('cust-wrapper'),
     document.getElementById('pkg-wrapper'),
+    document.getElementById('s10-delivery-wrapper'),
     document.getElementById('s9-wrapper'),
     document.getElementById('demo-wrapper'),
     document.getElementById('closing')

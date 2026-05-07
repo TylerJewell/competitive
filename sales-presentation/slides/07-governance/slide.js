@@ -7,7 +7,7 @@ function updateS7() {
   const wTop    = s7wrapper.offsetTop;
   const wScroll = s7wrapper.offsetHeight - window.innerHeight;
   const scrolled = y - wTop;
-  const p = wScroll > 0 ? Math.min(scrolled / wScroll, 1) : 0;
+  const p = wScroll > 0 ? Math.max(0, Math.min(scrolled / wScroll, 1)) : 0;
 
   s7els.forEach(el => {
     const step = +el.dataset.s7;

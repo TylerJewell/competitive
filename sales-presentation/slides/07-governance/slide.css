@@ -103,7 +103,7 @@
 .s7-answer-headline {
   font-size: clamp(28px, 3.5vw, 52px); font-weight:700;
   line-height:1.08; letter-spacing:-0.03em; color:var(--white);
-  max-width: 1180px; margin-bottom: 134px;
+  max-width: 1180px; margin-bottom: 56px;
 }
 .s7-answer-headline .accent { color:var(--yellow); }
 
@@ -117,7 +117,6 @@
   z-index: 1;
   width: 100%;
   max-width: 1340px;
-  transform: translateY(-50px);
 }
 .s7-impact-col {
   margin-left: 36px;
@@ -183,7 +182,7 @@
   position: relative;
 }
 .s7-loop-step {
-  min-height: 248px;
+  min-height: 200px;
   background: rgba(8,10,14,0.9);
   border: 1px solid rgba(255,255,255,0.13);
   border-top: 4px solid var(--yellow);
@@ -379,8 +378,7 @@
   z-index: 1;
   width: 100%;
   max-width: 1340px;
-  margin-top: 64px;
-  transform: translateY(-50px);
+  margin-top: 32px;
 }
 .s7-proof-box {
   width: 100%;
