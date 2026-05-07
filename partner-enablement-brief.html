@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka Partner Enablement Brief — Finding & Qualifying Accounts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: letter; margin: 0.55in 0.65in 0.5in 0.65in; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #1A1A1A;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Header / Brand Bar ── */
+  .header {
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo svg { height: 22px; width: auto; }
+  .header .tagline { font-size: 8.5pt; font-weight: 400; color: #ccc; text-align: right; }
+
+  /* ── Title Block ── */
+  .title-block {
+    margin-top: 16px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #F5C518;
+    padding-bottom: 10px;
+  }
+  .title-block h1 { font-size: 17pt; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 2px; }
+  .title-block .subtitle { font-size: 9.5pt; color: #4E4E4E; font-weight: 500; }
+  .title-block .meta { font-size: 7.5pt; color: #888; margin-top: 4px; }
+
+  /* ── Summary Table ── */
+  .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 8pt; }
+  .summary-table th {
+    background: #000; color: #fff; text-align: left; padding: 5px 8px;
+    font-weight: 600; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .summary-table th:first-child { border-radius: 3px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 3px 0 0; }
+  .summary-table td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .summary-table tr:nth-child(even) td { background: #FAFAFA; }
+  .summary-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .summary-table .akka-col { color: #000; font-weight: 500; }
+  .summary-table .highlight { background: #FFF9DB; }
+
+  /* ── Two-Column Layout ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 12px; }
+
+  /* ── Section Styles ── */
+  .section { margin-bottom: 13px; }
+  .section h2 {
+    font-size: 11pt; font-weight: 700; color: #000;
+    border-left: 4px solid #F5C518; padding-left: 8px;
+    margin-bottom: 6px; line-height: 1.3;
+  }
+  .section h3 { font-size: 9pt; font-weight: 600; color: #333; margin-bottom: 3px; margin-top: 6px; }
+  .section p, .section li { font-size: 8.5pt; color: #333; line-height: 1.4; }
+  .section ul { padding-left: 14px; margin-bottom: 4px; }
+  .section li { margin-bottom: 2px; }
+
+  /* ── Callout / Quote Box ── */
+  .callout {
+    background: #000; color: #fff; padding: 10px 14px; border-radius: 4px;
+    margin: 8px 0; font-size: 8.5pt; line-height: 1.4; font-style: italic;
+  }
+  .callout .source { display: block; margin-top: 4px; font-style: normal; font-size: 7pt; color: #F5C518; }
+
+  /* ── Comparison Mini-Table ── */
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .cmp-table th {
+    background: #F5F5F5; font-weight: 600; text-align: left;
+    padding: 4px 6px; border-bottom: 2px solid #F5C518; font-size: 7.5pt;
+  }
+  .cmp-table td { padding: 3px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .cmp-table .bad { color: #C0392B; font-weight: 500; }
+  .cmp-table .good { color: #1A7A3A; font-weight: 500; }
+
+  /* ── Stats Row ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+  .stat-card {
+    background: #000; color: #fff; border-radius: 4px;
+    padding: 8px 10px; text-align: center;
+  }
+  .stat-card .number { font-size: 16pt; font-weight: 700; color: #F5C518; line-height: 1.1; }
+  .stat-card .label {
+    font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px;
+    color: #ccc; margin-top: 2px;
+  }
+
+  /* ── Trigger / Signal cards ── */
+  .signal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 4px; }
+  .signal-card {
+    background: #FFF9DB; border-left: 3px solid #F5C518;
+    padding: 5px 8px; border-radius: 0 3px 3px 0;
+  }
+  .signal-card .title { font-size: 8pt; font-weight: 700; color: #000; }
+  .signal-card .desc { font-size: 7.5pt; color: #444; line-height: 1.35; margin-top: 1px; }
+
+  /* ── Discovery question list ── */
+  .discovery {
+    background: #FAFAFA; border: 1px solid #e5e5e5; border-radius: 4px;
+    padding: 8px 12px; margin: 6px 0;
+  }
+  .discovery .q { font-size: 8.5pt; font-weight: 600; color: #000; margin-bottom: 1px; }
+  .discovery .why { font-size: 7.5pt; color: #666; font-style: italic; margin-bottom: 5px; }
+
+  /* ── Persona table ── */
+  .persona-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .persona-table th {
+    background: #000; color: #fff; text-align: left;
+    padding: 5px 8px; font-weight: 600; font-size: 7.5pt;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .persona-table th:first-child { border-radius: 3px 0 0 0; }
+  .persona-table th:last-child { border-radius: 0 3px 0 0; }
+  .persona-table td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .persona-table tr:nth-child(even) td { background: #FAFAFA; }
+
+  /* ── Objection Handling ── */
+  .objection { margin-bottom: 6px; }
+  .objection .q { font-weight: 600; font-size: 8.5pt; color: #000; }
+  .objection .a { font-size: 8pt; color: #444; font-style: italic; margin-top: 1px; }
+
+  /* ── Disqualifier box ── */
+  .disqualify {
+    background: #FDF2F0; border: 1px solid #E5C0BB; border-radius: 4px;
+    padding: 8px 12px; margin: 6px 0;
+  }
+  .disqualify h3 { font-size: 9pt; color: #C0392B; margin-bottom: 4px; font-weight: 700; }
+  .disqualify ul { padding-left: 14px; }
+  .disqualify li { font-size: 8pt; color: #6B2A20; margin-bottom: 1px; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 8px; padding-top: 6px; border-top: 2px solid #000;
+    display: flex; justify-content: space-between; font-size: 7pt; color: #888;
+  }
+  .footer a { color: #888; text-decoration: none; }
+
+  /* ── Page Break ── */
+  .page-break { page-break-before: always; break-before: page; margin-top: 0; padding-top: 12px; }
+
+  /* ── Screen-only styling ── */
+  @media screen { body { max-width: 8.5in; margin: 0 auto; padding: 0.55in 0.65in; } }
+
+  /* ── Accent ── */
+  strong.accent { color: #000; background: #FFF3C4; padding: 0 3px; border-radius: 2px; }
+  .yellow { color: #D4A017; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ PAGE 1 ════════════════════════ -->
+
+<div class="header">
+  <div class="logo"><svg width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_344_191)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="white"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="white"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="white"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="white"/></g><defs><clipPath id="clip0_344_191"><rect width="109" height="25" fill="white"/></clipPath></defs></svg></div>
+  <div class="tagline">Reliable AI for Every Industry<br>The Agentic Systems Platform</div>
+</div>
+
+<div class="title-block">
+  <h1>Partner Enablement Brief: Finding &amp; Qualifying Akka Accounts</h1>
+  <div class="subtitle">A field guide for resell partners hunting enterprise agentic AI opportunities</div>
+  <div class="meta">Confidential &mdash; Channel Partner Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+<!-- Why This Matters Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="number">$15M+</div>
+    <div class="label">Avg 3-yr TCO Win</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">70-90%</div>
+    <div class="label">Lower Infra Cost</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">7%</div>
+    <div class="label">EU AI Act Max Fine</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">19+</div>
+    <div class="label">Compliance Certs</div>
+  </div>
+</div>
+
+<!-- ICP Snapshot -->
+<div class="section">
+  <h2>Ideal Customer Profile &mdash; At a Glance</h2>
+  <p>Akka wins biggest where agentic AI must be production-grade, regulated, and multi-region. Use this profile to score every account before you spend a meeting on it.</p>
+</div>
+
+<table class="summary-table">
+  <tr><th>Dimension</th><th>Strong Fit</th><th>Why It Matters</th></tr>
+  <tr>
+    <td>Industry</td>
+    <td class="akka-col">Banking, insurance, healthcare, telecom, public sector, energy, asset management</td>
+    <td>Regulated data + revenue-bearing flows = HA/DR and governance are board-level</td>
+  </tr>
+  <tr>
+    <td>Size</td>
+    <td class="akka-col">Global 2000; $1B+ revenue; 5,000+ employees</td>
+    <td>Has the AI budget, the compliance exposure, and the multi-region footprint to need Akka</td>
+  </tr>
+  <tr>
+    <td>Geography</td>
+    <td class="akka-col">EU, UK, Singapore, Japan, Canada, US regulated states; sovereign-cloud markets</td>
+    <td>EU AI Act, GDPR, sovereign-cloud mandates &mdash; all force the conversation Akka wins</td>
+  </tr>
+  <tr>
+    <td>AI Maturity</td>
+    <td class="akka-col">Past PoC; has stuck pilots; building or evaluating an agentic platform</td>
+    <td>Greenfield "exploring AI" accounts are too early &mdash; production pain is the trigger</td>
+  </tr>
+  <tr>
+    <td>Tech Footprint</td>
+    <td class="akka-col">Heavy Azure / Cosmos DB / OpenAI; or LangChain/Temporal pilot stalled</td>
+    <td>Cost compounding and HA/DR gaps are already visible &mdash; you don't need to convince them the problem exists</td>
+  </tr>
+  <tr>
+    <td>Org Signals</td>
+    <td class="akka-col">Chief AI Officer, dedicated AI Platform team, board-mandated AI strategy</td>
+    <td>Means there's a budget owner and a deadline &mdash; the two things deals need</td>
+  </tr>
+</table>
+
+<!-- Vertical Hot List + Trigger Events -->
+<div class="two-col">
+  <div class="section">
+    <h2>Verticals That Convert</h2>
+    <table class="cmp-table">
+      <tr><th>Vertical</th><th>Why Akka Wins</th></tr>
+      <tr><td><strong>Banking &amp; Capital Markets</strong></td><td class="good">Multi-region, revenue-bearing, EU AI Act + DORA</td></tr>
+      <tr><td><strong>Insurance</strong></td><td class="good">Manulife proof point; claims + underwriting agents</td></tr>
+      <tr><td><strong>Healthcare / Life Sciences</strong></td><td class="good">PHI handling, HIPAA, audit trails, explainability</td></tr>
+      <tr><td><strong>Telecom</strong></td><td class="good">Verizon proof point; real-time event volumes; sovereign markets</td></tr>
+      <tr><td><strong>Public Sector / Defense</strong></td><td class="good">Sovereign cloud; on-prem deployable; immutable audit</td></tr>
+      <tr><td><strong>Energy &amp; Utilities</strong></td><td class="good">Grid + IoT event streams; resilience SLAs; regulator scrutiny</td></tr>
+      <tr><td><strong>Asset / Wealth Management</strong></td><td class="good">Compliance + advisor copilots; SEC/FINRA audit</td></tr>
+    </table>
+    <p style="font-size:7.5pt; color:#666; margin-top:4px;"><strong>Avoid:</strong> pure consumer SaaS, ad-tech, single-region SMBs, research-only teams.</p>
+  </div>
+
+  <div class="section">
+    <h2>Trigger Events &mdash; When to Strike</h2>
+    <div class="signal-grid">
+      <div class="signal-card">
+        <div class="title">Chief AI Officer hire</div>
+        <div class="desc">New exec needs a 90-day platform decision &mdash; window is small</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">Stuck pilot &gt; 6 months</div>
+        <div class="desc">PoC can't make it to production; LangChain or Foundry stack is breaking</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">Azure outage in their region</div>
+        <div class="desc">Sweden Central, GPT-5.2, Front Door &mdash; outages turn HA/DR into a CFO topic</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">EU AI Act audit notice</div>
+        <div class="desc">Article 5 enforceable now; Article 9-15 since Aug 2025</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">Cosmos DB cost overrun</div>
+        <div class="desc">FinOps is escalating; multi-region writes blew the budget</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">Arize / eval budget added</div>
+        <div class="desc">They are buying a second evidence plane because the runtime cannot explain itself</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">Azure EA renewal &lt; 12 mo</div>
+        <div class="desc">Lock-in conversation has natural urgency; CFO is paying attention</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">Sovereign cloud mandate</div>
+        <div class="desc">EU Data Boundary, UK, Singapore &mdash; Foundry is feature-lagged here</div>
+      </div>
+      <div class="signal-card">
+        <div class="title">Board-level AI strategy</div>
+        <div class="desc">Public commitment creates a budget and a deadline you can sell into</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Manulife Proof Point -->
+<div style="background: #FFF9DB; border: 2px solid #F5C518; border-radius: 5px; padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 12px;">
+  <div style="flex-shrink:0; background:#000; color:#F5C518; font-size:18pt; font-weight:700; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:4px;">M</div>
+  <div>
+    <div style="font-size:9.5pt; font-weight:700; color:#000; margin-bottom:2px;">Use Manulife in Your First Conversation &mdash; Every Time</div>
+    <div style="font-size:8pt; color:#333; line-height:1.45;">Manulife &mdash; <strong>Microsoft's largest Canadian customer</strong>, ranked #1 life insurance company for AI maturity &mdash; evaluated Azure AI Foundry for their enterprise agentic AI platform and chose Akka. Deciding factors: <strong>cost effectiveness and production-ready HA/DR</strong>. They had every reason to stay on Azure (existing EA, deep relationship, big Azure investment). They moved anyway. <strong>If Microsoft can't keep their #1 Canadian customer for agentic AI, your prospect should ask why.</strong> &nbsp;<span style="font-size:7pt; color:#888;">akka.io/blog/manulife-selects-akka-to-operationalize-agentic-ai</span></div>
+  </div>
+</div>
+
+<!-- Akka Specify Proof Card -->
+<div style="background:#000; border:2px solid #F5C518; border-radius:5px; padding:10px 14px; margin-bottom:13px; display:flex; align-items:flex-start; gap:12px;">
+  <div style="flex-shrink:0; background:#F5C518; color:#000; font-size:13pt; font-weight:700; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:4px; line-height:1;">&lt;/&gt;</div>
+  <div>
+    <div style="font-size:9.5pt; font-weight:700; color:#F5C518; margin-bottom:2px;">Akka Specify &mdash; Build Cost Approaches Zero</div>
+    <div style="font-size:8pt; color:#fff; line-height:1.45;">Akka Specify (spec-driven development) generates production-grade implementations from specifications &mdash; not prototypes, production. The traditional $1M&ndash;$5M / 9&ndash;18-month build line item compresses by an order of magnitude. <strong style="color:#F5C518;">Three customer proofs you can name in any meeting:</strong>
+      <ul style="margin:4px 0 0 16px; padding:0; font-size:8pt; color:#fff;">
+        <li><strong style="color:#F5C518;">Dojo</strong> &mdash; hires <strong>college grads with no prior experience</strong> and ships major AI systems into production in <strong>weeks</strong>.</li>
+        <li><strong style="color:#F5C518;">Manulife</strong> &mdash; rewrote <strong>70% of an existing AI system in weeks</strong> with a <strong>70% performance improvement</strong> on the way out.</li>
+        <li><strong style="color:#F5C518;">Ntiva</strong> &mdash; re-implemented n8n workflow designs in <strong>hours</strong>, scaled to <strong>2,000 TPS in a couple of days</strong>.</li>
+      </ul>
+      <div style="margin-top:5px; font-size:7.5pt; color:#ccc; font-style:italic;">Why this matters for you: rip-and-replace becomes economically rational. Stuck Foundry, LangChain, or n8n stacks your prospect "can't afford to replace" &mdash; they can now. The sunk-cost defense just disappeared.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ PAGE 2 ════════════════════════ -->
+
+<div class="page-break"></div>
+
+<!-- Discovery Questions -->
+<div class="section">
+  <h2>Discovery &mdash; Seven Questions That Qualify a Deal in 15 Minutes</h2>
+  <p>Run these in order. If you get strong signal on questions 1, 3, and 6, you have an opportunity worth registering. If you get a flat "no" on 1 or 3, walk away &mdash; this isn't an Akka deal yet.</p>
+</div>
+
+<div class="discovery">
+  <div class="q">1. "Are you running, building, or planning agentic AI in production within the next 12 months?"</div>
+  <div class="why">Filters out research / experimentation. Akka sells to teams that need production guarantees.</div>
+
+  <div class="q">2. "What's your target SLA for those agents &mdash; including state durability and regional failover?"</div>
+  <div class="why">Surfaces HA/DR gap. If they say "we haven't thought about it," that's an opening, not a stop.</div>
+
+  <div class="q">3. "Are you subject to the EU AI Act, GDPR, HIPAA, DORA, or any sovereign-cloud requirement?"</div>
+  <div class="why">Triggers the governance + sovereign cloud angle. Regulated = our home turf.</div>
+
+  <div class="q">4. "What's your current orchestration choice &mdash; Azure AI Foundry, LangChain, Temporal, building it yourselves?"</div>
+  <div class="why">Tells you which battlecard to use and which competitive landmines apply.</div>
+
+  <div class="q">5. "What's your view on multi-cloud or on-prem portability for the AI workload?"</div>
+  <div class="why">If they care about lock-in, Akka's portability is a clean differentiator. If they don't, lead with cost and HA/DR.</div>
+
+  <div class="q">6. "Are you budgeting for Arize, LangSmith, Phoenix, Datadog AI observability, or a custom eval stack?"</div>
+  <div class="why">Turns evaluation, guardrails, logging, and evidence export into a TCO wedge. Akka should be the runtime of record, not a dashboard beside the runtime.</div>
+
+  <div class="q">7. "Who owns the AI platform decision &mdash; CIO, CTO, Chief AI Officer, Chief Risk Officer? And when does the budget land?"</div>
+  <div class="why">Without an owner and a date, there is no deal. Confirm both before you bring Akka in.</div>
+</div>
+
+<!-- Personas -->
+<div class="section">
+  <h2>Who to Call &mdash; Persona Map</h2>
+  <table class="persona-table">
+    <tr><th>Persona</th><th>What They Care About</th><th>Hook to Lead With</th></tr>
+    <tr>
+      <td>Chief AI Officer / VP of AI</td>
+      <td>Time to production; first agentic win on the resume</td>
+      <td>"Manulife went from evaluation to production agentic AI on Akka. Worth 20 minutes?"</td>
+    </tr>
+    <tr>
+      <td>CIO / CTO</td>
+      <td>Vendor risk, lock-in, CIO-of-record on the AI platform call</td>
+      <td>"Microsoft's own docs say their AI Agent Service has no SLA. Are you OK with that?"</td>
+    </tr>
+    <tr>
+      <td>Head of Platform Eng</td>
+      <td>Whether the team can actually ship and operate this</td>
+      <td>"How many FTEs are stitching together LangChain + Cosmos + Kafka right now?"</td>
+    </tr>
+    <tr>
+      <td>Chief Risk / Compliance Officer</td>
+      <td>EU AI Act, audit posture, demonstrable controls</td>
+      <td>"AI Act fines reach 7% of global revenue. Bolt-on governance won't survive an audit."</td>
+    </tr>
+    <tr>
+      <td>Chief Financial Officer</td>
+      <td>Cloud bill compounding; FinOps blowups; EA renewal leverage</td>
+      <td>"Customers cut infra cost 70-90% by collapsing 6-9 Azure services into one platform."</td>
+    </tr>
+    <tr>
+      <td>Head of Cloud / FinOps</td>
+      <td>Cosmos DB RU spend, App Insights ingestion, egress fees</td>
+      <td>"Want a 30-min walkthrough of where Cosmos + App Insights compound on agent workloads?"</td>
+    </tr>
+    <tr>
+      <td>VP Architecture / Chief Architect</td>
+      <td>Reference architecture, portability, future-proofing</td>
+      <td>"One platform replaces orchestration + memory + streaming + governance. Same APIs on any cloud."</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Outreach Hooks + Disqualifiers -->
+<div class="two-col">
+  <div class="section">
+    <h2>Outreach Hooks That Get Replies</h2>
+    <h3>Cost-led</h3>
+    <p>"Most enterprise teams scope agentic AI as an LLM line item, then get surprised when the bill arrives. Akka customers cut infra cost 70-90% by collapsing 6-9 separate services &mdash; orchestration, memory, streaming, evals, guardrails, logging, governance, and APIs &mdash; into one platform. Worth a 20-minute look at your stack?"</p>
+    <h3>Risk-led</h3>
+    <p>"Microsoft's own documentation says Azure AI Foundry's Agent Service has no SLA, no automatic failover, and that 'total state loss' is a planned-for scenario. If your agents touch revenue or regulated data, that's a board-level problem. We can show you sub-1 minute RTO and zero byte RPO &mdash; today."</p>
+    <h3>Compliance-led</h3>
+    <p>"EU AI Act fines reach EUR 35M or 7% of global revenue. Microsoft has not published an article-by-article compliance mapping for Foundry. Akka holds 19+ certifications and embeds enforcement, evaluation checkpoints, guardrail verdicts, interaction logs, legal hold, retention, and evidence export directly in the runtime. Worth a 15-min compliance review?"</p>
+    <h3>Eval-led</h3>
+    <p>"If you're buying Arize or a similar AI eval platform, you're paying for a second trace store because the runtime can't explain itself. Akka captures evals, guardrails, token cost, tool calls, causal lineage, and evidence exports as part of the runtime. Do you want another dashboard, or a system of record?"</p>
+    <h3>Proof-led</h3>
+    <p>"Manulife &mdash; Microsoft's largest Canadian customer &mdash; evaluated Azure AI Foundry and chose Akka for their enterprise agentic AI platform. If your team is making the same decision, here's what they considered."</p>
+    <h3>Speed-led (Akka Specify)</h3>
+    <p>"How long has your current agentic project been stuck? Akka Specify rewrote 70% of Manulife's existing AI system in weeks with a 70% performance improvement. Ntiva replaced n8n designs in hours and hit 2K TPS in two days. Dojo ships major systems with college grads in weeks. If your team is 6+ months into a stuck pilot, you should see what spec-driven build looks like."</p>
+  </div>
+
+  <div class="section">
+    <h2>Disqualifiers &mdash; Walk Away</h2>
+    <div class="disqualify">
+      <h3>Don't waste your cycles on:</h3>
+      <ul>
+        <li>Pure research or academic AI initiatives with no production commitment</li>
+        <li>Single-agent chatbot replacements with no multi-step or tool-using behavior</li>
+        <li>SMBs under $250M revenue &mdash; the platform value is wasted at this scale</li>
+        <li>Single-region, single-cloud, no regulated data, no compliance pressure</li>
+        <li>"Exploring" accounts with no named exec sponsor and no budget cycle</li>
+        <li>Teams already 12+ months into a production Foundry deployment they cannot reverse without a board fight</li>
+        <li>Pure model-vendor evaluations &mdash; we are a runtime, not a model provider</li>
+      </ul>
+    </div>
+    <h3>The 30-second qualifier</h3>
+    <p style="font-style:italic;">"They have a production agentic AI deadline, an exec sponsor, regulatory or HA/DR pressure, and budget within 12 months." If you can't say all four, pause and re-qualify before bringing Akka in.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════ PAGE 3 ════════════════════════ -->
+
+<div class="page-break"></div>
+
+<!-- Competitive Landmines -->
+<div class="section">
+  <h2>Competitive Landmines &mdash; What You'll Hear in the First Call</h2>
+  <table class="cmp-table">
+    <tr><th>What They Say</th><th>What's Really Going On</th><th>Your Move</th></tr>
+    <tr>
+      <td>"We're standardizing on Azure AI Foundry"</td>
+      <td class="bad">Incumbent inertia &mdash; but Foundry has no Agent Service SLA</td>
+      <td class="good">Pull the battlecard. Lead with the Microsoft doc quote on "no SLA" + Manulife</td>
+    </tr>
+    <tr>
+      <td>"We have a LangChain / CrewAI / n8n pilot in production"</td>
+      <td class="bad">It's almost certainly NOT in production &mdash; it's a stuck pilot. Python frameworks hit a density wall: GIL + process-per-worker = scale by adding VMs, not agents</td>
+      <td class="good">"For the same workload, customers cut cloud infra ~90% just by moving off Python frameworks &mdash; before any other lever. And Akka Specify can rewrite the existing system in weeks. Ntiva did n8n redesigns in hours and hit 2K TPS in days."</td>
+    </tr>
+    <tr>
+      <td>"We're looking at RegattaDB / new AI databases"</td>
+      <td class="bad">A database is 20% of the stack &mdash; no orchestration, no governance</td>
+      <td class="good">"Database is one piece. Who's building the other 80%?" Pull the RegattaDB whitepaper</td>
+    </tr>
+    <tr>
+      <td>"We'll build it ourselves on open-source"</td>
+      <td class="bad">4-8 specialist FTEs for 9-18 months before a single agent ships &mdash; and you can't hire that many distributed systems engineers</td>
+      <td class="good">"Akka Specify generates production architectures from specs. Dojo ships major systems with college grads in weeks. Manulife rewrote 70% of their AI in weeks with 70% better performance. Build cost compresses by an order of magnitude."</td>
+    </tr>
+    <tr>
+      <td>"We have an Azure EA &mdash; it's already paid for"</td>
+      <td class="bad">EA discounts apply per-service; you still pay 6-9 bills that compound</td>
+      <td class="good">"Customers see 70-90% lower infra cost vs. EA pricing &mdash; the architecture is different"</td>
+    </tr>
+    <tr>
+      <td>"We already bought Arize / LangSmith for evals"</td>
+      <td class="bad">They created a second evidence plane because the runtime cannot answer regulatory questions by itself</td>
+      <td class="good">"Keep it for legacy systems, but Akka workloads do not need a separate eval product. Runtime-native interaction logs, eval checkpoints, guardrail verdicts, legal hold, retention, and evidence export are built in."</td>
+    </tr>
+    <tr>
+      <td>"Microsoft will catch up on HA/DR"</td>
+      <td class="bad">Multiple accounts have been told 2-3 years on the roadmap</td>
+      <td class="good">"EU AI Act is enforceable now. Can you wait 2-3 years for governance that meets the requirements?"</td>
+    </tr>
+    <tr>
+      <td>"We trust Microsoft on compliance"</td>
+      <td class="bad">No article-by-article AI Act mapping; Purview is self-assessment templates</td>
+      <td class="good">"Self-assessment checklists won't survive an audit. Akka has 19+ certs embedded in the runtime"</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Talk Tracks Recap -->
+<div class="section">
+  <h2>Three Talk Tracks &mdash; Memorize These</h2>
+  <div class="objection">
+    <div class="q">1. The Cost Talk Track</div>
+    <div class="a">"With Azure, you're paying 6-9 separate cloud bills that compound unpredictably. With Akka's shared compute model, your orchestration, agents, memory, streaming, APIs, evaluation checkpoints, guardrails, interaction logging, and governance all run on the same compute &mdash; cutting infrastructure costs by 70-90%. And Akka scales to zero when idle, so you only pay for what you use."</div>
+  </div>
+  <div class="objection">
+    <div class="q">2. The HA/DR Talk Track</div>
+    <div class="a">"Microsoft's own documentation says their AI Agent Service has no SLA, no automatic failover, and that total data loss is a planned-for scenario. We've heard from accounts like Manulife that Microsoft has told them AI HA/DR is 2-3 years out. Akka delivers 99.9999% availability with active-active HA/DR today &mdash; sub-1 minute RTO, zero byte RPO, backed by contractual indemnities."</div>
+  </div>
+  <div class="objection">
+    <div class="q">3. The Compliance Talk Track</div>
+    <div class="a">"Microsoft's governance is spread across Content Safety, API Management, Purview, Monitor, Entra, and often a separate eval tool &mdash; none of which are the runtime of record. They have no real-time explainability, no human override, no immutable interaction ledger. The EU AI Act requires all of these and the fines are up to 7% of global revenue. Akka embeds governance directly in the runtime &mdash; every interaction witnessed, evaluated, guarded, retained, exported, and explainable."</div>
+  </div>
+</div>
+
+<!-- Deal Registration / Handoff -->
+<div class="two-col">
+  <div class="section">
+    <h2>Deal Registration &amp; Handoff</h2>
+    <h3>What to send Akka when you find an opportunity</h3>
+    <ul>
+      <li><strong>Account name + parent entity</strong> &mdash; for deal protection</li>
+      <li><strong>Named exec sponsor</strong> + title + last meeting date</li>
+      <li><strong>Use case</strong> &mdash; the specific agentic workflow they want to build</li>
+      <li><strong>Incumbent / competing solution</strong> &mdash; Foundry, LangChain, Temporal, build, etc.</li>
+      <li><strong>Regulatory exposure</strong> &mdash; EU AI Act, GDPR, HIPAA, DORA, sovereign mandate</li>
+      <li><strong>Budget timing</strong> &mdash; FY, quarter, EA renewal alignment</li>
+      <li><strong>Region footprint</strong> &mdash; single, multi, sovereign</li>
+    </ul>
+    <h3>What happens next</h3>
+    <ul>
+      <li><strong>Within 24h:</strong> deal registered, protection applied, Akka co-sell rep assigned</li>
+      <li><strong>Within 1 week:</strong> joint discovery call; Akka brings field CTO if needed</li>
+      <li><strong>Within 2 weeks:</strong> tailored TCO model + technical deep dive</li>
+      <li><strong>POC funding</strong> available for qualified deals over $500k ARR</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>Why Resell Akka &mdash; The Partner Economics</h2>
+    <h3>Three reasons partners win on Akka deals</h3>
+    <ul>
+      <li><strong>Differentiated narrative</strong> &mdash; you bring a story (HA/DR, AI Act, 70-90% cost) hyperscalers can't match. You stop competing on margin and start competing on outcomes.</li>
+      <li><strong>Multi-year stickiness</strong> &mdash; Akka deployments are platform decisions, not project decisions. Renewal economics are strong, expansion is natural.</li>
+      <li><strong>Services pull-through</strong> &mdash; every Akka deployment opens implementation, integration, governance program, and managed-services attach. The platform is the wedge; services are the multiplier.</li>
+    </ul>
+    <div class="callout">
+      "Akka customers cut infrastructure cost 70-90% and inherit 19+ compliance certifications. The story sells itself &mdash; your job is to find the rooms with budget and a deadline."
+      <span class="source">&mdash; Akka partner program guidance</span>
+    </div>
+  </div>
+</div>
+
+<!-- One-Page Cheat Sheet Summary -->
+<div class="section">
+  <h2>The One-Minute Cheat Sheet</h2>
+  <table class="summary-table">
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>Who do I sell to?</td><td class="akka-col">Global 2000, regulated industries, multi-region, with a stuck pilot or board AI mandate</td></tr>
+    <tr><td>What's the wedge?</td><td class="akka-col">Pick the one that hurts most: HA/DR, EU AI Act, 70-90% infra reduction (vs. hyperscaler) or ~90% (vs. Python frameworks), or rip-and-replace via Akka Specify</td></tr>
+    <tr><td>What's the build story?</td><td class="akka-col">Akka Specify &mdash; Dojo (college grads, weeks to prod), Manulife (70% rewrite, 70% perf gain), Ntiva (n8n in hours, 2K TPS in days)</td></tr>
+    <tr><td>Who's the buyer?</td><td class="akka-col">Chief AI Officer or CIO; CRO/CCO when compliance is the lever; CFO when cost is</td></tr>
+    <tr><td>What's the proof?</td><td class="akka-col">Manulife &mdash; Microsoft's largest Canadian customer chose Akka over Foundry</td></tr>
+    <tr><td>What's the close?</td><td class="akka-col">Joint Akka co-sell call within a week of registration; tailored TCO model in two</td></tr>
+    <tr><td>What disqualifies?</td><td class="akka-col">No production commitment, no exec sponsor, no budget cycle &mdash; walk away</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  <div>Akka Partner Enablement &mdash; Confidential, Channel Partner Use Only</div>
+  <div>akka.io &nbsp;|&nbsp; partners@akka.io</div>
+</div>
+
+</body>
+</html>

@@ -1,7 +1,6 @@
 /* ── Type data ─────────────────────────────────────── */
-/* Ordered: 0-3 = top row (col 0-3), 4-7 = bottom row (col 0-3) */
 // si = simple-icons slug (https://simpleicons.org) — blank = CSS text fallback
-const TYPES = [
+const TYPE_SOURCE = [
   { n:'01', name:'transact & reason', desc:'Process operational data',
     context:'Every payment, order, and decision — at sub-millisecond speed with zero data loss.',
     imgs:['capitalone','ING','westpac','bookingdotcom','gebit'] },
@@ -28,19 +27,27 @@ const TYPES = [
     imgs:['ciena','amprion','lloyds','RBC','tubi'] },
 ];
 
+/* Ordered by visual reveal: top/bottom within each column, then next column. */
+const TYPES = [0, 4, 1, 5, 2, 6, 3, 7].map((sourceIndex, i) => ({
+  ...TYPE_SOURCE[sourceIndex],
+  n: String(i + 1).padStart(2, '0')
+}));
+
 /* ── Build grid ────────────────────────────────────── */
 const stGrid   = document.getElementById('stGrid');
 const stDotsEl = document.getElementById('stDots');
 
 
 TYPES.forEach((t, i) => {
-  const col = i % 4;
-  const row = i < 4 ? 0 : 1;
+  const col = Math.floor(i / 2);
+  const row = i % 2;
 
   const card = document.createElement('div');
   card.className = 'st-card';
   card.dataset.col = col;
   card.dataset.row = row;
+  card.style.gridColumn = String(col + 1);
+  card.style.gridRow = String(row + 1);
 
   const pills = t.imgs.map(name =>
     `<img class="logo-tile-img" src="logos/${name}.png" alt="${name}" loading="lazy">`
@@ -59,8 +66,8 @@ TYPES.forEach((t, i) => {
   stGrid.appendChild(card);
 });
 
-/* 4 progress dots */
-for (let i = 0; i < 4; i++) {
+/* 8 progress dots, one per proof box */
+for (let i = 0; i < TYPES.length; i++) {
   const d = document.createElement('div');
   d.className = 'st-dot';
   stDotsEl.appendChild(d);
@@ -73,19 +80,17 @@ const stDots  = document.querySelectorAll('.st-dot');
 
 let stTriggered = false;
 
-function triggerStCols() {
+function triggerStBoxes() {
   if (stTriggered) return;
   stTriggered = true;
-  for (let col = 0; col < 4; col++) {
+  cards.forEach((card, i) => {
     setTimeout(() => {
-      cards.forEach(card => {
-        if (+card.dataset.col === col) card.classList.add('visible');
-      });
-      if (stDots[col]) stDots[col].classList.add('lit');
-    }, col * 1000);
-  }
+      card.classList.add('visible');
+      if (stDots[i]) stDots[i].classList.add('lit');
+    }, i * 500);
+  });
 }
 
 new IntersectionObserver(entries => {
-  if (entries[0].isIntersecting) triggerStCols();
+  if (entries[0].isIntersecting) triggerStBoxes();
 }, { threshold: 0 }).observe(document.getElementById('st-sticky'));

@@ -147,13 +147,9 @@
 
 /* Starter card — emphasized compact banner */
 .pkg-starter {
-  background: #0A0A0A; border: 1px solid #2a2a2a; border-radius: 10px;
+  background: #0A0A0A; border: 1px dashed #333; border-radius: 10px;
   padding: 12px 20px; position: relative; overflow: hidden;
   display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
-}
-.pkg-starter::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0;
-  height: 3px; background: var(--yellow);
 }
 .pkg-starter-top {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;

@@ -48,6 +48,8 @@ parser.add_argument('--presenter', default=None,
     help='Presenter JSON file stem in presenters/ (e.g. "tyler")')
 parser.add_argument('--out', default=None,
     help='Output file path (default: generated/<mode>/index.html)')
+parser.add_argument('--only-folder', default=None,
+    help='Build only one slide folder, e.g. slides/10-delivery, for standalone review')
 parser.add_argument('--keep-presenter-placeholders', action='store_true',
     help='Leave {{PRESENTER_*}} placeholders in the output instead of clearing them. '
          'Use when building a base.html template that will be substituted later '
@@ -59,6 +61,16 @@ out_path = args.out or os.path.join(GEN, args.mode, 'index.html')
 # ── Load registry ─────────────────────────────────────────────────────────────
 
 registry = read_json(os.path.join(BASE, 'slide-registry.json'))
+if args.only_folder:
+    folder = args.only_folder.replace('\\', '/').rstrip('/')
+    registry = {
+        'slides': [
+            {
+                'id': os.path.basename(folder),
+                'folder': folder
+            }
+        ]
+    }
 
 # ── Load shell ────────────────────────────────────────────────────────────────
 
@@ -100,6 +112,8 @@ for entry in registry['slides']:
 
     # Pre-spacer injection
     pre_spacer = meta.get('pre_spacer', 0)
+    if args.only_folder:
+        pre_spacer = 0
     if pre_spacer and str(pre_spacer) != '0':
         unit = 'vh' if isinstance(pre_spacer, int) else ''
         spacer = f'<div style="height:{pre_spacer}{unit};background:var(--black)"></div>\n'
@@ -316,6 +330,19 @@ result = result.replace('{{SLIDES_HTML}}', slides_html_combined)
 result = result.replace('{{SLIDES_JS}}',   '\n\n'.join(slides_js_parts))
 result = result.replace('{{NAV_JS}}',      nav_js)
 result = result.replace('{{KIOSK_JS}}',    kiosk_js)
+
+if args.only_folder:
+    result = result.replace('<body>', '<body class="single-preview">', 1)
+    result = result.replace(
+        '</style>',
+        '\n/* one-slide preview: render without scroll-triggered reveal gates */\n'
+        'body.single-preview{overflow:hidden!important;}\n'
+        'body.single-preview #s10-delivery-wrapper{height:100vh!important;}\n'
+        'body.single-preview #s10-delivery{position:relative!important;height:100vh!important;top:auto!important;}\n'
+        'body.single-preview .s10d-reveal{opacity:1!important;transform:none!important;}\n'
+        '</style>',
+        1
+    )
 
 # Inject CDN scripts from external inlines just before </head>
 if head_script_tags:

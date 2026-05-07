@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka Service Tiers — Internal Sales Playbook &amp; Pricing Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: letter; margin: 0.55in 0.65in 0.5in 0.65in; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #1A1A1A;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── Internal Confidential Ribbon ── */
+  .confidential-ribbon {
+    background: #C0392B;
+    color: #fff;
+    text-align: center;
+    padding: 5px 10px;
+    font-size: 8pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 3px;
+    margin-bottom: 8px;
+  }
+
+  .header {
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo svg { height: 22px; width: auto; }
+  .header .tagline { font-size: 8.5pt; font-weight: 400; color: #ccc; text-align: right; }
+
+  .title-block {
+    margin-top: 16px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #F5C518;
+    padding-bottom: 10px;
+  }
+  .title-block h1 { font-size: 17pt; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 2px; }
+  .title-block .subtitle { font-size: 9.5pt; color: #4E4E4E; font-weight: 500; }
+  .title-block .meta { font-size: 7.5pt; color: #888; margin-top: 4px; }
+
+  .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 8pt; }
+  .summary-table th {
+    background: #000; color: #fff; text-align: left; padding: 5px 8px;
+    font-weight: 600; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .summary-table th:first-child { border-radius: 3px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 3px 0 0; }
+  .summary-table td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .summary-table tr:nth-child(even) td { background: #FAFAFA; }
+  .summary-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .summary-table .akka-col { color: #000; font-weight: 500; }
+  .summary-table .highlight { background: #FFF9DB; }
+  .summary-table td.tier-name,
+  .summary-table tr:nth-child(even) td.tier-name {
+    background: #F5C518;
+    color: #000;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-size: 8pt;
+    border-left: 4px solid #000;
+    border-bottom: 1px solid #E0A800;
+  }
+  .summary-table td.price,
+  .summary-table tr:nth-child(even) td.price {
+    background: #000;
+    color: #F5C518;
+    font-weight: 700;
+    font-size: 9pt;
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-table td.list {
+    text-align: right;
+    color: #888;
+    text-decoration: line-through;
+    font-size: 7.5pt;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .summary-table td.savings {
+    text-align: right;
+    color: #1A7A3A;
+    font-weight: 700;
+    font-size: 8pt;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 12px; }
+
+  .section { margin-bottom: 13px; }
+  .section h2 {
+    font-size: 11pt; font-weight: 700; color: #000;
+    border-left: 4px solid #F5C518; padding-left: 8px;
+    margin-bottom: 6px; line-height: 1.3;
+  }
+  .section h3 { font-size: 9pt; font-weight: 600; color: #333; margin-bottom: 3px; margin-top: 6px; }
+  .section p, .section li { font-size: 8.5pt; color: #333; line-height: 1.4; }
+  .section ul { padding-left: 14px; margin-bottom: 4px; }
+  .section li { margin-bottom: 2px; }
+
+  .callout {
+    background: #000; color: #fff; padding: 10px 14px; border-radius: 4px;
+    margin: 8px 0; font-size: 8.5pt; line-height: 1.4; font-style: italic;
+  }
+  .callout .source { display: block; margin-top: 4px; font-style: normal; font-size: 7pt; color: #F5C518; }
+
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .cmp-table th {
+    background: #F5F5F5; font-weight: 600; text-align: left;
+    padding: 4px 6px; border-bottom: 2px solid #F5C518; font-size: 7.5pt;
+  }
+  .cmp-table td { padding: 4px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .cmp-table .bad { color: #C0392B; font-weight: 500; }
+  .cmp-table .good { color: #1A7A3A; font-weight: 500; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+  .stat-card {
+    background: #000; color: #fff; border-radius: 4px;
+    padding: 8px 10px; text-align: center;
+  }
+  .stat-card .number { font-size: 16pt; font-weight: 700; color: #F5C518; line-height: 1.1; }
+  .stat-card .label {
+    font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px;
+    color: #ccc; margin-top: 2px;
+  }
+
+  /* ── Sales Principle Callout ── */
+  .principle {
+    background: #F5C518; color: #000; border: 2px solid #000;
+    padding: 12px 16px; border-radius: 4px; margin: 10px 0;
+  }
+  .principle .big {
+    font-size: 13pt; font-weight: 700; color: #000;
+    text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .principle p { font-size: 8.5pt; color: #000; line-height: 1.45; }
+  .principle strong { background: #000; color: #F5C518; padding: 0 4px; border-radius: 2px; }
+
+  /* ── Bundle Card ── */
+  .bundle-card {
+    border: 1px solid #e5e5e5; border-radius: 4px;
+    background: #fff; padding: 10px 12px;
+    border-top: 3px solid #F5C518;
+    margin-bottom: 8px;
+  }
+  .bundle-card.sandbox { border-top-color: #888; }
+  .bundle-card.starter { border-top-color: #1A7A3A; }
+  .bundle-card .header-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 5px; padding-bottom: 4px; border-bottom: 1px solid #eee;
+  }
+  .bundle-card .name {
+    font-size: 10pt; font-weight: 700; color: #000;
+    text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .bundle-card .price-inline {
+    font-size: 11pt; font-weight: 700; color: #000;
+    background: #F5C518; padding: 2px 8px; border-radius: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .bundle-card .composition {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px;
+    margin-bottom: 5px;
+  }
+  .bundle-card .composition div {
+    font-size: 7.5pt; color: #444;
+  }
+  .bundle-card .composition div strong { color: #000; }
+  .bundle-card .rationale {
+    font-size: 7.5pt; color: #4E4E4E; font-style: italic; line-height: 1.4;
+    border-top: 1px dashed #e5e5e5; padding-top: 4px; margin-top: 4px;
+  }
+  .bundle-card .rationale strong { color: #000; font-style: normal; }
+
+  /* ── Price Book Table ── */
+  .pricebook {
+    width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0;
+  }
+  .pricebook th {
+    background: #000; color: #fff; font-weight: 600; text-align: left;
+    padding: 6px 8px; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  .pricebook th.price-col { text-align: right; }
+  .pricebook th:first-child { border-radius: 3px 0 0 0; }
+  .pricebook th:last-child { border-radius: 0 3px 0 0; }
+  .pricebook td {
+    padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: middle;
+  }
+  .pricebook tr:nth-child(even) td { background: #FAFAFA; }
+  .pricebook td.sku { font-weight: 600; color: #000; }
+  .pricebook td.price-val {
+    text-align: right; font-weight: 700; color: #000;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .pricebook td.na { text-align: right; color: #bbb; font-style: italic; }
+
+  /* ── Expansion Card ── */
+  .expansion-card {
+    background: #FFF9DB; border: 1px solid #F5C518; border-radius: 4px;
+    padding: 8px 12px; margin-bottom: 6px;
+  }
+  .expansion-card .from {
+    font-size: 8pt; font-weight: 700; color: #000;
+    text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;
+  }
+  .expansion-card .motion { font-size: 7.5pt; color: #333; line-height: 1.4; }
+  .expansion-card .motion strong { color: #000; }
+
+  /* ── Discovery ── */
+  .discovery {
+    background: #FAFAFA; border: 1px solid #e5e5e5; border-radius: 4px;
+    padding: 8px 12px; margin: 6px 0;
+  }
+  .discovery .q { font-size: 8.5pt; font-weight: 600; color: #000; margin-bottom: 1px; }
+  .discovery .why { font-size: 7.5pt; color: #666; font-style: italic; margin-bottom: 5px; }
+
+  .objection { margin-bottom: 6px; }
+  .objection .q { font-weight: 600; font-size: 8.5pt; color: #000; }
+  .objection .a { font-size: 8pt; color: #444; margin-top: 1px; }
+
+  .key-insight {
+    background: #000; color: #fff; border-left: 5px solid #F5C518;
+    padding: 10px 14px; margin: 8px 0; border-radius: 0 4px 4px 0;
+  }
+  .key-insight h3 { font-size: 10pt; color: #F5C518; margin-bottom: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+  .key-insight p { font-size: 8.5pt; color: #fff; line-height: 1.45; }
+
+  .footer {
+    margin-top: 8px; padding-top: 6px; border-top: 2px solid #C0392B;
+    display: flex; justify-content: space-between; font-size: 7pt; color: #888;
+  }
+  .footer a { color: #888; text-decoration: none; }
+
+  .page-break { page-break-before: always; break-before: page; margin-top: 0; padding-top: 12px; }
+
+  @media screen { body { max-width: 8.5in; margin: 0 auto; padding: 0.55in 0.65in; } }
+
+  strong.accent { color: #000; background: #FFF3C4; padding: 0 3px; border-radius: 2px; }
+  .yellow { color: #D4A017; font-weight: 700; }
+
+  /* ── Warning Box ── */
+  .warning {
+    background: #FDF2F0; border: 1px solid #E5C0BB; border-left: 4px solid #C0392B;
+    padding: 8px 12px; margin: 6px 0; border-radius: 0 4px 4px 0;
+  }
+  .warning h3 { font-size: 9pt; color: #C0392B; margin-bottom: 3px; font-weight: 700; }
+  .warning p, .warning li { font-size: 8pt; color: #6B2A20; line-height: 1.4; }
+  .warning ul { padding-left: 14px; margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ PAGE 1 ════════════════════════ -->
+
+<div class="confidential-ribbon">
+  INTERNAL USE ONLY &mdash; AKKA SALES TEAM &mdash; DO NOT SHARE WITH CUSTOMERS OR PARTNERS
+</div>
+
+<div class="header">
+  <div class="logo"><svg width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_344_191)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="white"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="white"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="white"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="white"/></g><defs><clipPath id="clip0_344_191"><rect width="109" height="25" fill="white"/></clipPath></defs></svg></div>
+  <div class="tagline">Internal Sales Playbook<br>Service Tiers &amp; Pricing Reference</div>
+</div>
+
+<div class="title-block">
+  <h1>Service Tiers: Internal Sales Playbook &amp; Pricing Reference</h1>
+  <div class="subtitle">Bundle pricing, à la carte SKUs, composition rationale, and expansion motion for Akka sales teams</div>
+  <div class="meta">April 2026 &nbsp;|&nbsp; Confidential &mdash; Akka Sales Use Only</div>
+</div>
+
+<!-- The Sales Principle -->
+<div class="principle">
+  <div class="big">Always Sell the Bundle First.</div>
+  <p>Bundles are the <strong>primary commercial unit</strong>. Every new-logo conversation starts with a bundle recommendation based on the customer's workload and tier fit. À la carte SKUs exist <strong>only for expansion and growth</strong> within a tier that the customer is already on. Never quote à la carte pricing on a new-logo deal. Never assemble a bundle from à la carte SKUs "because the customer asked." Bundles carry 33&ndash;44% built-in discounts off list &mdash; that discount is the reason bundles win. Mixing motions erodes the margin story and trains customers to negotiate against list.</p>
+</div>
+
+<!-- Headline: bundle price row -->
+<div class="section">
+  <h2>Bundle Pricing at a Glance</h2>
+  <table class="summary-table">
+    <tr>
+      <th>Tier</th>
+      <th>Composition</th>
+      <th>List Price</th>
+      <th>Bundle Price</th>
+      <th>Savings</th>
+    </tr>
+    <tr>
+      <td class="tier-name">Starter</td>
+      <td>1 cloud region, 1 prod w/ private data link, 5 service cores, 24/7 SRE</td>
+      <td class="list">&mdash;</td>
+      <td class="price">$2,500/mo + $0.37/instance-hour</td>
+      <td class="savings">Consumption</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Sandbox</td>
+      <td>1 dev region in your VPC, 5 service cores, 9x5 support, no HA/DR</td>
+      <td class="list">&mdash;</td>
+      <td class="price">$25,000</td>
+      <td class="savings">Bundle only</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Day 2 Ops</td>
+      <td>2 regions in your VPC (1 dev + 1 prod), 25 service cores, 1/4 TAM, 24/7 SRE</td>
+      <td class="list">$265,000</td>
+      <td class="price">$175,000</td>
+      <td class="savings">~34% off</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Business Continuity</td>
+      <td>3 regions in your VPC (1 dev + 2 HA), 100 service cores, 1/2 TAM, active-active HA/DR</td>
+      <td class="list">$750,000</td>
+      <td class="price">$500,000</td>
+      <td class="savings">~33% off</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Sovereign Cloud</td>
+      <td>3 regions in your VPC (1 dev + 2 HA), 100 service cores, 2 TAMs, country-isolated, local SREs</td>
+      <td class="list">$1,800,000</td>
+      <td class="price">$1,000,000</td>
+      <td class="savings">~44% off</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Bundle Composition Rationale -->
+<div class="section">
+  <h2>Bundle Composition &mdash; Why Each Bundle Is Built This Way</h2>
+  <p>Every bundle is engineered to match the minimum viable configuration a customer on that tier will actually need. Do not modify bundle compositions on the fly. If a customer needs more than the bundle includes, the right motion is à la carte expansion <em>on top of</em> the bundle, not bundle redesign.</p>
+</div>
+
+<div class="two-col">
+  <div class="bundle-card starter">
+    <div class="header-row">
+      <div class="name">Starter</div>
+      <div class="price-inline">$2,500/mo + $0.37/inst-hr</div>
+    </div>
+    <div class="composition">
+      <div><strong>Region:</strong> 1 Akka-hosted</div>
+      <div><strong>Configuration:</strong> 1 prod w/ private data link</div>
+      <div><strong>HA/DR:</strong> No</div>
+      <div><strong>SRE:</strong> 24/7 included</div>
+      <div><strong>Service cores:</strong> 5</div>
+      <div><strong>Platform cores:</strong> 20 (on Akka)</div>
+      <div><strong>TAM/FDE:</strong> None</div>
+      <div><strong>Billing:</strong> Monthly in arrears, no PO</div>
+    </div>
+    <div class="rationale"><strong>Rationale:</strong> The lowest-friction way to land a new-logo customer with a real production workload. No procurement cycle, no capex. Customer pays for consumption. 2nd dev region available at the same rate. Sell this when the customer wants to ship fast and has no appetite for BYOC commitment yet.</div>
+  </div>
+
+  <div class="bundle-card sandbox">
+    <div class="header-row">
+      <div class="name">Sandbox</div>
+      <div class="price-inline">$25,000</div>
+    </div>
+    <div class="composition">
+      <div><strong>Region:</strong> 1 in customer VPC</div>
+      <div><strong>Configuration:</strong> 1 dev, non-resilient</div>
+      <div><strong>HA/DR:</strong> No</div>
+      <div><strong>SRE:</strong> 9x5 business hours</div>
+      <div><strong>Service cores:</strong> 5</div>
+      <div><strong>Platform cores:</strong> 5 (customer-provisioned)</div>
+      <div><strong>TAM/FDE:</strong> None</div>
+      <div><strong>Billing:</strong> Annual, one invoice</div>
+    </div>
+    <div class="rationale"><strong>Rationale:</strong> The $25K psychological entry point for customers who need Akka in their own VPC before committing to Day 2 Ops. Deliberately stripped of the resilience layer to minimize customer cloud spend (~$7K/yr vs ~$40K/yr for a production region). <strong>Migration to higher tiers is a rebuild, not in-place.</strong> Set this expectation at signature, not at upgrade time. Never discount Sandbox further &mdash; the price is already the floor.</div>
+  </div>
+</div>
+
+<div class="bundle-card">
+  <div class="header-row">
+    <div class="name">Day 2 Ops</div>
+    <div class="price-inline">$175,000 <span style="font-size:7pt; color:#C0392B; text-decoration:line-through; margin-left:6px;">$265,000 list</span></div>
+  </div>
+  <div class="composition">
+    <div><strong>Regions:</strong> 2 in customer VPC</div>
+    <div><strong>Configuration:</strong> 1 dev, 1 prod</div>
+    <div><strong>HA/DR:</strong> No</div>
+    <div><strong>SRE:</strong> 24/7 included</div>
+    <div><strong>Service cores:</strong> 25</div>
+    <div><strong>Platform cores:</strong> 40 (customer-provisioned)</div>
+    <div><strong>TAM/FDE:</strong> 1/4 time</div>
+    <div><strong>Discount:</strong> ~34% off list</div>
+  </div>
+  <div class="rationale"><strong>Rationale:</strong> The standard landing zone for first production deployments. The bundle assumes a dev/prod split because customers running real workloads nearly always need both. 25 service cores covers a typical first agentic deployment with room for two quarters of growth. 1/4 TAM is enough to get the customer through onboarding and the first incident review. Day 2 Ops is also where the Arize-class eval-tool displacement story lands: evaluation checkpoints, guardrail verdicts, interaction logging, legal hold, retention, and evidence export are runtime-native, not separate SKUs. Upsell to BC once they have customers depending on the workload.</div>
+</div>
+
+<div class="bundle-card">
+  <div class="header-row">
+    <div class="name">Business Continuity</div>
+    <div class="price-inline">$500,000 <span style="font-size:7pt; color:#C0392B; text-decoration:line-through; margin-left:6px;">$750,000 list</span></div>
+  </div>
+  <div class="composition">
+    <div><strong>Regions:</strong> 3 in customer VPC</div>
+    <div><strong>Configuration:</strong> 1 dev + 2 active-active HA</div>
+    <div><strong>HA/DR:</strong> Yes, sub-1 min RTO, 0-byte RPO</div>
+    <div><strong>SRE:</strong> 24/7 included</div>
+    <div><strong>Service cores:</strong> 100</div>
+    <div><strong>Platform cores:</strong> 60 (customer-provisioned)</div>
+    <div><strong>TAM/FDE:</strong> 1/2 time</div>
+    <div><strong>Discount:</strong> ~33% off list</div>
+  </div>
+  <div class="rationale"><strong>Rationale:</strong> Where regulated industries, revenue-bearing workloads, and customer-facing systems land. 100 service cores is the typical capacity for a real multi-agent production workload. 1/2 TAM provides continuous architecture and operational support &mdash; enough to shepherd the customer through the first year of multi-region operations. Sovereign upgrade path is natural when data residency becomes a requirement.</div>
+</div>
+
+<div class="bundle-card">
+  <div class="header-row">
+    <div class="name">Sovereign Cloud</div>
+    <div class="price-inline">$1,000,000 <span style="font-size:7pt; color:#C0392B; text-decoration:line-through; margin-left:6px;">$1,800,000 list</span></div>
+  </div>
+  <div class="composition">
+    <div><strong>Regions:</strong> 3 in customer VPC</div>
+    <div><strong>Configuration:</strong> 1 dev + 2 HA, country-isolated</div>
+    <div><strong>HA/DR:</strong> Yes, within sovereign region</div>
+    <div><strong>SRE:</strong> 24/7 local SREs + private federation plane</div>
+    <div><strong>Service cores:</strong> 100</div>
+    <div><strong>Platform cores:</strong> 100 (customer-provisioned)</div>
+    <div><strong>TAM/FDE:</strong> 2 full-time dedicated</div>
+    <div><strong>Discount:</strong> ~44% off list</div>
+  </div>
+  <div class="rationale"><strong>Rationale:</strong> The deepest discount in the book (~44%) is driven by two full-time TAMs (~$800K of TAM/FDE value on its own at list). The bundle assumes the customer is operating in a regulated or sovereign market and needs continuous Akka presence from architecture, delivery, compliance, evidence retention, and audit-readiness angles. This is not a tier customers self-select into &mdash; lead with it only when the customer has a concrete data residency, sovereign-cloud, or regulator-facing evidence mandate.</div>
+</div>
+
+<!-- ════════════════════════ PAGE 2 ════════════════════════ -->
+
+<div class="page-break"></div>
+
+<!-- À la Carte Price Book -->
+<div class="section">
+  <h2>À La Carte SKU Price Book</h2>
+  <p>Use this table <strong>only for expansion within a tier a customer is already on.</strong> Never assemble a new-logo deal from à la carte SKUs. Never quote à la carte pricing before a bundle.</p>
+</div>
+
+<table class="pricebook">
+  <tr>
+    <th>SKU</th>
+    <th class="price-col">Starter</th>
+    <th class="price-col">Day 2 Ops</th>
+    <th class="price-col">Business Continuity</th>
+    <th class="price-col">Sovereign Cloud</th>
+  </tr>
+  <tr>
+    <td class="sku">Akka Region (in your VPC)</td>
+    <td class="na">N/A &mdash; cloud only</td>
+    <td class="price-val">$60,000</td>
+    <td class="price-val">$150,000</td>
+    <td class="price-val">$300,000</td>
+  </tr>
+  <tr>
+    <td class="sku">1 service core</td>
+    <td class="na">N/A &mdash; consumption</td>
+    <td class="price-val">$1,995</td>
+    <td class="na">N/A</td>
+    <td class="na">N/A</td>
+  </tr>
+  <tr>
+    <td class="sku">25 service cores</td>
+    <td class="na">N/A &mdash; consumption</td>
+    <td class="price-val">$45,000</td>
+    <td class="price-val">$35,000</td>
+    <td class="price-val">$35,000</td>
+  </tr>
+  <tr>
+    <td class="sku">100 service cores</td>
+    <td class="na">N/A &mdash; consumption</td>
+    <td class="price-val">$150,000</td>
+    <td class="price-val">$100,000</td>
+    <td class="price-val">$100,000</td>
+  </tr>
+  <tr>
+    <td class="sku">TAM / FDE (annual)</td>
+    <td class="na">N/A</td>
+    <td class="price-val">$400,000</td>
+    <td class="price-val">$400,000</td>
+    <td class="price-val">$400,000</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <h3>À La Carte Guardrails &mdash; Do Not Quote on New-Logo Deals</h3>
+  <ul>
+    <li>Sandbox has <strong>no à la carte SKUs at all</strong>. It is a bundle-only SKU. If a Sandbox customer needs more service cores, they buy them at Day 2 Ops rates (1-core or 25-core).</li>
+    <li>Starter is <strong>consumption-priced</strong> &mdash; there is no "add a region" SKU. Starter customers scale by usage or upgrade to Day 2 Ops when they need BYOC.</li>
+    <li>BC and Sovereign have <strong>no 1-core SKU</strong>. Expansion at those tiers uses the 25-core or 100-core SKU only. This protects the commitment model.</li>
+    <li>TAM/FDE is <strong>always $400K regardless of tier</strong>. This is not negotiable at the SKU level.</li>
+    <li>If a customer asks you to quote à la carte before you've landed them on a bundle, redirect the conversation back to the bundle. Leading with à la carte always loses against bundle discount math.</li>
+  </ul>
+</div>
+
+<!-- Bundle Savings Math -->
+<div class="section">
+  <h2>Bundle Savings Math &mdash; Use This to Close</h2>
+  <p>Every bundle below is priced as "take the à la carte SKUs the customer would otherwise buy, and discount the total by 33&ndash;44%." The discount is the reason to close. Memorize these numbers.</p>
+</div>
+
+<table class="summary-table">
+  <tr>
+    <th>Tier</th>
+    <th>À La Carte Breakdown</th>
+    <th>List Total</th>
+    <th>Bundle Price</th>
+    <th>Customer Saves</th>
+  </tr>
+  <tr>
+    <td class="tier-name">Day 2 Ops</td>
+    <td>2 regions ($120K) + 25 cores ($45K) + 1/4 TAM ($100K)</td>
+    <td class="list">$265,000</td>
+    <td class="price">$175,000</td>
+    <td class="savings">$90,000<br><span style="font-weight:400; font-size:7pt; color:#888;">(33.96% off)</span></td>
+  </tr>
+  <tr>
+    <td class="tier-name">Business Continuity</td>
+    <td>3 regions ($450K) + 100 cores ($100K) + 1/2 TAM ($200K)</td>
+    <td class="list">$750,000</td>
+    <td class="price">$500,000</td>
+    <td class="savings">$250,000<br><span style="font-weight:400; font-size:7pt; color:#888;">(33.33% off)</span></td>
+  </tr>
+  <tr>
+    <td class="tier-name">Sovereign Cloud</td>
+    <td>3 regions ($900K) + 100 cores ($100K) + 2 TAMs ($800K)</td>
+    <td class="list">$1,800,000</td>
+    <td class="price">$1,000,000</td>
+    <td class="savings">$800,000<br><span style="font-weight:400; font-size:7pt; color:#888;">(44.44% off)</span></td>
+  </tr>
+</table>
+
+<div class="callout">
+  When a prospect pushes back on bundle pricing, the move is not to discount further &mdash; the move is to walk them through the savings math. Every bundle is already a 33&ndash;44% discount off the exact à la carte SKUs they would otherwise need to assemble. You are not offering a deal; you are showing them the deal that already exists.
+  <span class="source">&mdash; Discounting principle: the bundle is the discount</span>
+</div>
+
+<!-- Expansion Motion -->
+<div class="section">
+  <h2>Expansion Motion &mdash; How to Grow Within a Tier</h2>
+  <p>Once a customer is on a bundle, à la carte SKUs are how you grow the account. The expansion playbook differs by tier. Memorize the natural expansion path for each tier before you land a new logo &mdash; the next conversation starts as soon as the first one closes.</p>
+</div>
+
+<div class="expansion-card">
+  <div class="from">From Starter</div>
+  <div class="motion">Starter customers expand through <strong>consumption</strong> &mdash; more instance-hours drive more monthly billing automatically. Watch for two signals: (1) monthly spend growing above ~$15K, (2) customer requesting BYOC. Both are upgrade signals to Day 2 Ops. Do not try to sell more Starter regions &mdash; the second region is already included. Position Day 2 Ops as "bring what you've built in our cloud into your own cloud, with production-grade guarantees."</div>
+</div>
+
+<div class="expansion-card">
+  <div class="from">From Sandbox</div>
+  <div class="motion">Sandbox customers have <strong>only one natural expansion motion: upgrade tiers.</strong> If they need more service cores, they technically can buy them at Day 2 Ops 1-core ($1,995) or 25-core ($45K) prices, but this is the wrong move commercially &mdash; it signals they've outgrown Sandbox. The right conversation is: "You're running more workload than Sandbox was designed for. Let's scope a Day 2 Ops bundle and plan the rebuild." Every Sandbox customer should graduate within 6&ndash;9 months or you're leaving money on the table.</div>
+</div>
+
+<div class="expansion-card">
+  <div class="from">From Day 2 Ops</div>
+  <div class="motion">Two expansion paths. <strong>(1) Add capacity within the tier:</strong> sell additional 25-core blocks ($45K each) as the customer's workload grows, or add a second 1/4 TAM ($100K for 1/4 time) if architecture support gaps emerge. <strong>(2) Upgrade the tier:</strong> when the customer's workload becomes revenue-bearing or customer-facing, the upgrade to Business Continuity is natural &mdash; lead with "what happens if this region fails?" Every Day 2 Ops deployment is a BC deal in waiting; track the upgrade trigger in the account plan.</div>
+</div>
+
+<div class="expansion-card">
+  <div class="from">From Business Continuity</div>
+  <div class="motion">BC customers expand through <strong>additional regions, additional cores, or additional TAM time.</strong> Additional regions at $150K each (BC pricing). Additional 100-core blocks at $100K each (volume rate kicks in at this tier). Additional TAM time at $100K per 1/4 time. Watch for multi-region sprawl &mdash; our largest customers span 20+ regions, and each new region is an expansion opportunity. The natural upgrade from BC is Sovereign, triggered by a data residency or regulatory requirement.</div>
+</div>
+
+<div class="expansion-card">
+  <div class="from">From Sovereign Cloud</div>
+  <div class="motion">Sovereign customers rarely upgrade beyond Sovereign &mdash; it is the top tier. Expansion happens via <strong>additional sovereign regions</strong> ($300K each) as the customer enters new regulated markets, and <strong>additional TAM allocations</strong> as local delivery teams come online in each sovereign region. The expansion story is geographic: "you're on Akka in the EU; let's scope Akka in Singapore and Japan with the same compliance posture."</div>
+</div>
+
+<!-- ════════════════════════ PAGE 3 ════════════════════════ -->
+
+<div class="page-break"></div>
+
+<!-- When to Upgrade vs Expand -->
+<div class="section">
+  <h2>When to Upgrade a Tier vs. Expand Within One</h2>
+  <p>The commercial difference is significant: a tier upgrade is a new bundle sale (high ACV, high commit); within-tier expansion is an à la carte uplift (lower ACV, faster close). Choose the right motion based on the customer's trigger event.</p>
+</div>
+
+<table class="summary-table">
+  <tr>
+    <th>Customer Signal</th>
+    <th>Motion</th>
+    <th>What to Sell</th>
+  </tr>
+  <tr>
+    <td>Customer is hitting service core capacity limits</td>
+    <td class="akka-col">Within-tier expansion</td>
+    <td>Additional 25-core or 100-core blocks at the existing tier's pricing</td>
+  </tr>
+  <tr>
+    <td>Customer needs a new region for capacity or geography</td>
+    <td class="akka-col">Within-tier expansion</td>
+    <td>Additional region SKU at existing tier's pricing</td>
+  </tr>
+  <tr>
+    <td>Customer asks for more architecture/delivery support</td>
+    <td class="akka-col">Within-tier expansion</td>
+    <td>Additional 1/4 or 1/2 TAM time at $100K/$200K</td>
+  </tr>
+  <tr>
+    <td>Customer's workload has become revenue-bearing or customer-facing</td>
+    <td class="akka-col">Tier upgrade</td>
+    <td>Day 2 Ops &rarr; BC bundle</td>
+  </tr>
+  <tr>
+    <td>Customer is hit by (or fears) a regional outage</td>
+    <td class="akka-col">Tier upgrade</td>
+    <td>Day 2 Ops &rarr; BC bundle (lead with sub-1 min RTO, 0-byte RPO)</td>
+  </tr>
+  <tr>
+    <td>Customer receives a data residency, sovereign, or regulatory mandate</td>
+    <td class="akka-col">Tier upgrade</td>
+    <td>BC &rarr; Sovereign Cloud bundle</td>
+  </tr>
+  <tr>
+    <td>Sandbox customer has built something they want to run for real</td>
+    <td class="akka-col">Tier upgrade (rebuild)</td>
+    <td>Sandbox &rarr; Day 2 Ops bundle &mdash; set rebuild expectation early</td>
+  </tr>
+  <tr>
+    <td>Starter customer wants BYOC control</td>
+    <td class="akka-col">Tier upgrade</td>
+    <td>Starter &rarr; Day 2 Ops bundle &mdash; migration with workload continuity</td>
+  </tr>
+</table>
+
+<!-- Pricing Objection Handling -->
+<div class="section">
+  <h2>Pricing Objection Handling &mdash; What to Say When Price Comes Up</h2>
+  <div class="two-col">
+    <div>
+      <div class="objection">
+        <div class="q">"$175K for Day 2 Ops is too much &mdash; can you do $100K?"</div>
+        <div class="a">Don't discount &mdash; explain the math. The bundle is already ~34% off list. At $175K you're saving them $90K vs à la carte. Reducing further erodes bundle integrity and trains the customer to push back on every renewal. If they genuinely can't afford Day 2 Ops, the right answer is Sandbox at $25K, with an explicit upgrade conversation planned for 6 months out. <strong>Never unbundle to hit a number.</strong></div>
+      </div>
+      <div class="objection">
+        <div class="q">"Can we start with Sandbox and get the Day 2 Ops features we need later?"</div>
+        <div class="a">Only if "later" means "rebuild on Day 2 Ops later." Sandbox does not do HA/DR, does not do 24/7 SRE, does not do rolling updates, and is not SLA-backed. If the customer's ask can be answered with Sandbox, sell Sandbox. If the ask includes any production characteristic, sell Day 2 Ops. Don't try to split the difference.</div>
+      </div>
+      <div class="objection">
+        <div class="q">"Why is Sovereign so much more expensive than BC?"</div>
+        <div class="a">The delta is primarily the second full-time TAM (2x vs 1/2 TAM) and the country-isolation infrastructure (3x region cost at $300K vs $150K). The 44% discount on Sovereign is the deepest in the book because TAM value is so concentrated. Walk the customer through the à la carte math: $900K of regions + $100K of cores + $800K of TAMs = $1.8M list, bundled at $1M. They're saving $800K.</div>
+      </div>
+    </div>
+    <div>
+      <div class="objection">
+        <div class="q">"We want to pay quarterly / monthly / on consumption."</div>
+        <div class="a">Only Starter supports monthly/consumption billing. Everything else is annual prepaid. If the customer is committed to monthly billing on a production workload, sell them Starter. If they want Day 2 Ops pricing on a monthly cadence, that's an exception that requires VP Sales approval &mdash; do not commit to it on the call.</div>
+      </div>
+      <div class="objection">
+        <div class="q">"Can we buy just the region and add cores later?"</div>
+        <div class="a">Technically yes (à la carte region + 1-core SKU), but the bundle is always cheaper if they'll consume the included cores over the year. Show them the bundle math: "you'd pay $60K for the region plus whatever cores you add à la carte. The bundle is $175K for 2 regions and 25 cores. Buy fewer than 25 cores à la carte and you're already over the bundle price." Let the math make the decision.</div>
+      </div>
+      <div class="objection">
+        <div class="q">"The customer has no budget for Day 2 Ops this year."</div>
+        <div class="a">Two moves. <strong>(1)</strong> Sell Sandbox for $25K this year, land the relationship, plan the Day 2 Ops upgrade for next fiscal. <strong>(2)</strong> Sell Starter with consumption billing &mdash; the monthly cadence fits opex budgets that can't absorb annual prepays. Both keep Akka in the account and set up a bigger deal in 6&ndash;12 months.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pricing Discipline Warning -->
+<div class="warning">
+  <h3>Pricing Discipline Rules &mdash; Non-Negotiable</h3>
+  <ul>
+    <li><strong>Never quote à la carte pricing before a bundle.</strong> Leading with SKU math trains customers to negotiate against list, not against bundle value.</li>
+    <li><strong>Never unbundle a bundle to hit a target price.</strong> If the customer can't afford the bundle, sell them a lower tier &mdash; not a de-composed version of a higher tier.</li>
+    <li><strong>Never discount a bundle below its published price without VP Sales approval.</strong> The 33&ndash;44% discount is already in the bundle. Further discounting requires written exception.</li>
+    <li><strong>Never promise Sandbox-to-higher-tier in-place upgrade.</strong> It's a rebuild. Any commitment otherwise creates a customer-success problem later.</li>
+    <li><strong>Never quote TAM/FDE below $400K.</strong> TAM pricing is flat across tiers for a reason &mdash; it's the one SKU customers anchor on across deals.</li>
+    <li><strong>Never let the customer assemble a bundle from à la carte SKUs.</strong> "Can you just put together X, Y, Z for me?" is a trap &mdash; redirect to the nearest bundle.</li>
+  </ul>
+</div>
+
+<!-- Quick Reference Cheat Sheet -->
+<div class="section">
+  <h2>One-Minute Pricing Cheat Sheet</h2>
+  <table class="summary-table">
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>What's the lowest entry price?</td><td class="akka-col"><strong>Sandbox: $25K annual</strong> (VPC) or <strong>Starter: $2.5K/mo + $0.37/instance-hour</strong> (Akka cloud)</td></tr>
+    <tr><td>What's the first production tier?</td><td class="akka-col"><strong>Day 2 Ops: $175K</strong> (2 regions, 25 cores, 1/4 TAM, 24/7 SRE)</td></tr>
+    <tr><td>What tier for revenue-bearing workloads?</td><td class="akka-col"><strong>Business Continuity: $500K</strong> (3 regions with active-active HA/DR, 100 cores, 1/2 TAM)</td></tr>
+    <tr><td>What tier for regulated / data-residency?</td><td class="akka-col"><strong>Sovereign Cloud: $1M</strong> (3 country-isolated regions, 100 cores, 2 full TAMs)</td></tr>
+    <tr><td>What's the bundle discount?</td><td class="akka-col">34% (Day 2 Ops), 33% (BC), 44% (Sovereign)</td></tr>
+    <tr><td>How much is a 1/4 TAM?</td><td class="akka-col">$100K/yr (same flat TAM base of $400K/yr across all tiers)</td></tr>
+    <tr><td>How much is 25 more service cores?</td><td class="akka-col">$45K at Day 2 Ops; $35K at BC / Sovereign (volume kicks in)</td></tr>
+    <tr><td>How much is a second BC region?</td><td class="akka-col">$150K; $300K for Sovereign; $60K for Day 2 Ops</td></tr>
+    <tr><td>What if the customer wants to unbundle?</td><td class="akka-col">Redirect to a lower-tier bundle. Never unbundle to fit a price.</td></tr>
+    <tr><td>What if the customer asks for à la carte on a new deal?</td><td class="akka-col">Walk them through bundle math. Every time. Bundles are always cheaper.</td></tr>
+    <tr><td>Biggest discounting mistake?</td><td class="akka-col">Cutting the bundle to hit a number instead of moving the customer to a lower tier</td></tr>
+    <tr><td>Biggest expansion miss?</td><td class="akka-col">Not tracking Day 2 Ops &rarr; BC trigger events in the account plan</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  <div>Akka Internal Sales Playbook &mdash; CONFIDENTIAL &mdash; DO NOT SHARE EXTERNALLY</div>
+  <div>Questions? Contact your Akka field CTO or VP Sales</div>
+</div>
+
+</body>
+</html>

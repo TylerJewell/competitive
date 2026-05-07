@@ -1,28 +1,93 @@
 <div id="s7-problem">
   <div id="s7-problem-sticky">
     <div class="s7-eyebrow" data-s7="0">Akka Governance Platform</div>
-    <div class="s7-problem-headline" data-s7="0">Observation is not <span class="accent">control.</span></div>
+    <div class="s7-problem-headline" data-s7="0">Evaluation is not <span class="accent">control.</span></div>
     <div class="s7-problems">
-      <div class="s7-prob" data-s7="1">
-        <div class="s7-prob-stat">Moving Target</div>
+      <div class="s7-prob" data-s7="0">
+        <div class="s7-prob-stat">&euro;35M Penalties</div>
         <div class="s7-prob-text">174 regulatory frameworks &mdash; all of them changing. Which ones apply to your agents? How do you re-posture every time they shift? EU AI Act penalties alone reach &euro;35M.</div>
       </div>
-      <div class="s7-prob" data-s7="2">
-        <div class="s7-prob-stat">Unenforceable</div>
+      <div class="s7-prob" data-s7="0">
+        <div class="s7-prob-stat">Outside Looking In</div>
         <div class="s7-prob-text">Governance tools observe AI from the outside. They can't enforce at agent boundaries, can't gate a deployment, can't link a policy decision to the human who approved it. They produce reports &mdash; not proof.</div>
       </div>
-      <div class="s7-prob" data-s7="3">
+      <div class="s7-prob" data-s7="0">
         <div class="s7-prob-stat">PB+</div>
         <div class="s7-prob-text">Petabyte-scale storage for regulatory holds &mdash; 10-year retention for high-risk AI under EU AI Act Art. 72. Copied logs aren't tamper-proof. When auditors come, you need hash-chains &mdash; not hope. Governance isn't cheap; it has to be built in.</div>
       </div>
     </div>
-    <div class="s7-thesis" data-s7="4">One platform governs what you build and what you run &mdash; and stays in sync as regulations change.</div>
   </div>
 </div>
 
 <div id="s7-answer-wrapper">
 <div id="s7-answer">
-  <div class="s7-answer-headline s7-reveal">An AI platform with a <span class="accent">living regulatory corpus</span> &mdash; enforced at runtime.</div>
+  <div class="s7-answer-headline s7-reveal">Akka's governance is a runtime control loop: <span class="accent">Classify, Approve, Enforce, Prove.</span></div>
+
+  <div class="s7-control-loop s7-reveal">
+    <div class="s7-loop-main">
+      <div class="s7-loop-steps">
+        <div class="s7-loop-step">
+          <div class="s7-step-body">
+            <div class="s7-step-title">Classify</div>
+            <div class="s7-step-text">Map each AI system to 174 frameworks and 521 controls to derive its obligation set.</div>
+          </div>
+        </div>
+        <div class="s7-loop-arrow"></div>
+        <div class="s7-loop-step">
+          <div class="s7-step-body">
+            <div class="s7-step-title">Approve</div>
+            <div class="s7-step-text">Route dossiers through Legal, Risk, Security, Model Risk, and business-owner sign-off recipes.</div>
+          </div>
+        </div>
+        <div class="s7-loop-arrow"></div>
+        <div class="s7-loop-step">
+          <div class="s7-step-body">
+            <div class="s7-step-title">Enforce</div>
+            <div class="s7-step-text">Apply guardrails, eval checkpoints, HITL gates, policy decisions, and containment inline.</div>
+          </div>
+        </div>
+        <div class="s7-loop-arrow"></div>
+        <div class="s7-loop-step">
+          <div class="s7-step-body">
+            <div class="s7-step-title">Prove</div>
+            <div class="s7-step-text">Emit non-sampled interaction logs, evidence bundles, legal holds, retention state, and audit records.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="s7-side-col s7-impact-col">
+      <div class="s7-loop-label">Runtime safety</div>
+      <div class="s7-floating-list">
+        <div class="s7-floating-item">Policies stay current as regulations change.</div>
+        <div class="s7-floating-item">Unsafe actions are stopped before execution, not scored later.</div>
+        <div class="s7-floating-item">Every decision has a runtime evidence trail.</div>
+        <div class="s7-floating-item">Separate AI eval and observability tools become optional, not required.</div>
+      </div>
+    </div>
+
+    <div class="s7-side-col s7-reg-col">
+      <div class="s7-reg-count">174</div>
+      <div class="s7-reg-caption">AI regulations<br>monitored</div>
+      <div class="s7-reg-list">
+        <div class="s7-reg-item">EU AI Act</div>
+        <div class="s7-reg-item">DORA</div>
+        <div class="s7-reg-item">GDPR</div>
+        <div class="s7-reg-item">HIPAA</div>
+        <div class="s7-reg-item">NIST AI RMF</div>
+        <div class="s7-reg-item">ISO 42001</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="s7-proof-strip s7-reveal">
+    <div class="s7-proof-box proof-posture"><img src="images/governance-posture.png" alt="Governance posture"></div>
+    <div class="s7-proof-box proof-log"><img src="images/interaction-log.png" alt="Interaction log"></div>
+    <div class="s7-proof-box proof-control"><img src="images/control-detail.png" alt="Control detail"></div>
+    <div class="s7-proof-box proof-authoring"><img src="images/policy-authoring.png" alt="Policy authoring"></div>
+    <div class="s7-proof-box proof-sandbox"><img src="images/policy-sandbox.png" alt="Policy sandbox"></div>
+    <div class="s7-proof-box proof-audit"><img src="images/audit.png" alt="Audit package"></div>
+  </div>
 
   <div class="s7-answer-layout s7-reveal">
   <div class="s7-carousel-section">

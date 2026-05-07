@@ -61,10 +61,19 @@
 /* Iframe container — fills remaining space */
 .s6-frame-wrap {
   flex: 1; min-height: 0;
+  position: relative;
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid #1C1C1C;
   box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+.s6-frame-wrap.s6-expanded {
+  position: absolute;
+  left: var(--pad-6);
+  right: var(--pad-6);
+  top: 24px;
+  bottom: 24px;
+  z-index: 8;
 }
 .s6-frame-wrap iframe {
   width: 119%;     /* 1 / 0.84 */
@@ -73,6 +82,30 @@
   display: block;
   transform: scale(0.84);
   transform-origin: top left;
+}
+.s6-expand-toggle {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 3;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(245,197,24,0.65);
+  border-radius: 4px;
+  background: rgba(0,0,0,0.78);
+  color: var(--yellow);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+}
+.s6-expand-toggle:hover {
+  background: rgba(20,20,20,0.92);
+  border-color: var(--yellow);
 }
 
 @media (max-width: 900px) {

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka Service Tiers &mdash; Choosing the Right On-Ramp for Enterprise Agentic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: letter; margin: 0.55in 0.65in 0.5in 0.65in; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #1A1A1A;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header {
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo svg { height: 22px; width: auto; }
+  .header .tagline { font-size: 8.5pt; font-weight: 400; color: #ccc; text-align: right; }
+
+  .title-block {
+    margin-top: 16px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #F5C518;
+    padding-bottom: 10px;
+  }
+  .title-block h1 { font-size: 17pt; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 2px; }
+  .title-block .subtitle { font-size: 9.5pt; color: #4E4E4E; font-weight: 500; }
+  .title-block .meta { font-size: 7.5pt; color: #888; margin-top: 4px; }
+
+  .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 8pt; }
+  .summary-table th {
+    background: #000; color: #fff; text-align: left; padding: 5px 8px;
+    font-weight: 600; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .summary-table th:first-child { border-radius: 3px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 3px 0 0; }
+  .summary-table td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .summary-table tr:nth-child(even) td { background: #FAFAFA; }
+  .summary-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .summary-table .akka-col { color: #000; font-weight: 500; }
+  .summary-table .highlight { background: #FFF9DB; }
+  .summary-table td.tier-name,
+  .summary-table tr:nth-child(even) td.tier-name {
+    background: #F5C518;
+    color: #000;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-size: 8pt;
+    border-left: 4px solid #000;
+    border-bottom: 1px solid #E0A800;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 12px; }
+  .five-col { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px; }
+
+  .section { margin-bottom: 13px; }
+  .section h2 {
+    font-size: 11pt; font-weight: 700; color: #000;
+    border-left: 4px solid #F5C518; padding-left: 8px;
+    margin-bottom: 6px; line-height: 1.3;
+  }
+  .section h3 { font-size: 9pt; font-weight: 600; color: #333; margin-bottom: 3px; margin-top: 6px; }
+  .section p, .section li { font-size: 8.5pt; color: #333; line-height: 1.4; }
+  .section ul { padding-left: 14px; margin-bottom: 4px; }
+  .section li { margin-bottom: 2px; }
+
+  .callout {
+    background: #000; color: #fff; padding: 10px 14px; border-radius: 4px;
+    margin: 8px 0; font-size: 8.5pt; line-height: 1.4; font-style: italic;
+  }
+  .callout .source { display: block; margin-top: 4px; font-style: normal; font-size: 7pt; color: #F5C518; }
+
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .cmp-table th {
+    background: #F5F5F5; font-weight: 600; text-align: left;
+    padding: 4px 6px; border-bottom: 2px solid #F5C518; font-size: 7.5pt;
+  }
+  .cmp-table td { padding: 4px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .cmp-table .bad { color: #C0392B; font-weight: 500; }
+  .cmp-table .good { color: #1A7A3A; font-weight: 500; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+  .stat-card {
+    background: #000; color: #fff; border-radius: 4px;
+    padding: 8px 10px; text-align: center;
+  }
+  .stat-card .number { font-size: 16pt; font-weight: 700; color: #F5C518; line-height: 1.1; }
+  .stat-card .label {
+    font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px;
+    color: #ccc; margin-top: 2px;
+  }
+
+  .tier-card {
+    border: 1px solid #e5e5e5; border-radius: 4px;
+    padding: 8px 10px; background: #fff;
+    border-top: 3px solid #F5C518;
+  }
+  .tier-card.sandbox { border-top-color: #888; }
+  .tier-card.starter { border-top-color: #1A7A3A; }
+  .tier-card .name {
+    font-size: 9pt; font-weight: 700; color: #000;
+    text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px;
+  }
+  .tier-card .where { font-size: 7pt; color: #888; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 5px; }
+  .tier-card .desc { font-size: 7.5pt; color: #333; line-height: 1.35; margin-bottom: 4px; }
+  .tier-card .best-for { font-size: 7pt; color: #4E4E4E; font-style: italic; }
+  .tier-card .best-for strong { color: #000; font-style: normal; }
+
+  .core-box {
+    background: #FFF9DB; border: 1px solid #F5C518; border-radius: 4px;
+    padding: 10px 14px; margin: 8px 0;
+  }
+  .core-box h3 { font-size: 10pt; font-weight: 700; color: #000; margin-bottom: 4px; }
+  .core-box p { font-size: 8.5pt; color: #333; line-height: 1.45; }
+  .core-box .split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; }
+  .core-box .split-item { background: #fff; border-radius: 3px; padding: 6px 8px; }
+  .core-box .split-item .label { font-size: 7pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; color: #888; margin-bottom: 2px; }
+  .core-box .split-item .label.service { color: #1A7A3A; }
+  .core-box .split-item .label.platform { color: #C0392B; }
+  .core-box .split-item .body { font-size: 7.5pt; color: #333; line-height: 1.35; }
+
+  .decision-tree {
+    background: #FAFAFA; border: 1px solid #e5e5e5; border-radius: 4px;
+    padding: 10px 14px; margin: 6px 0;
+  }
+  .decision-tree .step {
+    font-size: 8.5pt; color: #333; padding: 4px 0;
+    border-bottom: 1px dashed #e5e5e5;
+  }
+  .decision-tree .step:last-child { border-bottom: none; }
+  .decision-tree .q { font-weight: 700; color: #000; }
+  .decision-tree .arrow { color: #F5C518; font-weight: 700; }
+  .decision-tree .answer { color: #1A7A3A; font-weight: 600; }
+
+  .discovery {
+    background: #FAFAFA; border: 1px solid #e5e5e5; border-radius: 4px;
+    padding: 8px 12px; margin: 6px 0;
+  }
+  .discovery .q { font-size: 8.5pt; font-weight: 600; color: #000; margin-bottom: 1px; }
+  .discovery .why { font-size: 7.5pt; color: #666; font-style: italic; margin-bottom: 5px; }
+
+  .objection { margin-bottom: 6px; }
+  .objection .q { font-weight: 600; font-size: 8.5pt; color: #000; }
+  .objection .a { font-size: 8pt; color: #444; margin-top: 1px; }
+
+  .key-insight {
+    background: #000; color: #fff; border-left: 5px solid #F5C518;
+    padding: 10px 14px; margin: 8px 0; border-radius: 0 4px 4px 0;
+  }
+  .key-insight h3 { font-size: 10pt; color: #F5C518; margin-bottom: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
+  .key-insight p { font-size: 8.5pt; color: #fff; line-height: 1.45; }
+
+  .footer {
+    margin-top: 8px; padding-top: 6px; border-top: 2px solid #000;
+    display: flex; justify-content: space-between; font-size: 7pt; color: #888;
+  }
+  .footer a { color: #888; text-decoration: none; }
+
+  .page-break { page-break-before: always; break-before: page; margin-top: 0; padding-top: 12px; }
+
+  @media screen { body { max-width: 8.5in; margin: 0 auto; padding: 0.55in 0.65in; } }
+
+  strong.accent { color: #000; background: #FFF3C4; padding: 0 3px; border-radius: 2px; }
+  .yellow { color: #D4A017; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ PAGE 1 ════════════════════════ -->
+
+<div class="header">
+  <div class="logo"><svg width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_344_191)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="white"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="white"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="white"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="white"/></g><defs><clipPath id="clip0_344_191"><rect width="109" height="25" fill="white"/></clipPath></defs></svg></div>
+  <div class="tagline">Reliable AI for Every Industry<br>The Agentic Systems Platform</div>
+</div>
+
+<div class="title-block">
+  <h1>Akka Service Tiers &mdash; Choosing Your On-Ramp to Production Agentic AI</h1>
+  <div class="subtitle">A TCO-driven guide to Akka's five service tiers for enterprise buyers, architects, and channel partners</div>
+  <div class="meta">April 2026 &nbsp;|&nbsp; akka.io</div>
+</div>
+
+<!-- Headline Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="number">99.9999%</div>
+    <div class="label">Availability Guarantee</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">&lt;1 min</div>
+    <div class="label">RTO (Active-Active HA/DR)</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">0 byte</div>
+    <div class="label">RPO (Zero Data Loss)</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">Up to 90%</div>
+    <div class="label">Lower Infra Cost</div>
+  </div>
+</div>
+
+<!-- Key Insight -->
+<div class="key-insight">
+  <h3>The Core Idea</h3>
+  <p>Akka offers five tiers on a deliberate on-ramp from first experiment to global production. Four are fully resilient, production-grade environments. One &mdash; <strong style="color:#F5C518;">Sandbox</strong> &mdash; is intentionally lower quality-of-service, designed as a low-friction way to build and evaluate Akka in your own cloud without committing to a production footprint. Every deal starts by answering two questions: <em style="color:#F5C518;">where do you want Akka to run, and what does the workload need?</em></p>
+</div>
+
+<!-- TL;DR Tier Summary -->
+<div class="section">
+  <h2>The Five Tiers at a Glance</h2>
+  <table class="summary-table">
+    <tr>
+      <th>Tier</th>
+      <th>Where It Runs</th>
+      <th>Quality of Service</th>
+      <th>Best For</th>
+      <th>TCO Headline</th>
+    </tr>
+    <tr>
+      <td class="tier-name">Starter</td>
+      <td>Akka's public cloud with private data link back to your environment</td>
+      <td class="akka-col">Fully resilient, 24/7 SRE, no-downtime rolling updates</td>
+      <td>Running a real production workload without installing anything in your own cloud</td>
+      <td class="akka-col">Monthly billing in arrears, no POs, no invoices &mdash; spend scales with actual usage</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Sandbox</td>
+      <td>A single region in your own VPC</td>
+      <td class="bad">Non-resilient, 9x5 support, not SLA-backed</td>
+      <td>Building and evaluating Akka inside your own cloud before a production commitment</td>
+      <td class="akka-col">Lowest possible cloud footprint &mdash; roughly one-quarter the platform-core overhead of production tiers</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Day 2 Ops</td>
+      <td>Two regions in your VPC (1 development, 1 production)</td>
+      <td class="akka-col">Fully resilient, 24/7 SRE, elastic scale-to-zero, live CVE patching, AI explainability</td>
+      <td>Running real workloads that don't yet need cross-region failover</td>
+      <td class="akka-col">Replaces 6&ndash;9 separately billed services (orchestration + memory + streaming + APIs + evals + guardrails + logging + governance + observability) on shared compute</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Business Continuity</td>
+      <td>Three regions in your VPC (1 development + 2 in active-active HA)</td>
+      <td class="akka-col">Fully resilient + active-active HA/DR across regions or clouds</td>
+      <td>Workloads that cannot tolerate a regional outage; revenue-bearing systems; regulated data flows</td>
+      <td class="akka-col">Managed HA/DR with sub-1 minute RTO and zero-byte RPO &mdash; no DIY failover infrastructure to build or operate</td>
+    </tr>
+    <tr>
+      <td class="tier-name">Sovereign Cloud</td>
+      <td>Three regions in your VPC, country-isolated with local SREs</td>
+      <td class="akka-col">Fully resilient + HA/DR + private federation plane + country-level isolation</td>
+      <td>Regulated industries, data residency mandates, sovereign requirements (EU, UK, Singapore, Japan, Australia, China, and more)</td>
+      <td class="akka-col">Inherit 19+ compliance certifications rather than building compliance from scratch &mdash; full feature parity with commercial tiers</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Two Starting Paths -->
+<div class="section">
+  <h2>The Two Starting Paths</h2>
+  <p style="margin-bottom:6px;">Every deal begins with the same branching question: <strong>does the customer want Akka-hosted or their-cloud-hosted?</strong> The answer routes to one of two on-ramps. Both progress into Day 2 Ops, Business Continuity, or Sovereign Cloud as needs grow.</p>
+</div>
+
+<div class="two-col">
+  <div class="tier-card starter">
+    <div class="name">Path A &mdash; Starter</div>
+    <div class="where">Akka-hosted in Akka's public cloud</div>
+    <div class="desc">A fully resilient Akka region running in Akka's cloud with a private data link back to your environment. Monthly billing in arrears. No POs, no invoices, no procurement cycle. You never install anything.</div>
+    <div class="best-for"><strong>Best for:</strong> Teams with a real workload and no appetite for a BYOC commitment yet. Lines of business that need to ship without waiting on central IT. Proofs-of-value where the success criterion is "did it run in production?"</div>
+  </div>
+  <div class="tier-card sandbox">
+    <div class="name">Path B &mdash; Sandbox</div>
+    <div class="where">Installed in your own VPC</div>
+    <div class="desc">A single Akka region installed in your own cloud, deliberately configured for low overhead. No HA/DR. 9x5 support. Not SLA-backed. Designed as a low-friction way to evaluate Akka in your own environment without committing to a production footprint.</div>
+    <div class="best-for"><strong>Best for:</strong> Engineering teams who want Akka in their cloud before committing to a production tier. Enterprises whose procurement process requires a successful in-house pilot before larger contracts. Architecture teams running fit-for-purpose evaluation.</div>
+  </div>
+</div>
+
+<div class="callout">
+  Sandbox is cheap because it is deliberately stripped of the resilience layer. It is not a production tier, and migration to a higher tier is a rebuild &mdash; not an in-place upgrade. The word "Sandbox" does this positioning work for you: it signals throwaway, experimental, not the destination.
+  <span class="source">&mdash; Positioning principle: set expectations at sign-up, not at upgrade time</span>
+</div>
+
+<!-- ════════════════════════ PAGE 2 ════════════════════════ -->
+
+<div class="page-break"></div>
+
+<!-- QoS Distinction -->
+<div class="section">
+  <h2>Quality of Service &mdash; Sandbox vs. the Production Tiers</h2>
+  <p>This is the most important conversation to have on every deal. Customers who misunderstand it buy Sandbox for production workloads and blame Akka when something fails. Sandbox and the production tiers are not versions of the same thing at different price points &mdash; they are different QoS tiers built on different infrastructure configurations.</p>
+  <table class="summary-table">
+    <tr>
+      <th>Dimension</th>
+      <th>Sandbox</th>
+      <th>Day 2 Ops, Business Continuity, Sovereign</th>
+    </tr>
+    <tr>
+      <td>HA/DR</td>
+      <td class="bad">None</td>
+      <td class="akka-col">Day 2 Ops: none. BC + Sovereign: active-active across regions</td>
+    </tr>
+    <tr>
+      <td>Rolling Updates</td>
+      <td class="bad">None &mdash; platform downtime during updates</td>
+      <td class="akka-col">No-downtime rolling updates</td>
+    </tr>
+    <tr>
+      <td>SRE Coverage</td>
+      <td class="bad">9x5 monitoring</td>
+      <td class="akka-col">24/7 SRE monitoring and management</td>
+    </tr>
+    <tr>
+      <td>SLA</td>
+      <td class="bad">Not SLA-backed</td>
+      <td class="akka-col">Contractual 99.9999% availability, backed by indemnities</td>
+    </tr>
+    <tr>
+      <td>CVE Patching</td>
+      <td class="bad">Requires downtime</td>
+      <td class="akka-col">Live CVE patching with zero downtime</td>
+    </tr>
+    <tr>
+      <td>Platform Core Footprint</td>
+      <td class="akka-col">~5 platform cores (lowest infra overhead)</td>
+      <td class="akka-col">~20&ndash;25 platform cores per region (varies by tier)</td>
+    </tr>
+    <tr>
+      <td>Intended Workloads</td>
+      <td class="bad">Evaluation, learning, early development</td>
+      <td class="akka-col">Production, customer-facing systems, anything that matters</td>
+    </tr>
+    <tr>
+      <td>Upgrade Path</td>
+      <td class="bad">Rebuild on a higher tier</td>
+      <td class="akka-col">In-place progression between Day 2 Ops, BC, and Sovereign</td>
+    </tr>
+  </table>
+</div>
+
+<!-- Platform Cores vs Service Cores -->
+<div class="section">
+  <h2>Platform Cores vs. Service Cores &mdash; The Akka Transparency Model</h2>
+  <p>Akka is the only agentic AI platform that separates and discloses infrastructure overhead up front. Every other platform either hides it inside an opaque price, or forces customers to stand up separate services (vector DB, memory, streaming, evaluation, guardrails, logging, governance) each with their own infrastructure bill. Akka breaks the two apart.</p>
+</div>
+
+<div class="core-box">
+  <h3>How Akka Prices Infrastructure</h3>
+  <p>Every Akka region installed in your VPC runs on two kinds of cores. You see both before you commit &mdash; no sticker shock at contract time.</p>
+  <div class="split">
+    <div class="split-item">
+      <div class="label platform">Platform Cores</div>
+      <div class="body"><strong>What they run:</strong> Akka's own runtime infrastructure &mdash; clustering, resilience, data sharding, zero-trust networking, traffic steering. The infrastructure that delivers the 99.9999% availability guarantee.<br><br><strong>Who pays:</strong> You provision these in your own cloud as part of your standard cloud infrastructure bill. <strong>Akka does not charge a license fee for platform cores.</strong> They are disclosed up front so you see the full footprint before you sign.</div>
+    </div>
+    <div class="split-item">
+      <div class="label service">Service Cores</div>
+      <div class="body"><strong>What they run:</strong> Your agentic workloads &mdash; the agents, workflows, endpoints, entities, and views you build on Akka. The capacity that runs your business logic.<br><br><strong>Who pays:</strong> Akka license scales with service cores. You pay for what you run, nothing more. When you add service cores, your Akka bill and your cloud infrastructure bill both scale predictably.</div>
+    </div>
+  </div>
+</div>
+
+<div class="callout">
+  Sandbox is engineered to minimize platform-core overhead &mdash; roughly one-quarter the footprint of a production tier. The cost reduction comes from the infrastructure configuration itself, not from a discount. You pay less because you run less. When you need production-grade resilience, you rebuild on a tier that includes the full platform-core footprint required to deliver it.
+  <span class="source">&mdash; The Akka engineering &amp; pricing principle: transparent sizing, not hidden overhead</span>
+</div>
+
+<!-- Decision Tree -->
+<div class="section">
+  <h2>Matching Your Workload to the Right Tier</h2>
+  <p>A five-step decision tree. Answer each question in order; the tier emerges in under a minute.</p>
+</div>
+
+<div class="decision-tree">
+  <div class="step">
+    <span class="q">1. Where do you want Akka to run?</span>
+    <span class="arrow">&rarr;</span>
+    Akka's public cloud: <span class="answer">Starter</span> &nbsp;|&nbsp; Your own VPC: <em>continue to step 2</em>
+  </div>
+  <div class="step">
+    <span class="q">2. Are you running something real, or exploring?</span>
+    <span class="arrow">&rarr;</span>
+    Exploring / evaluating: <span class="answer">Sandbox</span> &nbsp;|&nbsp; Running something real: <em>continue to step 3</em>
+  </div>
+  <div class="step">
+    <span class="q">3. Can your workload tolerate a regional outage?</span>
+    <span class="arrow">&rarr;</span>
+    Yes: <span class="answer">Day 2 Ops</span> &nbsp;|&nbsp; No: <em>continue to step 4</em>
+  </div>
+  <div class="step">
+    <span class="q">4. Do you need country-level data isolation for regulatory or sovereign reasons?</span>
+    <span class="arrow">&rarr;</span>
+    No: <span class="answer">Business Continuity</span> &nbsp;|&nbsp; Yes: <span class="answer">Sovereign Cloud</span>
+  </div>
+  <div class="step">
+    <span class="q">5. Confirm the upgrade path before closing.</span>
+    <span class="arrow">&rarr;</span>
+    Sandbox &rarr; higher tier = <strong>rebuild</strong>. Day 2 Ops &rarr; BC &rarr; Sovereign = <strong>in-place progression</strong>.
+  </div>
+</div>
+
+<!-- ════════════════════════ PAGE 3 ════════════════════════ -->
+
+<div class="page-break"></div>
+
+<!-- TCO Arguments by Tier -->
+<div class="section">
+  <h2>TCO Arguments, Tier by Tier</h2>
+</div>
+
+<table class="summary-table">
+  <tr>
+    <th>Tier</th>
+    <th>Primary TCO Argument</th>
+    <th>What You're Avoiding</th>
+  </tr>
+  <tr>
+    <td class="tier-name">Starter</td>
+    <td class="akka-col">Time-to-value and procurement friction. You're buying a running workload, not infrastructure. No capex, no architecture project, no deployment timeline.</td>
+    <td>Avoided: multi-month deployment cycles, central-IT gating, the cost of not starting</td>
+  </tr>
+  <tr>
+    <td class="tier-name">Sandbox</td>
+    <td class="akka-col">Lowest-friction evaluation in your own environment. Smallest possible cloud footprint for validating fit before a larger commitment.</td>
+    <td>Avoided: failed production rollouts based on documentation-only decisions; opportunity cost of over-committing too early</td>
+  </tr>
+  <tr>
+    <td class="tier-name">Day 2 Ops</td>
+    <td class="akka-col">Shared compute model. One platform replaces 6&ndash;9 separately billed services (orchestration, memory, streaming, APIs, evaluation, guardrails, interaction logging, governance, observability). Up to 90% infrastructure cost reduction vs. stitched stacks.</td>
+    <td>Avoided: service sprawl, maintenance windows, patching downtime, Arize-class eval-tool spend, integration cost across point solutions</td>
+  </tr>
+  <tr>
+    <td class="tier-name">Business Continuity</td>
+    <td class="akka-col">Managed HA/DR with contractual guarantees. Sub-1 minute RTO, zero-byte RPO, backed by indemnities. Eliminates the DIY failover infrastructure project entirely.</td>
+    <td>Avoided: multi-year, multi-million-dollar DIY failover projects; regulatory exposure from total state loss on region failure</td>
+  </tr>
+  <tr>
+    <td class="tier-name">Sovereign Cloud</td>
+    <td class="akka-col">Full feature parity in a country-isolated configuration. Inherit 19+ compliance certifications (EU AI Act, ISO 42001, SOC 2, Singapore Agent Framework) rather than building your own posture. Runtime-native interaction logs, eval checkpoints, guardrail verdicts, legal hold, retention, and evidence export make Akka the evidence of record.</td>
+    <td>Avoided: compliance remediation cost; audit preparation from scratch; separate eval evidence plane; EU AI Act fines up to 7% of global annual turnover</td>
+  </tr>
+</table>
+
+<!-- Discovery Questions -->
+<div class="section">
+  <h2>Seven Questions That Expose the Hidden TCO Gap</h2>
+  <p>Whether you are evaluating Akka for the first time or comparing it against Azure AI Foundry, LangChain, Temporal, or a DIY stack, these seven questions surface the real cost picture most vendors hide.</p>
+</div>
+
+<div class="discovery">
+  <div class="q">1. "How many separately billed services are you stitching together today, and what's the combined monthly spend?"</div>
+  <div class="why">Exposes the 6&ndash;9 service sprawl pattern. A single opaque price from one vendor is usually 6+ bills underneath the brand.</div>
+
+  <div class="q">2. "What are you paying for agent memory today, and what's the read/write latency?"</div>
+  <div class="why">Surfaces the ~200ms bolt-on memory penalty. Akka delivers &lt;10ms read/write durable memory as part of the platform.</div>
+
+  <div class="q">3. "What's your cloud spend on observability, tracing, and logging for AI workloads?"</div>
+  <div class="why">Verbose agent tracing causes observability bills to balloon. Akka includes OTEL export without per-GB ingest charges.</div>
+
+  <div class="q">4. "Are you budgeting for Arize, LangSmith, Phoenix, or another eval/observability product?"</div>
+  <div class="why">Exposes duplicated evaluation, trace storage, and audit-reconciliation cost. Akka captures eval checkpoints, guardrail verdicts, causal traces, token cost, legal hold, retention, and evidence export in the runtime.</div>
+
+  <div class="q">5. "When a regulator or customer asks why an agent made a decision, which system is the evidence of record?"</div>
+  <div class="why">Post-hoc dashboards are not the runtime. Akka's non-sampled interaction log is the authoritative record of what happened.</div>
+
+  <div class="q">6. "When you need to patch a CVE in your runtime, how much downtime does that cost you?"</div>
+  <div class="why">Exposes the lack of live CVE patching in most platforms. Akka patches with zero downtime &mdash; no maintenance windows.</div>
+
+  <div class="q">7. "Have you priced out what it would cost to build active-active HA/DR in-house for your agent state?"</div>
+  <div class="why">Exposes the hidden cost of DIY failover. Most enterprises estimate multi-year, multi-million-dollar projects that never finish. Akka ships it in BC and Sovereign.</div>
+</div>
+
+<!-- Common Questions / Objection Handling -->
+<div class="section">
+  <h2>Common Questions &mdash; Straight Answers</h2>
+  <div class="two-col">
+    <div>
+      <div class="objection">
+        <div class="q">Can I just run production workloads on Sandbox to save money?</div>
+        <div class="a">Sandbox is stripped of the resilience layer. There is no HA/DR, no 24/7 SRE, no SLA, and platform updates require downtime. If your workload has any production characteristics &mdash; customers depending on it, data that matters, revenue tied to uptime &mdash; Day 2 Ops is the minimum. Sandbox exists to let you evaluate Akka at the lowest possible cost, not to run production on the cheap.</div>
+      </div>
+      <div class="objection">
+        <div class="q">Why is there no in-place upgrade from Sandbox?</div>
+        <div class="a">Sandbox runs on a fundamentally different infrastructure configuration &mdash; fewer platform cores, no resilience layer, no HA/DR primitives. Retrofitting all of that onto a running environment would either force the same footprint as a production tier (defeating the purpose) or create an unreliable upgrade path. The rebuild is a feature. Build in Sandbox, prove out your design, then stand up the production tier your workload actually needs.</div>
+      </div>
+      <div class="objection">
+        <div class="q">Why am I paying for platform cores on top of the license?</div>
+        <div class="a">You are not paying Akka for platform cores &mdash; they are part of your own cloud infrastructure bill, not a line item on your Akka license. Akka charges only for service cores, where your workloads actually run. Platform cores are disclosed up front so you see the full picture before you commit. Most platforms hide this inside one opaque price.</div>
+      </div>
+    </div>
+    <div>
+      <div class="objection">
+        <div class="q">Azure AI Foundry has one bill. Isn't that simpler than Akka?</div>
+        <div class="a">Azure AI Foundry is 6&ndash;9 separately billed services underneath a single brand &mdash; Azure OpenAI, Cosmos DB, AI Search, Event Hubs, API Management, App Insights, Content Safety, Private Endpoints, and often a separate eval/observability product. Each has its own pricing model and its own cost traps. The full bill arrives at the end of the month, after consumption has happened. Akka runs orchestration, agents, memory, streaming, APIs, evaluation checkpoints, guardrails, interaction logging, and governance on one platform with shared compute &mdash; and discloses platform-core overhead before you commit. Simpler is not one bill; simpler is one platform.</div>
+      </div>
+      <div class="objection">
+        <div class="q">We already use Arize for evals and AI observability. Do we still need it?</div>
+        <div class="a">Keep Arize for legacy workloads if it is already embedded, but do not budget it as required for Akka. Akka captures non-sampled interaction logs, evaluation checkpoints, guardrail verdicts, LLM calls, tool calls, token cost, authority snapshots, causal lineage, legal holds, retention, and evidence exports as part of the runtime. The question is whether you want to pay for a second evidence plane and then reconcile it with the runtime of record.</div>
+      </div>
+      <div class="objection">
+        <div class="q">Can I start with Starter and migrate to Day 2 Ops later?</div>
+        <div class="a">Yes &mdash; Starter is designed as an on-ramp. The common pattern is to prove the business case on Starter for one or two quarters, then bring the workload in-house to Day 2 Ops once your architecture, security, and procurement teams have signed off. Akka's field team helps you migrate with continuity of your running workload.</div>
+      </div>
+      <div class="objection">
+        <div class="q">Do I really need 24/7 SRE on day one?</div>
+        <div class="a">Every tier above Sandbox includes 24/7 SRE because production-grade infrastructure without 24/7 coverage is a contradiction. If a customer-facing workload goes down at 2am, you need someone watching. If your workload genuinely doesn't need 24/7 coverage, it isn't a production workload yet &mdash; which makes Sandbox the right fit, and the low-overhead configuration reflects that.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- One-Page Summary -->
+<div class="section">
+  <h2>The One-Minute Summary</h2>
+  <table class="summary-table">
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>How many tiers?</td><td class="akka-col">Five. Four are production-grade (Starter, Day 2 Ops, Business Continuity, Sovereign). One is a low-overhead evaluation tier (Sandbox).</td></tr>
+    <tr><td>Where does Akka install?</td><td class="akka-col">Starter: Akka's cloud. Everything else: your own VPC, on any hyperscaler or on-prem Kubernetes.</td></tr>
+    <tr><td>What's the fastest on-ramp?</td><td class="akka-col">Starter (monthly billing, no POs) or Sandbox (lowest footprint in your own cloud)</td></tr>
+    <tr><td>What determines my cloud bill?</td><td class="akka-col">Platform cores (Akka infrastructure, customer-provisioned) + service cores (your workloads, Akka-licensed). Both disclosed up front.</td></tr>
+    <tr><td>What's the migration story?</td><td class="akka-col">Sandbox &rarr; higher tier is a rebuild. Day 2 Ops &rarr; BC &rarr; Sovereign is in-place progression.</td></tr>
+    <tr><td>What's included in every production tier?</td><td class="akka-col">24/7 SRE, no-downtime rolling updates, live CVE patching, runtime evals, guardrails, interaction logging, evidence export, contractual 99.9999% availability, indemnity-backed SLAs</td></tr>
+    <tr><td>Who's the workload for?</td><td class="akka-col">Sandbox: evaluation. Day 2 Ops: real workloads, no failover. BC: workloads that can't tolerate regional outage. Sovereign: regulated or data-residency requirements.</td></tr>
+    <tr><td>What does Akka charge for?</td><td class="akka-col">Service cores (workload capacity) and TAM/FDE time. Platform cores are customer-provisioned cloud infrastructure, not an Akka line item.</td></tr>
+  </table>
+</div>
+
+<div class="footer">
+  <div>Akka &mdash; Reliable AI for Every Industry &nbsp;|&nbsp; The Agentic Systems Platform</div>
+  <div><a href="https://akka.io">akka.io</a> &nbsp;|&nbsp; sales@akka.io</div>
+</div>
+
+</body>
+</html>

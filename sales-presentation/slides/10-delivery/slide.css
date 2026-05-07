@@ -1,0 +1,269 @@
+#s10-delivery-wrapper {
+  height: 140vh;
+  position: relative;
+}
+#s10-delivery {
+  background: var(--black);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px var(--pad-8);
+  overflow: hidden;
+}
+#s10-delivery::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(245,197,24,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  z-index: 0;
+}
+.s10d-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+  position: relative;
+  z-index: 1;
+}
+.s10d-reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+.s10d-reveal-d1 { transition-delay: .1s; }
+.s10d-reveal-d2 { transition-delay: .2s; }
+.s10d-reveal-d3 { transition-delay: .3s; }
+.s10d-reveal-d4 { transition-delay: .4s; }
+
+.s10d-kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--yellow);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.s10d-kicker::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 2px;
+  background: var(--yellow);
+  margin-right: 10px;
+  vertical-align: middle;
+}
+.s10d-headline {
+  font-size: clamp(32px, 4.2vw, 64px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--white);
+  max-width: 1120px;
+  margin-bottom: 14px;
+}
+.s10d-headline .accent {
+  color: var(--yellow);
+}
+.s10d-sub {
+  font-size: clamp(15px, 1.35vw, 20px);
+  color: #B8B8B8;
+  line-height: 1.4;
+  max-width: 820px;
+  margin-bottom: 46px;
+}
+
+.s10d-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr) 34px minmax(0, 1fr) 34px minmax(0, 1fr) 34px minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+  max-width: 1340px;
+  min-height: 252px;
+}
+.s10d-stage-control {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.s10d-stage {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 10px;
+  padding: 24px 20px 22px;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  transition: background .25s ease, border-color .25s ease, transform .25s ease;
+}
+.s10d-stage::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #2A2A2A;
+}
+.s10d-stage:hover {
+  border-color: #333;
+  background: #101010;
+}
+#s10d-frame:checked ~ .s10d-flow .s10d-stage.frame,
+#s10d-govern:checked ~ .s10d-flow .s10d-stage.govern,
+#s10d-specify:checked ~ .s10d-flow .s10d-stage.specify,
+#s10d-ship:checked ~ .s10d-flow .s10d-stage.ship,
+#s10d-improve:checked ~ .s10d-flow .s10d-stage.improve {
+  background: rgba(245,197,24,0.06);
+  border-color: rgba(245,197,24,0.55);
+}
+#s10d-frame:checked ~ .s10d-flow .s10d-stage.frame::before,
+#s10d-govern:checked ~ .s10d-flow .s10d-stage.govern::before,
+#s10d-specify:checked ~ .s10d-flow .s10d-stage.specify::before,
+#s10d-ship:checked ~ .s10d-flow .s10d-stage.ship::before,
+#s10d-improve:checked ~ .s10d-flow .s10d-stage.improve::before {
+  background: var(--yellow);
+}
+#s10d-frame:checked ~ .s10d-flow .s10d-stage.frame .s10d-stage-num,
+#s10d-govern:checked ~ .s10d-flow .s10d-stage.govern .s10d-stage-num,
+#s10d-specify:checked ~ .s10d-flow .s10d-stage.specify .s10d-stage-num,
+#s10d-ship:checked ~ .s10d-flow .s10d-stage.ship .s10d-stage-num,
+#s10d-improve:checked ~ .s10d-flow .s10d-stage.improve .s10d-stage-num {
+  border-color: rgba(245,197,24,0.55);
+  background: rgba(245,197,24,0.12);
+}
+.s10d-stage-num {
+  width: 34px;
+  height: 34px;
+  border-radius: 17px;
+  background: #111;
+  border: 1px solid #2A2A2A;
+  color: var(--yellow);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+.s10d-stage-title {
+  font-size: 30px;
+  color: var(--white);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  margin-bottom: 14px;
+}
+.s10d-stage-copy {
+  font-size: 13.5px;
+  color: #A5A5A5;
+  line-height: 1.48;
+}
+.s10d-arrow {
+  position: relative;
+  align-self: center;
+  height: 2px;
+  background: #343434;
+}
+.s10d-arrow::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-top: 2px solid #343434;
+  border-right: 2px solid #343434;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.s10d-output-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr 1fr;
+  gap: 14px;
+  max-width: 1340px;
+  margin-top: 28px;
+}
+.s10d-output-details {
+  grid-column: span 3;
+}
+.s10d-output-set {
+  display: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+#s10d-frame:checked ~ .s10d-output-row .s10d-output-set.frame,
+#s10d-govern:checked ~ .s10d-output-row .s10d-output-set.govern,
+#s10d-specify:checked ~ .s10d-output-row .s10d-output-set.specify,
+#s10d-ship:checked ~ .s10d-output-row .s10d-output-set.ship,
+#s10d-improve:checked ~ .s10d-output-row .s10d-output-set.improve {
+  display: grid;
+}
+.s10d-output {
+  background: #0A0A0A;
+  border: 1px solid #1C1C1C;
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+.s10d-output.hero {
+  border-color: rgba(245,197,24,0.55);
+  background: rgba(245,197,24,0.06);
+}
+.s10d-output-label {
+  font-size: 10px;
+  color: var(--yellow);
+  font-weight: 700;
+  letter-spacing: 2.2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.s10d-output-main {
+  font-size: 15px;
+  color: #CFCFCF;
+  line-height: 1.38;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.s10d-output.hero .s10d-output-main {
+  font-size: 28px;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--white);
+  font-weight: 700;
+}
+
+.s10d-thesis {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  max-width: 1340px;
+  margin-top: 22px;
+}
+.s10d-thesis-line {
+  width: 78px;
+  height: 2px;
+  background: var(--yellow);
+  flex-shrink: 0;
+}
+.s10d-thesis-text {
+  font-size: 15px;
+  color: #D2D2D2;
+  line-height: 1.4;
+}
+
+@media (max-width: 1100px) {
+  .s10d-flow {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .s10d-arrow {
+    display: none;
+  }
+  .s10d-output-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
