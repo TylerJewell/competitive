@@ -1,0 +1,9 @@
+# Claude Code per-machine settings
+.claude/
+
+# Sales presentation build outputs
+sales-presentation/generated/
+
+# Python
+__pycache__/
+*.pyc
