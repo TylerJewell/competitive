@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka vs. Azure AI Foundry — Competitive Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: letter;
+    margin: 0.55in 0.65in 0.5in 0.65in;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #1A1A1A;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header {
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo svg { height: 22px; width: auto; }
+  .header .tagline { font-size: 8.5pt; font-weight: 400; color: #ccc; text-align: right; }
+
+  .title-block {
+    margin-top: 16px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #F5C518;
+    padding-bottom: 10px;
+  }
+  .title-block h1 { font-size: 17pt; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 2px; }
+  .title-block .subtitle { font-size: 9.5pt; color: #4E4E4E; font-weight: 500; }
+  .title-block .meta { font-size: 7.5pt; color: #888; margin-top: 4px; }
+
+  .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 8pt; }
+  .summary-table th {
+    background: #000; color: #fff; text-align: left; padding: 5px 8px;
+    font-weight: 600; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .summary-table th:first-child { border-radius: 3px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 3px 0 0; }
+  .summary-table td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .summary-table tr:nth-child(even) td { background: #FAFAFA; }
+  .summary-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .summary-table .azure-col { color: #555; }
+  .summary-table .akka-col { color: #000; font-weight: 500; }
+  .summary-table .highlight { background: #FFF9DB; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px; }
+
+  .section { margin-bottom: 13px; }
+  .section h2 {
+    font-size: 11pt; font-weight: 700; color: #000;
+    border-left: 4px solid #F5C518; padding-left: 8px;
+    margin-bottom: 6px; line-height: 1.3;
+  }
+  .section h3 { font-size: 9pt; font-weight: 600; color: #333; margin-bottom: 3px; margin-top: 6px; }
+  .section p, .section li { font-size: 8.5pt; color: #333; line-height: 1.4; }
+  .section ul { padding-left: 14px; margin-bottom: 4px; }
+  .section li { margin-bottom: 2px; }
+
+  .callout {
+    background: #000; color: #fff; padding: 10px 14px; border-radius: 4px;
+    margin: 8px 0; font-size: 8.5pt; line-height: 1.4; font-style: italic;
+  }
+  .callout .source { display: block; margin-top: 4px; font-style: normal; font-size: 7pt; color: #F5C518; }
+
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .cmp-table th {
+    background: #F5F5F5; font-weight: 600; text-align: left;
+    padding: 4px 6px; border-bottom: 2px solid #F5C518; font-size: 7.5pt;
+  }
+  .cmp-table td { padding: 3px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .cmp-table .bad { color: #C0392B; font-weight: 500; }
+  .cmp-table .good { color: #1A7A3A; font-weight: 500; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+  .stat-card { background: #000; color: #fff; border-radius: 4px; padding: 8px 10px; text-align: center; }
+  .stat-card .number { font-size: 16pt; font-weight: 700; color: #F5C518; line-height: 1.1; }
+  .stat-card .label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px; color: #ccc; margin-top: 2px; }
+
+  .penalty-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .penalty-table th { background: #C0392B; color: #fff; text-align: left; padding: 4px 8px; font-weight: 600; font-size: 7.5pt; }
+  .penalty-table td { padding: 4px 8px; border-bottom: 1px solid #eee; }
+  .penalty-table td:last-child { font-weight: 600; color: #C0392B; }
+
+  .objection { margin-bottom: 6px; }
+  .objection .q { font-weight: 600; font-size: 8.5pt; color: #000; }
+  .objection .a { font-size: 8pt; color: #444; font-style: italic; margin-top: 1px; }
+
+  .footer {
+    margin-top: 8px; padding-top: 6px; border-top: 2px solid #000;
+    display: flex; justify-content: space-between; font-size: 7pt; color: #888;
+  }
+
+  .page-break { page-break-before: always; break-before: page; margin-top: 0; padding-top: 12px; }
+
+  @media screen {
+    body { max-width: 8.5in; margin: 0 auto; padding: 0.55in 0.65in; }
+  }
+
+  strong.accent { color: #000; background: #FFF3C4; padding: 0 3px; border-radius: 2px; }
+  .yellow { color: #D4A017; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ PAGE 1 ════════════════════════ -->
+
+<div class="header">
+  <div class="logo"><svg width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_344_191)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="white"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="white"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="white"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="white"/></g><defs><clipPath id="clip0_344_191"><rect width="109" height="25" fill="white"/></clipPath></defs></svg></div>
+  <div class="tagline">Reliable AI for Every Industry<br>The Agentic Systems Platform</div>
+</div>
+
+<div class="title-block">
+  <h1>Why Akka Beats Azure AI Foundry</h1>
+  <div class="subtitle">Competitive brief for Enterprise Agentic Grid sales teams</div>
+  <div class="meta">Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="number">70-90%</div>
+    <div class="label">Lower Infra Cost</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">99.9999%</div>
+    <div class="label">Availability SLA</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">&lt;1 min</div>
+    <div class="label">Recovery Time</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">175</div>
+    <div class="label">Regulatory Frameworks</div>
+  </div>
+</div>
+
+<table class="summary-table">
+  <tr>
+    <th>Dimension</th>
+    <th>Azure AI Foundry</th>
+    <th>Akka</th>
+  </tr>
+  <tr>
+    <td>Infrastructure Cost</td>
+    <td class="azure-col">6-8 separately billed services; egress fees; PTU minimums (~$73k/mo)</td>
+    <td class="akka-col">Shared compute &mdash; one platform, one bill, scale-to-zero</td>
+  </tr>
+  <tr>
+    <td>HA / DR</td>
+    <td class="azure-col">No SLA on Agent Service; no auto-failover; total state loss on failure</td>
+    <td class="akka-col">Active-active HA/DR; sub-1 min RTO; zero byte RPO; backed by indemnities</td>
+  </tr>
+  <tr>
+    <td>Vendor Lock-In</td>
+    <td class="azure-col">Locked at identity, orchestration, compute, data, and governance layers</td>
+    <td class="akka-col">Any cloud, on-prem, or Akka cloud &mdash; same APIs everywhere</td>
+  </tr>
+  <tr>
+    <td>Sovereign Cloud</td>
+    <td class="azure-col">Feature-lagged; control plane metadata may leave region</td>
+    <td class="akka-col">Full-parity; data + networking isolation; local SREs</td>
+  </tr>
+  <tr>
+    <td>Governance (Runtime)</td>
+    <td class="azure-col">Fragmented across 5+ services; post-hoc explainability only; no inline enforcement</td>
+    <td class="akka-col">Single embedded policy engine &mdash; inline governance at runtime</td>
+  </tr>
+  <tr class="highlight">
+    <td>Pre-Production Governance</td>
+    <td class="azure-col">Does not exist &mdash; no pre-deployment classification, sign-offs, or sealed audit artifacts</td>
+    <td class="akka-col">Classify against 175 frameworks, multi-persona sign-offs, Governance Posture Packages</td>
+  </tr>
+</table>
+
+<div class="two-col">
+  <div class="section">
+    <h2>1. Infrastructure: 70-90% Cheaper</h2>
+    <p>Enterprise agentic AI on Azure requires stitching together separately billed services &mdash; each with its own pricing model, egress fees, and hidden charges:</p>
+    <ul>
+      <li><strong>Azure OpenAI</strong> &mdash; per-token or PTU commitments (~$73k/mo min)</li>
+      <li><strong>Cosmos DB</strong> &mdash; per-RU; multi-region writes multiply cost; ~200ms memory latency</li>
+      <li><strong>AI Search</strong> &mdash; $250-$2k+/mo; semantic ranking add-on</li>
+      <li><strong>API Management</strong> &mdash; $700-$2,800/mo per unit</li>
+      <li><strong>Monitor / App Insights</strong> &mdash; $2.76/GB; agent tracing balloons cost</li>
+      <li><strong>Egress</strong> &mdash; $0.087/GB; <strong>Premium Support</strong> &mdash; starts $50k/yr</li>
+    </ul>
+    <h3>Akka: Shared Compute, One Bill</h3>
+    <p>Orchestration, agents, memory, streaming, APIs, and governance all run on shared compute. No separate charges. Scale-to-zero when idle. Up to 70% fewer tokens via AdaptiveML integration.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. HA/DR: Available Now</h2>
+    <div class="callout">
+      "Agent Service has no availability or state durability Service Level Agreement (SLA)."
+      <span class="source">&mdash; Microsoft Learn, Azure AI Foundry HA/DR documentation</span>
+    </div>
+    <table class="cmp-table">
+      <tr><th>Metric</th><th>Azure</th><th>Akka</th></tr>
+      <tr><td>Availability SLA</td><td class="bad">No SLA</td><td class="good">99.9999%</td></tr>
+      <tr><td>HA/DR Mode</td><td class="bad">Manual, active-passive</td><td class="good">Active-active, auto</td></tr>
+      <tr><td>RTO</td><td class="bad">30+ min / project</td><td class="good">&lt;1 minute</td></tr>
+      <tr><td>RPO</td><td class="bad">Total state loss</td><td class="good">Zero byte</td></tr>
+      <tr><td>Multi-region</td><td class="bad">Not supported</td><td class="good">20+ regions</td></tr>
+    </table>
+    <p style="font-size:7.5pt; color:#666; margin-top:4px;"><strong>Recent outages:</strong> Sweden Central, 7 hrs (Jan 2026); GPT-5.2 across 7 regions, 20 hrs (Mar 2026); Azure Front Door global, 7 hrs (Oct 2025). EU customers had zero failover options.</p>
+  </div>
+</div>
+
+<!-- Manulife Proof Point -->
+<div style="background: #FFF9DB; border: 2px solid #F5C518; border-radius: 5px; padding: 10px 14px; margin-bottom: 13px; display: flex; align-items: flex-start; gap: 12px;">
+  <div style="flex-shrink:0; background:#000; color:#F5C518; font-size:18pt; font-weight:700; width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:4px;">M</div>
+  <div>
+    <div style="font-size:9.5pt; font-weight:700; color:#000; margin-bottom:2px;">Manulife &mdash; Microsoft's Largest Canadian Customer &mdash; Chose Akka</div>
+    <div style="font-size:8pt; color:#333; line-height:1.45;">Manulife, ranked #1 life insurance company for AI maturity, evaluated Azure AI Foundry and selected Akka to operationalize agentic AI for customer and colleague decision-making at enterprise scale. The deciding factors: <strong>Akka's cost effectiveness and production-ready HA/DR</strong>. Manulife had every reason to stay on Azure &mdash; existing EA, deep Microsoft relationship, significant Azure investment. They chose Akka because Azure could not deliver on cost or HA/DR. &nbsp;<span style="font-size:7pt; color:#888;">akka.io/blog/manulife-selects-akka-to-operationalize-agentic-ai</span></div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="section">
+    <h2>3. No Lock-In</h2>
+    <h3>Azure locks you in at every layer</h3>
+    <ul>
+      <li><strong>Identity</strong> &mdash; Requires Entra ID; not portable</li>
+      <li><strong>Orchestration</strong> &mdash; Proprietary Prompt Flow format; rewrite to move</li>
+      <li><strong>Data</strong> &mdash; Cosmos DB + AI Search indexes; egress fees to migrate</li>
+      <li><strong>Models</strong> &mdash; Fine-tuned Azure OpenAI models cannot be exported</li>
+      <li><strong>Governance</strong> &mdash; Purview, Content Safety, APIM &mdash; all Azure-only</li>
+    </ul>
+    <h3>Akka runs anywhere</h3>
+    <p>Deploy on Akka's cloud, your hyperscaler VPC (AWS, Azure, GCP), your own Kubernetes, or on-prem. Same platform, same APIs, same guarantees. No proprietary lock-in, no data gravity traps.</p>
+  </div>
+
+  <div class="section">
+    <h2>4. Sovereign Cloud</h2>
+    <h3>Azure sovereign limitations</h3>
+    <ul>
+      <li>Government &amp; China clouds <strong>lag 3-6 months</strong> in feature availability</li>
+      <li>AI Foundry availability in sovereign regions is limited</li>
+      <li>Control plane metadata <strong>may still flow outside the region</strong></li>
+      <li>Model availability and PTU capacity are restricted</li>
+    </ul>
+    <h3>Akka: full parity, full isolation</h3>
+    <ul>
+      <li>Country-isolated &mdash; all traffic and data stays in-region</li>
+      <li>Data isolation + networking isolation + private federation plane</li>
+      <li>Local SREs in each sovereign region</li>
+      <li>Regions: China, EU, Singapore, UK, Japan, Australia, and more</li>
+      <li><strong>No feature lag</strong> &mdash; full parity with global platform</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════ PAGE 2 ════════════════════════ -->
+<div class="page-break"></div>
+
+<div class="section">
+  <h2>5. EU AI Act: Embedded Governance vs. Bolt-On Compliance Theater</h2>
+
+  <div class="two-col" style="margin-top:6px;">
+    <div>
+      <h3>The penalties are severe &mdash; and enforceable now</h3>
+      <table class="penalty-table">
+        <tr><th>Violation</th><th>Maximum Fine</th></tr>
+        <tr><td>Prohibited AI practices (Art. 5)</td><td>EUR 35M or 7% global turnover</td></tr>
+        <tr><td>High-risk obligations (Art. 9-15)</td><td>EUR 15M or 3% global turnover</td></tr>
+        <tr><td>Incorrect information to authorities</td><td>EUR 7.5M or 1.5% global turnover</td></tr>
+      </table>
+      <p style="margin-top:4px;">Prohibited practice penalties enforceable since <strong>Feb 2025</strong>. High-risk obligations since <strong>Aug 2025</strong>. These are not future risks &mdash; they are current law.</p>
+    </div>
+
+    <div>
+      <h3>Five critical failures in Azure's governance approach</h3>
+      <ul>
+        <li><strong>No article-by-article EU AI Act mapping</strong> &mdash; Purview Compliance Manager is a self-assessment checklist, not technical enforcement</li>
+        <li><strong>No inline policy enforcement</strong> &mdash; Content Safety is a separate API at 100-300ms latency; no unified engine</li>
+        <li><strong>No human override capability</strong> &mdash; cannot pause, redirect, or stop a running agent process</li>
+        <li><strong>No immutable interaction ledger</strong> &mdash; Azure Monitor logs are not purpose-built for regulatory proof</li>
+        <li><strong>No pre-deployment classification or attestation</strong> &mdash; no way to classify a system against applicable regulations, route sign-offs to the right personas, or produce a sealed audit record before a system ships</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Where Azure Governance Fails the EU AI Act</h3>
+  <table class="cmp-table">
+    <tr><th style="width:22%;">EU AI Act Requirement</th><th style="width:39%;">Azure Approach</th><th style="width:39%;">Akka Approach</th></tr>
+    <tr>
+      <td>Real-time policy enforcement</td>
+      <td class="bad">Content Safety (separate API, 100-300ms latency) + APIM gateway &mdash; fragmented, no unified engine</td>
+      <td class="good">Single embedded policy engine: guardrails, LLMs-as-judge, and sanitizers inline at runtime</td>
+    </tr>
+    <tr>
+      <td>Decision explainability</td>
+      <td class="bad">Post-hoc only &mdash; Responsible AI Dashboard analyzes after the fact, not at decision time</td>
+      <td class="good">Self-explanation is a runtime property &mdash; every decision is explained as it happens</td>
+    </tr>
+    <tr>
+      <td>Immutable interaction logging</td>
+      <td class="bad">Standard Azure Monitor / Purview audit logs &mdash; not inherently immutable, no purpose-built ledger</td>
+      <td class="good">Runtime witnesses and encodes every interaction immutably</td>
+    </tr>
+    <tr>
+      <td>Human intervention</td>
+      <td class="bad">Does not exist &mdash; no pause/override/redirect for running agents</td>
+      <td class="good">Humans can pause, override, review, or redirect any agentic process in real time</td>
+    </tr>
+    <tr>
+      <td>Authorization capture</td>
+      <td class="bad">Must correlate 3+ log sources; AI Gateway does not log tool traces</td>
+      <td class="good">Runtime records all authorizations and tools at the point of every interaction</td>
+    </tr>
+    <tr>
+      <td>PII scrubbing + explainability</td>
+      <td class="bad">Unsolved &mdash; PII detection exists but no scrub-with-explain pipeline</td>
+      <td class="good">Runtime scrubs PII and produces explanations atomically</td>
+    </tr>
+    <tr>
+      <td>Pre-deployment classification</td>
+      <td class="bad">Does not exist &mdash; no classification against regulatory frameworks before deployment</td>
+      <td class="good">175 regulatory frameworks, 600 controls &mdash; classify any AI system before it ships</td>
+    </tr>
+    <tr>
+      <td>Multi-persona sign-off workflows</td>
+      <td class="bad">Does not exist</td>
+      <td class="good">Declarative recipe engine with dossiers, carry-forward rules, and quorum logic</td>
+    </tr>
+    <tr>
+      <td>Governance Posture Package</td>
+      <td class="bad">Does not exist &mdash; no tamper-evident sealed audit artifact</td>
+      <td class="good">Tamper-evident audit artifact sealed at deployment &mdash; ready for regulatory handoff</td>
+    </tr>
+  </table>
+</div>
+
+<div class="callout">
+  "If governance isn't inline to the runtime, you're trusting second-hand records instead of witnessing interactions as they happen. A log message from a third-party runtime is just a claim &mdash; there is no way to prove it wasn't modified, delayed, or selectively omitted. And before a system even ships, Azure has no way to classify it against applicable regulations, route sign-offs to the right people, or produce a sealed audit record. Akka covers both &mdash; runtime enforcement and full pre-production governance &mdash; in one platform."
+</div>
+
+<div class="section" style="margin-top:12px;">
+  <h2>Handling Common Objections</h2>
+
+  <div class="two-col" style="gap:14px;">
+    <div>
+      <div class="objection">
+        <div class="q">"We're already on Azure"</div>
+        <div class="a">"Akka deploys inside your Azure VPC. You keep your infrastructure, Entra ID, and networking. You're adding the reliability, HA/DR, and governance layer that Azure AI Foundry doesn't have &mdash; not replacing Azure."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"Microsoft will catch up"</div>
+        <div class="a">"Their own docs say no SLA, no built-in DR. Multiple accounts have been told AI HA/DR is 2-3 years out. The EU AI Act is enforceable now. Can you wait? And pre-deployment classification and governance workflows are an entirely different product category &mdash; not on any Azure roadmap."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"Azure has Content Safety built in"</div>
+        <div class="a">"Content filtering is one dimension. The EU AI Act requires explainability, human intervention, immutable audit trails, PII handling, and pre-deployment classification. Azure has no solution for any of those. Content filtering is table stakes, not compliance."</div>
+      </div>
+    </div>
+    <div>
+      <div class="objection">
+        <div class="q">"We trust Microsoft on compliance"</div>
+        <div class="a">"Microsoft has published no article-by-article EU AI Act mapping. Their compliance tooling is Purview Compliance Manager &mdash; self-assessment checklists. There is no pre-deployment classification surface, no sign-off workflow engine, and no sealed audit artifact. Akka holds 19+ certifications and embeds compliance as a property of every deployment &mdash; before shipping and in production."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"Azure is cheaper with our EA"</div>
+        <div class="a">"EA discounts apply to individual services &mdash; you're still paying for 6-8 separate services that compound. Akka's shared compute model is architecturally different. Customers see 70-90% lower infra costs even vs. EA pricing."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 10px;">
+  <h2>Sources &mdash; Microsoft's Own Documentation</h2>
+  <p style="font-size: 7pt; color: #666; line-height: 1.55; columns: 2; column-gap: 18px;">
+    <strong>No SLA:</strong> learn.microsoft.com/en-us/azure/ai-foundry/how-to/high-availability-resiliency &mdash; "Agent Service has no availability or state durability SLA"<br>
+    <strong>No auto-failover:</strong> same source &mdash; "Foundry itself doesn't provide automatic failover or disaster recovery"<br>
+    <strong>No built-in DR:</strong> learn.microsoft.com/en-us/azure/ai-foundry/how-to/agent-service-disaster-recovery &mdash; "doesn't replicate state, create backups, or support point-in-time restore"<br>
+    <strong>No active-active:</strong> same source &mdash; "no supported method for active-active, multi-region replication"<br>
+    <strong>Total state loss:</strong> learn.microsoft.com/en-us/azure/foundry/how-to/agent-service-platform-disaster-recovery &mdash; "recovery point for stateful content can be total loss"<br>
+    <strong>No tool trace logging:</strong> learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/governance<br>
+    <strong>Azure OpenAI SLA 99.9%:</strong> microsoft.com/licensing/docs/view/Service-Level-Agreements-SLA-for-Online-Services<br>
+    <strong>No EU AI Act article mapping:</strong> microsoft.com/en-us/trust-center/compliance/eu-ai-act<br>
+    <strong>Sweden Central outage (Jan 2026):</strong> theregister.com/2026/01/28/azure_openai_service_sweden<br>
+    <strong>GPT-5.2 multi-region outage (Mar 2026):</strong> azure.status.microsoft/en-us/status/history<br>
+    <strong>Akka governance platform:</strong> 175 regulatory frameworks, 600 controls, multi-persona sign-off workflows, tamper-evident Governance Posture Packages
+  </p>
+</div>
+
+<div class="footer">
+  <div style="display:flex; align-items:center; gap:8px;"><svg width="65" height="15" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip1)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="#1A1A1A"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="#1A1A1A"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="#1A1A1A"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="#1A1A1A"/></g><defs><clipPath id="clip1"><rect width="109" height="25" fill="white"/></clipPath></defs></svg> <span>Reliable AI for Every Industry &nbsp;|&nbsp; akka.ai</span></div>
+  <div>Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+</body>
+</html>

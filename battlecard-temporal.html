@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka vs. Temporal — Competitive Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: letter;
+    margin: 0.55in 0.65in 0.5in 0.65in;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #1A1A1A;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header {
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo svg { height: 22px; width: auto; }
+  .header .tagline { font-size: 8.5pt; font-weight: 400; color: #ccc; text-align: right; }
+
+  .title-block {
+    margin-top: 16px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #F5C518;
+    padding-bottom: 10px;
+  }
+  .title-block h1 { font-size: 17pt; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 2px; }
+  .title-block .subtitle { font-size: 9.5pt; color: #4E4E4E; font-weight: 500; }
+  .title-block .meta { font-size: 7.5pt; color: #888; margin-top: 4px; }
+
+  .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 8pt; }
+  .summary-table th {
+    background: #000; color: #fff; text-align: left; padding: 5px 8px;
+    font-weight: 600; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .summary-table th:first-child { border-radius: 3px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 3px 0 0; }
+  .summary-table td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .summary-table tr:nth-child(even) td { background: #FAFAFA; }
+  .summary-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .summary-table .comp-col { color: #555; }
+  .summary-table .akka-col { color: #000; font-weight: 500; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px; }
+
+  .section { margin-bottom: 13px; }
+  .section h2 {
+    font-size: 11pt; font-weight: 700; color: #000;
+    border-left: 4px solid #F5C518; padding-left: 8px;
+    margin-bottom: 6px; line-height: 1.3;
+  }
+  .section h3 { font-size: 9pt; font-weight: 600; color: #333; margin-bottom: 3px; margin-top: 6px; }
+  .section p, .section li { font-size: 8.5pt; color: #333; line-height: 1.4; }
+  .section ul { padding-left: 14px; margin-bottom: 4px; }
+  .section li { margin-bottom: 2px; }
+
+  .callout {
+    background: #000; color: #fff; padding: 10px 14px; border-radius: 4px;
+    margin: 8px 0; font-size: 8.5pt; line-height: 1.4; font-style: italic;
+  }
+  .callout .source { display: block; margin-top: 4px; font-style: normal; font-size: 7pt; color: #F5C518; }
+
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .cmp-table th {
+    background: #F5F5F5; font-weight: 600; text-align: left;
+    padding: 4px 6px; border-bottom: 2px solid #F5C518; font-size: 7.5pt;
+  }
+  .cmp-table td { padding: 3px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .cmp-table .bad { color: #C0392B; font-weight: 500; }
+  .cmp-table .good { color: #1A7A3A; font-weight: 500; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+  .stat-card { background: #000; color: #fff; border-radius: 4px; padding: 8px 10px; text-align: center; }
+  .stat-card .number { font-size: 16pt; font-weight: 700; color: #F5C518; line-height: 1.1; }
+  .stat-card .label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px; color: #ccc; margin-top: 2px; }
+
+  .penalty-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .penalty-table th { background: #C0392B; color: #fff; text-align: left; padding: 4px 8px; font-weight: 600; font-size: 7.5pt; }
+  .penalty-table td { padding: 4px 8px; border-bottom: 1px solid #eee; }
+  .penalty-table td:last-child { font-weight: 600; color: #C0392B; }
+
+  .objection { margin-bottom: 6px; }
+  .objection .q { font-weight: 600; font-size: 8.5pt; color: #000; }
+  .objection .a { font-size: 8pt; color: #444; font-style: italic; margin-top: 1px; }
+
+  .footer {
+    margin-top: 8px; padding-top: 6px; border-top: 2px solid #000;
+    display: flex; justify-content: space-between; font-size: 7pt; color: #888;
+  }
+  .footer a { color: #888; text-decoration: none; }
+
+  .page-break { page-break-before: always; break-before: page; margin-top: 0; padding-top: 12px; }
+
+  @media screen {
+    body { max-width: 8.5in; margin: 0 auto; padding: 0.55in 0.65in; }
+  }
+
+  strong.accent { color: #000; background: #FFF3C4; padding: 0 3px; border-radius: 2px; }
+  .yellow { color: #D4A017; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ PAGE 1 ════════════════════════ -->
+
+<div class="header">
+  <div class="logo"><svg width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_344_191)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="white"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="white"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="white"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="white"/></g><defs><clipPath id="clip0_344_191"><rect width="109" height="25" fill="white"/></clipPath></defs></svg></div>
+  <div class="tagline">Reliable AI for Every Industry<br>The Agentic Systems Platform</div>
+</div>
+
+<div class="title-block">
+  <h1>Why Akka Beats Temporal</h1>
+  <div class="subtitle">Competitive brief for Enterprise Agentic Grid sales teams</div>
+  <div class="meta">Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="number">8 hrs</div>
+    <div class="label">Temporal HA RPO</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">$50/M</div>
+    <div class="label">Temporal Per-Action Cost</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">99.9999%</div>
+    <div class="label">Akka Availability SLA</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">175</div>
+    <div class="label">Regulatory Frameworks</div>
+  </div>
+</div>
+
+<table class="summary-table">
+  <tr>
+    <th>Dimension</th>
+    <th>Temporal</th>
+    <th>Akka</th>
+  </tr>
+  <tr>
+    <td>Scope</td>
+    <td class="comp-col">Workflow orchestration only &mdash; source and integrate everything else yourself</td>
+    <td class="akka-col">Full-stack platform: SDK, runtime, memory, streaming, governance, observability</td>
+  </tr>
+  <tr>
+    <td>AI Agents</td>
+    <td class="comp-col">SDK integration only (OpenAI Agents SDK added Mar 2026)</td>
+    <td class="akka-col">Native agent framework with tools, guardrails, and interaction logging built in</td>
+  </tr>
+  <tr>
+    <td>Memory</td>
+    <td class="comp-col">No native memory &mdash; bolt-on at ~200ms latency</td>
+    <td class="akka-col">Sub-10ms durable memory, built into the shared compute model</td>
+  </tr>
+  <tr>
+    <td>HA / DR</td>
+    <td class="comp-col">99.99% with 8-hour RPO for region failures</td>
+    <td class="akka-col">99.9999% active-active; sub-1 min RTO; zero byte RPO; backed by indemnities</td>
+  </tr>
+  <tr>
+    <td>Governance</td>
+    <td class="comp-col">No compliance story &mdash; silent on EU AI Act</td>
+    <td class="akka-col">Embedded runtime enforcement + full pre-production governance platform</td>
+  </tr>
+  <tr>
+    <td>Pre-Production Governance</td>
+    <td class="comp-col">None</td>
+    <td class="akka-col">Classify against 175 frameworks, multi-persona sign-offs, Governance Posture Packages</td>
+  </tr>
+  <tr>
+    <td>Cost Model</td>
+    <td class="comp-col">$50/M actions + separate infra bills for every other capability</td>
+    <td class="akka-col">Shared compute &mdash; orchestration, agents, memory, streaming, APIs on one platform</td>
+  </tr>
+</table>
+
+<div class="two-col">
+  <div class="section">
+    <h2>1. Scope: Temporal Is One Layer</h2>
+    <p>Temporal solves one problem well: durable execution of long-running workflows. But enterprise agentic AI needs far more:</p>
+    <table class="cmp-table" style="margin-top:6px;">
+      <tr><th>Capability</th><th>Temporal</th><th>Akka</th></tr>
+      <tr><td>Agent framework</td><td class="bad">SDK integration only</td><td class="good">Native, built-in</td></tr>
+      <tr><td>Durable memory</td><td class="bad">None (~200ms bolt-on)</td><td class="good">Sub-10ms built-in</td></tr>
+      <tr><td>Real-time streaming</td><td class="bad">None</td><td class="good">Event-driven built-in</td></tr>
+      <tr><td>HTTP/gRPC APIs</td><td class="bad">None</td><td class="good">Built-in endpoint layer</td></tr>
+      <tr><td>Observability</td><td class="bad">Basic workflow tracing</td><td class="good">OTEL, agent analysis, cost</td></tr>
+      <tr><td>Governance</td><td class="bad">None</td><td class="good">Runtime + pre-production</td></tr>
+    </table>
+    <p style="margin-top:5px;">With Temporal, you are the integrator. You source each capability separately, stitch it together, and own every operational failure across the seams.</p>
+  </div>
+
+  <div class="section">
+    <h2>2. HA/DR: 8-Hour RPO Is Unacceptable</h2>
+    <div class="callout">
+      Temporal's HA namespace has an 8-hour RPO &mdash; meaning up to 8 hours of workflow state can be lost in a region failure. And that SLA covers the orchestration layer only.
+    </div>
+    <table class="cmp-table">
+      <tr><th>Metric</th><th>Temporal Cloud (HA)</th><th>Akka</th></tr>
+      <tr><td>Availability SLA</td><td class="bad">99.99%</td><td class="good">99.9999%</td></tr>
+      <tr><td>HA Mode</td><td class="bad">Active-passive</td><td class="good">Active-active</td></tr>
+      <tr><td>RTO</td><td class="bad">Not specified</td><td class="good">&lt;1 minute</td></tr>
+      <tr><td>RPO</td><td class="bad"><strong>8 hours</strong></td><td class="good">Zero byte</td></tr>
+      <tr><td>State during failover</td><td class="bad">Up to 8 hrs lost</td><td class="good">Fully preserved</td></tr>
+      <tr><td>SLA scope</td><td class="bad">Orchestration only</td><td class="good">Entire platform</td></tr>
+    </table>
+    <p style="font-size:7.5pt; color:#666; margin-top:4px;">For financial services, healthcare, or any regulated enterprise, an 8-hour RPO is not an acceptable recovery point &mdash; and Temporal's SLA doesn't cover the memory, streaming, or API layers you still need to provision separately.</p>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="section">
+    <h2>3. Cost: Per-Action Billing Scales Against You</h2>
+    <h3>Temporal's pricing model</h3>
+    <table class="cmp-table">
+      <tr><th>Volume</th><th>Price per million actions</th></tr>
+      <tr><td>Standard</td><td><strong>$50/M</strong></td></tr>
+      <tr><td>High volume</td><td>$25/M (declining)</td></tr>
+      <tr><td>Active workflow storage</td><td>$0.042/GB-hour</td></tr>
+    </table>
+    <p style="margin-top:5px;">Hidden costs: every capability Temporal doesn't provide &mdash; memory, streaming, observability, governance, APIs &mdash; is a separate vendor contract, separate infrastructure bill, and separate operational burden.</p>
+    <h3>Akka: shared compute, one bill</h3>
+    <p>Akka runs orchestration, agents, memory, streaming, and APIs on shared compute &mdash; no per-action charges, no separate bills per capability. Scale-to-zero means you only pay for what runs. Customers consistently report 70-90% infrastructure cost reduction.</p>
+  </div>
+
+  <div class="section">
+    <h2>5. Developer Experience: The Determinism Tax</h2>
+    <h3>Temporal requires strictly deterministic workflow code</h3>
+    <ul>
+      <li>LLM calls are non-deterministic by nature &mdash; requires careful wrapping in Temporal activities</li>
+      <li>Any library with internal randomness must be audited or replaced</li>
+      <li>Debugging non-determinism failures requires deep Temporal expertise</li>
+      <li>Community reports document scale walls on task queue throughput at high volumes</li>
+      <li>Workflow replay amplifies any non-determinism bug into a production incident</li>
+    </ul>
+    <h3>Akka's approach</h3>
+    <p>Akka's SDK enforces good patterns without the determinism constraint. Event sourcing is built into entities; agents are naturally stateless; the runtime handles failure recovery without requiring deterministic replay. Teams write natural Java or Scala &mdash; the platform provides the durability guarantees underneath.</p>
+    <div class="callout" style="margin-top:6px;">
+      "Temporal requires all your workflow code to be strictly deterministic. That sounds reasonable until you're working with LLMs, where non-determinism is the point."
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════ PAGE 2 ════════════════════════ -->
+<div class="page-break"></div>
+
+<div class="section">
+  <h2>4. EU AI Act: Temporal Has No Answer</h2>
+
+  <div class="two-col" style="margin-top:6px;">
+    <div>
+      <h3>The penalties are enforceable now</h3>
+      <table class="penalty-table">
+        <tr><th>Violation</th><th>Maximum Fine</th></tr>
+        <tr><td>Prohibited AI practices (Art. 5)</td><td>EUR 35M or 7% global turnover</td></tr>
+        <tr><td>High-risk obligations (Art. 9-15)</td><td>EUR 15M or 3% global turnover</td></tr>
+        <tr><td>Incorrect information to authorities</td><td>EUR 7.5M or 1.5% global turnover</td></tr>
+      </table>
+      <p style="margin-top:4px;">Temporal holds SOC 2 Type II, GDPR, and HIPAA certifications &mdash; standard infrastructure compliance. There is no published EU AI Act mapping, no runtime policy enforcement, no decision explainability, and no pre-deployment classification capability.</p>
+    </div>
+    <div>
+      <h3>Temporal's governance story is infrastructure security, not AI governance</h3>
+      <p>When asked about EU AI Act compliance, Temporal's answer is silence. Even if Temporal added runtime governance tomorrow, they would have no answer for pre-production governance &mdash; the classification, sign-off workflows, and sealed audit artifacts that must exist before a system ships.</p>
+      <p style="margin-top:5px;">Akka covers the entire governance lifecycle: classify against 175 regulatory frameworks and 600 controls, execute multi-persona sign-off workflows through the recipe engine, and seal the result as a tamper-evident Governance Posture Package &mdash; before deployment and in production, in one system.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Where Temporal Fails the EU AI Act</h3>
+  <table class="cmp-table">
+    <tr><th style="width:22%;">EU AI Act Requirement</th><th style="width:39%;">Temporal Approach</th><th style="width:39%;">Akka Approach</th></tr>
+    <tr>
+      <td>Real-time policy enforcement</td>
+      <td class="bad">None &mdash; workflow history only</td>
+      <td class="good">Inline guardrails, policies, LLMs-as-a-judge at runtime</td>
+    </tr>
+    <tr>
+      <td>Decision explainability</td>
+      <td class="bad">None</td>
+      <td class="good">Self-explanation as a runtime property of every decision</td>
+    </tr>
+    <tr>
+      <td>Human intervention (pause/override)</td>
+      <td class="bad">None &mdash; no pause/redirect for running processes</td>
+      <td class="good">Built-in human control dashboard; pause, override, redirect in real time</td>
+    </tr>
+    <tr>
+      <td>Immutable interaction logging</td>
+      <td class="bad">Standard workflow history only &mdash; not a purpose-built ledger</td>
+      <td class="good">Runtime witnesses and encodes every interaction immutably</td>
+    </tr>
+    <tr>
+      <td>Authorization capture</td>
+      <td class="bad">Partial (workflow context only)</td>
+      <td class="good">Full authorization snapshot per interaction at execution time</td>
+    </tr>
+    <tr>
+      <td>PII scrubbing + Right to Explain</td>
+      <td class="bad">None</td>
+      <td class="good">Atomic: decide, scrub PII, produce explanation</td>
+    </tr>
+    <tr>
+      <td>Pre-deployment classification</td>
+      <td class="bad">None &mdash; no concept of pre-production governance</td>
+      <td class="good">175 frameworks, 600 controls &mdash; classify before a system ships</td>
+    </tr>
+    <tr>
+      <td>Multi-persona sign-off workflows</td>
+      <td class="bad">None</td>
+      <td class="good">Declarative recipe engine with dossiers, carry-forward rules, quorum logic</td>
+    </tr>
+    <tr>
+      <td>Governance Posture Package</td>
+      <td class="bad">None</td>
+      <td class="good">Tamper-evident audit artifact &mdash; ready for regulatory handoff</td>
+    </tr>
+  </table>
+</div>
+
+<div class="callout">
+  "Temporal's compliance story is SOC 2 and HIPAA &mdash; infrastructure security, not AI governance. The EU AI Act requires real-time policy enforcement, human override capability, immutable audit trails, and explainability as properties of the system. Temporal has none of these. And before a system even ships, you need to classify it against applicable regulations, get the right people to sign off, and produce a sealed audit record. Temporal has no concept of any of that. Akka covers the entire governance lifecycle &mdash; before deployment and in production."
+</div>
+
+<div class="section" style="margin-top:12px;">
+  <h2>Handling Common Objections</h2>
+
+  <div class="two-col" style="gap:14px;">
+    <div>
+      <div class="objection">
+        <div class="q">"We're already running Temporal in production"</div>
+        <div class="a">"Temporal works well for pure workflow orchestration. The question is what you're building next &mdash; if you're moving into agentic AI, you'll need memory, governance, observability, and policy enforcement that Temporal doesn't provide. Akka can run alongside your existing Temporal workflows while you migrate the agentic layer."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"Temporal just raised $300M at a $5B valuation"</div>
+        <div class="a">"Their funding round cited agentic AI as the target &mdash; and they responded by integrating someone else's SDK. Akka is built for agentic AI from the ground up: native agents, built-in memory, embedded governance, and a full-stack platform. A high valuation doesn't close the capability gap."</div>
+      </div>
+    </div>
+    <div>
+      <div class="objection">
+        <div class="q">"We can bolt governance on top of Temporal"</div>
+        <div class="a">"The EU AI Act requires governance inline to the runtime: immutable records witnessed as they happen, human override capability on running processes, and authorization capture at execution time. Bolt-on tools read logs after the fact &mdash; they cannot stop a running process, cannot prove records weren't modified, and cannot capture authorization state at the moment of execution. And none of them address pre-deployment governance: classification, sign-offs, and sealed audit artifacts before the system ships."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"Temporal is open source"</div>
+        <div class="a">"Temporal's core is open source &mdash; but production-grade Temporal requires Temporal Cloud (with its per-action billing) or self-hosting (where you build and operate HA/DR, observability, and everything else yourself). The license is free; the operational cost of running it at production scale is not. Akka's shared compute model typically delivers 70-90% lower infrastructure cost than the equivalent point-solution stack."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 10px;">
+  <h2>Sources &mdash; Temporal's Own Documentation</h2>
+  <p style="font-size: 7pt; color: #666; line-height: 1.55; columns: 2; column-gap: 18px;">
+    <strong>Temporal pricing:</strong> temporal.io/pricing &mdash; $50/M standard actions, $25/M high-volume, active storage $0.042/GB-hour<br>
+    <strong>Temporal HA/DR &mdash; 8-hour RPO:</strong> docs.temporal.io/cloud/high-availability &mdash; 8-hour RPO for region failures across HA and multi-cloud namespaces<br>
+    <strong>Temporal AI solutions:</strong> temporal.io/solutions/ai &mdash; OpenAI Agents SDK integration added March 2026<br>
+    <strong>Temporal Series D ($300M):</strong> temporal.io/news/temporal-raises-300M-to-make-agentic-ai-real-for-companies<br>
+    <strong>Community scale wall reports:</strong> community.temporal.io/t/temporal-seems-to-hit-scale-wall/4510<br>
+    <strong>Akka availability guarantee:</strong> 99.9999% with active-active HA/DR, sub-1 min RTO, zero byte RPO &mdash; backed by contractual indemnities<br>
+    <strong>Akka governance platform:</strong> 175 regulatory frameworks, 600 controls, multi-persona sign-off workflows, Governance Posture Packages
+  </p>
+</div>
+
+<div class="footer">
+  <div style="display:flex; align-items:center; gap:8px;"><svg width="65" height="15" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip1)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="#1A1A1A"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="#1A1A1A"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="#1A1A1A"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="#1A1A1A"/></g><defs><clipPath id="clip1"><rect width="109" height="25" fill="white"/></clipPath></defs></svg> <span>Reliable AI for Every Industry &nbsp;|&nbsp; akka.ai</span></div>
+  <div>Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+</body>
+</html>

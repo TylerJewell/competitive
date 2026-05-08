@@ -2,7 +2,7 @@
 
 **For:** NTT Data — Enterprise Agentic Grid sales teams
 **Use:** Customer-facing competitive positioning when Azure AI Foundry is the incumbent or alternative
-**Last updated:** 2026-04-01
+**Last updated:** 2026-04-24
 
 ---
 
@@ -14,7 +14,7 @@
 | **HA/DR** | No SLA on Agent Service; no automatic failover; total state loss on region failure | 99.9999% availability; active-active HA/DR; sub-1 min RTO, zero byte RPO |
 | **Lock-in** | Tight coupling to Azure identity, compute, orchestration, and data services | Deploy on any cloud, on-prem, or Akka's cloud; no proprietary lock-in |
 | **Sovereign cloud** | Feature-lagged, limited AI service availability, control plane metadata may leave region | Full-parity sovereign cloud with data isolation, networking isolation, local SREs |
-| **Governance / EU AI Act** | Fragmented across 5+ services; no inline explainability; no human override dashboard | Single embedded policy engine — inline governance, explainability, and human intervention |
+| **Governance / EU AI Act** | Fragmented across 5+ services; no inline explainability; no human override dashboard; no pre-deployment classification | Embedded runtime governance + full pre-production governance platform: classify against 175 frameworks, multi-persona sign-offs, Governance Posture Packages |
 
 ---
 
@@ -161,12 +161,15 @@ Azure's governance is spread across **5+ separate services** at different archit
 | Human intervention (pause/override) | No built-in capability | **Does not exist** — no "pause this agent" dashboard or real-time human override |
 | Authorization capture | Entra sign-in logs + RBAC logs + API Management logs | **No consolidated snapshot** — must correlate 3+ log sources to reconstruct |
 | PII scrubbing + explainability | PII detection exists; no scrub-with-explain pipeline | **Unsolved** — GDPR/AI Act tension left to customer |
+| Pre-deployment classification | No AI system classification against regulatory frameworks | **Does not exist** — no obligation derivation, no framework mapping |
+| Sign-off workflows | No multi-persona attestation capability | **Does not exist** — no change governance engine |
+| Governance Posture Package | No sealed audit artifact for regulatory handoff | **Does not exist** — compliance documentation assembled manually |
 
 ### Why Bolt-On Governance Fails the EU AI Act
 
 Microsoft has made **no article-by-article compliance mapping** for Azure AI Foundry. Their compliance story relies on Purview Compliance Manager templates (self-assessment checklists), not built-in technical controls.
 
-Four critical failures of bolt-on governance:
+Five critical failures of bolt-on governance:
 
 1. **Immutable records**: A log message from a third-party runtime is a claim — there is no way to prove it wasn't modified, delayed, or selectively omitted. Only a system inline to the runtime can witness and encode every interaction immutably.
 
@@ -175,6 +178,8 @@ Four critical failures of bolt-on governance:
 3. **Authorization capture**: The EU AI Act requires recording which authorizations and tools were in use at the time of every interaction. Azure requires correlating 3+ separate log sources to reconstruct this — and their AI Gateway documentation explicitly states it does not log tool traces.
 
 4. **PII scrubbing with Right to Explain**: PII must be scrubbed, but decisions must still be explainable. Azure has no solution for this tension. Only the agentic runtime itself can make the decision, enforce scrubbing, and produce the explanation in a single atomic operation.
+
+5. **Pre-deployment classification and attestation**: Azure has no answer for the governance that must happen before an AI system ships. There is no capability to classify systems against regulatory frameworks, route change approvals to the right personas with the right evidence, or produce a sealed audit artifact that proves the system was reviewed appropriately before deployment. Akka's governance platform covers this entire lifecycle — from obligation derivation through multi-persona attestation to a signed deployment bundle — as a first-class product surface.
 
 ### Akka's Embedded Governance
 
@@ -186,9 +191,12 @@ Akka's policy enforcement engine is **embedded directly in the runtime** — not
 - **Human intervention**: Humans can pause, discontinue, override, review, or nudge an ongoing agentic process
 - **Immutable interaction logging**: The runtime witnesses and records every interaction
 - **PII scrubbing with explainability**: The runtime makes the decision, scrubs PII, and produces the explanation atomically
+- **Pre-deployment classification**: Classify AI systems against 175 regulatory frameworks and 600 controls to derive the exact obligation set before a single line of production code ships
+- **Multi-persona sign-off workflows**: Declarative recipe engine routes change events to the right reviewers with dossiers, carry-forward rules, and quorum logic — not email chains and spreadsheets
+- **Governance Posture Package**: Every deployment produces a tamper-evident audit artifact containing the full record of every classification decision, sign-off, and approval — ready for regulatory handoff without scrambling
 - **19+ compliance certifications** including EU AI Act, ISO 42001, SOC 2
 
-**Talk track:** *"Microsoft's governance is spread across five separate services — Content Safety, API Management, Purview, Monitor, and Entra — none of which talk to each other as a unified system. They have no real-time explainability, no human override capability, no immutable interaction ledger, and no solution for PII scrubbing with explainability. The EU AI Act requires all of these — and the fines are up to 7% of global revenue. Akka embeds governance directly in the runtime. Every interaction is witnessed, recorded, and explainable. Humans can pause or override at any time. It's the difference between governance that works and a compliance checkbox that won't survive an audit."*
+**Talk track:** *"Microsoft's governance is spread across five separate services — Content Safety, API Management, Purview, Monitor, and Entra — none of which talk to each other as a unified system. They have no real-time explainability, no human override capability, no immutable interaction ledger, and no solution for PII scrubbing with explainability. And before a system even ships, Azure has no way to classify it against applicable regulations, get the right people to sign off, or produce a sealed audit record. The EU AI Act requires all of these — and the fines are up to 7% of global revenue. Akka covers governance before deployment and in production: every classification decision recorded, every sign-off captured, every runtime interaction witnessed and explainable. It's the difference between governance that works and a compliance checkbox that won't survive an audit."*
 
 ---
 

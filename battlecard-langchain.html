@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Akka vs. LangChain — Competitive Brief</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page {
+    size: letter;
+    margin: 0.55in 0.65in 0.5in 0.65in;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9pt;
+    line-height: 1.45;
+    color: #1A1A1A;
+    background: #fff;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header {
+    background: #000;
+    color: #fff;
+    padding: 14px 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo svg { height: 22px; width: auto; }
+  .header .tagline { font-size: 8.5pt; font-weight: 400; color: #ccc; text-align: right; }
+
+  .title-block {
+    margin-top: 16px;
+    margin-bottom: 14px;
+    border-bottom: 3px solid #F5C518;
+    padding-bottom: 10px;
+  }
+  .title-block h1 { font-size: 17pt; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 2px; }
+  .title-block .subtitle { font-size: 9.5pt; color: #4E4E4E; font-weight: 500; }
+  .title-block .meta { font-size: 7.5pt; color: #888; margin-top: 4px; }
+
+  .summary-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 8pt; }
+  .summary-table th {
+    background: #000; color: #fff; text-align: left; padding: 5px 8px;
+    font-weight: 600; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .summary-table th:first-child { border-radius: 3px 0 0 0; }
+  .summary-table th:last-child { border-radius: 0 3px 0 0; }
+  .summary-table td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; vertical-align: top; }
+  .summary-table tr:nth-child(even) td { background: #FAFAFA; }
+  .summary-table td:first-child { font-weight: 600; white-space: nowrap; }
+  .summary-table .comp-col { color: #555; }
+  .summary-table .akka-col { color: #000; font-weight: 500; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 12px; }
+
+  .section { margin-bottom: 13px; }
+  .section h2 {
+    font-size: 11pt; font-weight: 700; color: #000;
+    border-left: 4px solid #F5C518; padding-left: 8px;
+    margin-bottom: 6px; line-height: 1.3;
+  }
+  .section h3 { font-size: 9pt; font-weight: 600; color: #333; margin-bottom: 3px; margin-top: 6px; }
+  .section p, .section li { font-size: 8.5pt; color: #333; line-height: 1.4; }
+  .section ul { padding-left: 14px; margin-bottom: 4px; }
+  .section li { margin-bottom: 2px; }
+
+  .callout {
+    background: #000; color: #fff; padding: 10px 14px; border-radius: 4px;
+    margin: 8px 0; font-size: 8.5pt; line-height: 1.4; font-style: italic;
+  }
+  .callout .source { display: block; margin-top: 4px; font-style: normal; font-size: 7pt; color: #F5C518; }
+
+  .cmp-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .cmp-table th {
+    background: #F5F5F5; font-weight: 600; text-align: left;
+    padding: 4px 6px; border-bottom: 2px solid #F5C518; font-size: 7.5pt;
+  }
+  .cmp-table td { padding: 3px 6px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .cmp-table .bad { color: #C0392B; font-weight: 500; }
+  .cmp-table .good { color: #1A7A3A; font-weight: 500; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 10px 0; }
+  .stat-card { background: #000; color: #fff; border-radius: 4px; padding: 8px 10px; text-align: center; }
+  .stat-card .number { font-size: 16pt; font-weight: 700; color: #F5C518; line-height: 1.1; }
+  .stat-card .label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.4px; color: #ccc; margin-top: 2px; }
+
+  .penalty-table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 6px 0; }
+  .penalty-table th { background: #C0392B; color: #fff; text-align: left; padding: 4px 8px; font-weight: 600; font-size: 7.5pt; }
+  .penalty-table td { padding: 4px 8px; border-bottom: 1px solid #eee; }
+  .penalty-table td:last-child { font-weight: 600; color: #C0392B; }
+
+  .objection { margin-bottom: 6px; }
+  .objection .q { font-weight: 600; font-size: 8.5pt; color: #000; }
+  .objection .a { font-size: 8pt; color: #444; font-style: italic; margin-top: 1px; }
+
+  .footer {
+    margin-top: 8px; padding-top: 6px; border-top: 2px solid #000;
+    display: flex; justify-content: space-between; font-size: 7pt; color: #888;
+  }
+
+  .page-break { page-break-before: always; break-before: page; margin-top: 0; padding-top: 12px; }
+
+  @media screen {
+    body { max-width: 8.5in; margin: 0 auto; padding: 0.55in 0.65in; }
+  }
+
+  strong.accent { color: #000; background: #FFF3C4; padding: 0 3px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════ PAGE 1 ════════════════════════ -->
+
+<div class="header">
+  <div class="logo"><svg width="109" height="25" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_344_191)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="white"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="white"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="white"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="white"/></g><defs><clipPath id="clip0_344_191"><rect width="109" height="25" fill="white"/></clipPath></defs></svg></div>
+  <div class="tagline">Reliable AI for Every Industry<br>The Agentic Systems Platform</div>
+</div>
+
+<div class="title-block">
+  <h1>Why Akka Beats LangChain</h1>
+  <div class="subtitle">Competitive brief for Enterprise Agentic Grid sales teams</div>
+  <div class="meta">Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="number">None</div>
+    <div class="label">LangChain Availability SLA</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">$5k/mo</div>
+    <div class="label">LangSmith Traces at Scale</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">18 yrs</div>
+    <div class="label">Akka Production Runtime</div>
+  </div>
+  <div class="stat-card">
+    <div class="number">175</div>
+    <div class="label">Regulatory Frameworks</div>
+  </div>
+</div>
+
+<table class="summary-table">
+  <tr>
+    <th>Dimension</th>
+    <th>LangChain</th>
+    <th>Akka</th>
+  </tr>
+  <tr>
+    <td>What it is</td>
+    <td class="comp-col">Developer framework &mdash; you build it, you run it, you own the risk</td>
+    <td class="akka-col">Full-stack platform with operational guarantees</td>
+  </tr>
+  <tr>
+    <td>HA / DR</td>
+    <td class="comp-col">None &mdash; you provision and manage your own infrastructure</td>
+    <td class="akka-col">99.9999% active-active; sub-1 min RTO; zero byte RPO</td>
+  </tr>
+  <tr>
+    <td>Memory</td>
+    <td class="comp-col">None built-in &mdash; bolt-on at ~200ms</td>
+    <td class="akka-col">Sub-10ms durable memory built into the platform</td>
+  </tr>
+  <tr>
+    <td>Governance / EU AI Act</td>
+    <td class="comp-col">Explicitly no EU AI Act compliance &mdash; left to customers</td>
+    <td class="akka-col">Embedded runtime enforcement + full pre-production governance platform</td>
+  </tr>
+  <tr>
+    <td>Pre-Production Governance</td>
+    <td class="comp-col">None</td>
+    <td class="akka-col">Classify against 175 frameworks, multi-persona sign-offs, Governance Posture Packages</td>
+  </tr>
+  <tr>
+    <td>Production Stability</td>
+    <td class="comp-col">Frequent breaking changes, opaque debugging, in-memory bottlenecks</td>
+    <td class="akka-col">18-year proven runtime, 100,000+ production deployments</td>
+  </tr>
+  <tr>
+    <td>Cost Model</td>
+    <td class="comp-col">Per-trace billing (LangSmith) + all infrastructure billed separately</td>
+    <td class="akka-col">Shared compute &mdash; up to 90% lower infrastructure cost</td>
+  </tr>
+</table>
+
+<div class="two-col">
+  <div class="section">
+    <h2>1. Framework vs. Platform</h2>
+    <p>LangChain explicitly operates a <strong>Shared Responsibility Model</strong>: the framework and LangSmith observability are their product. Everything else is your responsibility:</p>
+    <ul>
+      <li>Your own state persistence layer</li>
+      <li>Your own failover and recovery logic</li>
+      <li>Your own observability pipeline beyond LangSmith traces</li>
+      <li>Your own governance and compliance tooling</li>
+      <li>Your own scaling and deployment automation</li>
+    </ul>
+    <p style="margin-top:5px;">Each of those is a build project, a maintenance burden, and a potential production failure. Every enterprise that has shipped a LangChain-based system to production has had to build every one of these layers &mdash; or is running without them.</p>
+    <div class="callout" style="margin-top:6px;">
+      "LangChain is a great way to build a prototype. But when you move to production, you're responsible for availability, recovery, compliance, and operations &mdash; LangChain doesn't provide any of that."
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>2. Production Stability</h2>
+    <h3>LangChain's well-documented reputation problem</h3>
+    <ul>
+      <li><strong>Frequent breaking changes</strong> &mdash; APIs change without deprecation cycles; teams report rewriting integrations after minor version bumps</li>
+      <li><strong>Nested abstraction opacity</strong> &mdash; Prompts &rarr; chains &rarr; agents &rarr; tools creates debugging stacks that obscure where failures originate</li>
+      <li><strong>No mid-run state inspection</strong> &mdash; cannot inspect agent state during execution</li>
+      <li><strong>In-memory bottleneck</strong> &mdash; default in-memory operations don't scale</li>
+      <li><strong>No deployment automation</strong> &mdash; LangSmith Deployment covers serving; rollout automation is your problem</li>
+    </ul>
+    <h3>Akka's 18-year runtime</h3>
+    <p>Akka's runtime has been running production systems for 18 years across more than 100,000 deployments &mdash; including 52 banks and systems touching 2 billion people daily. LangChain's patterns were designed for ease of prototyping, not production resilience.</p>
+    <div class="callout" style="margin-top:6px;">
+      "LangChain is built to make it easy to get started. Akka is built to never go down. Those are different design goals."
+    </div>
+  </div>
+</div>
+
+<div class="two-col">
+  <div class="section">
+    <h2>3. HA/DR: LangChain Has None</h2>
+    <h3>What LangSmith provides (and doesn't)</h3>
+    <p>LangSmith (the commercial product) provides GCP-hosted infrastructure with daily backups. What it does <strong>not</strong> provide:</p>
+    <ul>
+      <li>Availability SLA for your LangChain application</li>
+      <li>HA/DR for your application's state</li>
+      <li>Automatic failover for your agents</li>
+      <li>Any guarantee on agent state during infrastructure failures</li>
+    </ul>
+    <table class="cmp-table" style="margin-top:5px;">
+      <tr><th>Metric</th><th>LangSmith / LangChain</th><th>Akka</th></tr>
+      <tr><td>Platform availability SLA</td><td class="bad">Not published</td><td class="good">99.9999%</td></tr>
+      <tr><td>HA mode</td><td class="bad">Manual / you build</td><td class="good">Active-active</td></tr>
+      <tr><td>RTO</td><td class="bad">You implement</td><td class="good">&lt;1 minute</td></tr>
+      <tr><td>RPO</td><td class="bad">You implement</td><td class="good">Zero byte</td></tr>
+      <tr><td>State during failover</td><td class="bad">Your responsibility</td><td class="good">Fully preserved</td></tr>
+      <tr><td>SLA backed by</td><td class="bad">Nothing</td><td class="good">Contractual indemnities</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>5. Cost: Per-Trace Billing Compounds</h2>
+    <h3>LangSmith pricing reality</h3>
+    <table class="cmp-table">
+      <tr><th>Plan</th><th>Cost</th><th>Traces</th></tr>
+      <tr><td>Developer</td><td>$2.50/1k base<br>$5.00/1k extended</td><td>Pay-as-you-go</td></tr>
+      <tr><td>Plus</td><td>$39/seat/month</td><td>10k traces/month</td></tr>
+      <tr><td>Enterprise</td><td>Custom</td><td>Custom</td></tr>
+    </table>
+    <p style="margin-top:5px;">At 1M agent interactions/month at extended tracing rates: <strong>$5,000/month in observability alone</strong> &mdash; before infrastructure, before memory, before governance tooling.</p>
+    <p style="margin-top:4px;"><strong>Total cost includes:</strong> LangSmith traces + state persistence (Postgres, Redis, vector DB) + streaming infrastructure + governance tooling (separate vendor) + HA/DR build + on-call engineering for all of the above.</p>
+    <h3>Akka: shared compute, one bill</h3>
+    <p>Orchestration, agents, memory, streaming, APIs, observability, and governance on shared compute. No per-trace charges. Customers see 70-90% lower infrastructure cost.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════ PAGE 2 ════════════════════════ -->
+<div class="page-break"></div>
+
+<div class="section">
+  <h2>4. Governance: LangChain Explicitly Has None</h2>
+
+  <div class="two-col" style="margin-top:6px;">
+    <div>
+      <h3>The penalties are enforceable now</h3>
+      <table class="penalty-table">
+        <tr><th>Violation</th><th>Maximum Fine</th></tr>
+        <tr><td>Prohibited AI practices (Art. 5)</td><td>EUR 35M or 7% global turnover</td></tr>
+        <tr><td>High-risk obligations (Art. 9-15)</td><td>EUR 15M or 3% global turnover</td></tr>
+        <tr><td>Incorrect information to authorities</td><td>EUR 7.5M or 1.5% global turnover</td></tr>
+      </table>
+      <p style="margin-top:4px;">LangChain has publicly acknowledged they do not provide EU AI Act compliance tooling. Their compliance posture covers SOC 2 Type II (LangSmith infrastructure), GDPR, and HIPAA. EU AI Act compliance is explicitly not provided &mdash; regulatory compliance logging for Article 12 has been raised as an open requirement with no resolution.</p>
+    </div>
+    <div>
+      <h3>Enterprises on LangChain are left to source governance from third parties</h3>
+      <p>Each is a separate integration, separate vendor, separate operational surface. Enterprises end up stitching together Microsoft Agent Governance Toolkit, Asqav, or equivalent third-party tools &mdash; none of which provide the inline governance that the EU AI Act actually requires.</p>
+      <p style="margin-top:5px;">LangChain has no concept of governance before deployment. There is no classification wizard, no sign-off workflow, no obligation derivation from regulatory frameworks, and no sealed audit artifact. If you're deploying AI systems in a regulated industry, you're solving all of that outside of LangChain.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Where LangChain Fails the EU AI Act</h3>
+  <table class="cmp-table">
+    <tr><th style="width:22%;">EU AI Act Requirement</th><th style="width:39%;">LangChain Approach</th><th style="width:39%;">Akka Approach</th></tr>
+    <tr>
+      <td>Real-time policy enforcement</td>
+      <td class="bad">None</td>
+      <td class="good">Inline guardrails, policies, LLMs-as-a-judge at runtime</td>
+    </tr>
+    <tr>
+      <td>Decision explainability</td>
+      <td class="bad">LangSmith traces (post-hoc only)</td>
+      <td class="good">Self-explanation as a runtime property of every decision</td>
+    </tr>
+    <tr>
+      <td>Human intervention (pause/override)</td>
+      <td class="bad">None</td>
+      <td class="good">Built-in human control dashboard; pause, override, redirect in real time</td>
+    </tr>
+    <tr>
+      <td>Immutable interaction logging</td>
+      <td class="bad">LangSmith traces &mdash; mutable, third-party, not purpose-built</td>
+      <td class="good">Runtime witnesses and encodes every interaction immutably</td>
+    </tr>
+    <tr>
+      <td>Authorization capture</td>
+      <td class="bad">None</td>
+      <td class="good">Full authorization snapshot per interaction at execution time</td>
+    </tr>
+    <tr>
+      <td>PII scrubbing + Right to Explain</td>
+      <td class="bad">None</td>
+      <td class="good">Atomic: decide, scrub PII, produce explanation</td>
+    </tr>
+    <tr>
+      <td>Pre-deployment classification</td>
+      <td class="bad">None &mdash; no concept of pre-production governance</td>
+      <td class="good">175 frameworks, 600 controls &mdash; classify before a system ships</td>
+    </tr>
+    <tr>
+      <td>Multi-persona sign-off workflows</td>
+      <td class="bad">None</td>
+      <td class="good">Declarative recipe engine with dossiers, carry-forward rules, quorum logic</td>
+    </tr>
+    <tr>
+      <td>Governance Posture Package</td>
+      <td class="bad">None</td>
+      <td class="good">Tamper-evident audit artifact &mdash; ready for regulatory handoff</td>
+    </tr>
+  </table>
+</div>
+
+<div class="callout">
+  "LangChain's EU AI Act story is silence. They don't have it and they've acknowledged as much publicly. For regulated enterprises, that means sourcing governance tooling from third parties, integrating it yourself, and hoping the seams hold up under audit. Akka embeds governance in the runtime and provides a full pre-production governance surface &mdash; classification against 175 frameworks, multi-persona sign-offs, and sealed Governance Posture Packages. It's the difference between a checklist you assemble yourself and a platform that makes governance a property of every deployment."
+</div>
+
+<div class="section" style="margin-top:12px;">
+  <h2>Handling Common Objections</h2>
+
+  <div class="two-col" style="gap:14px;">
+    <div>
+      <div class="objection">
+        <div class="q">"Our team already knows LangChain"</div>
+        <div class="a">"LangChain knowledge transfers &mdash; the agent patterns, prompt engineering, and LLM integration skills your team has are all applicable in Akka. What Akka adds is the production layer that LangChain doesn't have: durable state, HA/DR, governance, and operational guarantees. Your team doesn't start from zero; they add the reliability layer on top of what they already know."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"LangGraph handles our orchestration needs"</div>
+        <div class="a">"LangGraph is good at stateful graph-based agent orchestration. The question is what happens when a node in that graph fails, when a region goes down, or when an auditor asks you to prove what your AI decided and why. LangGraph doesn't provide durability guarantees, doesn't survive infrastructure failures, and has no governance story. Akka's workflow engine handles the same orchestration patterns with durable execution, active-active HA/DR, and embedded governance."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"LangSmith gives us the observability we need"</div>
+        <div class="a">"LangSmith gives you traces and evals &mdash; which is valuable for debugging. But the EU AI Act requires more than observability: immutable records witnessed inline to the runtime, human override capability on running processes, and authorization capture at execution time. LangSmith traces are mutable third-party records, can't stop a running process, and weren't designed for regulatory audit. Akka's interaction logging is purpose-built for compliance &mdash; immutable, inline, and complete."</div>
+      </div>
+    </div>
+    <div>
+      <div class="objection">
+        <div class="q">"LangChain is open source so we're not locked in"</div>
+        <div class="a">"The framework is open source. But production LangChain means LangSmith for observability (commercial, per-trace billing), a state layer you've built specifically for LangChain's patterns, and governance tooling you've integrated yourself. Migrating off LangChain means replacing all of that, not just swapping the library. Akka's SDK uses open standards &mdash; the lock-in risk is actually lower."</div>
+      </div>
+      <div class="objection">
+        <div class="q">"We just want to move fast &mdash; Akka sounds heavyweight"</div>
+        <div class="a">"The fastest way to production isn't the fastest way to a prototype. Teams that build on LangChain move fast at the start and slow down when they hit production requirements &mdash; HA/DR, governance, compliance, observability at scale. Akka's spec-driven development and golden paths are designed for exactly this: move fast without accumulating production debt. Manulife, one of the world's largest insurers, chose Akka over Azure AI Foundry specifically to avoid building that debt layer themselves."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 10px;">
+  <h2>Sources &mdash; LangChain's Own Documentation</h2>
+  <p style="font-size: 7pt; color: #666; line-height: 1.55; columns: 2; column-gap: 18px;">
+    <strong>LangChain pricing:</strong> langchain.com/pricing &mdash; $2.50/1k base traces, $5.00/1k extended, $39/seat/month Plus plan<br>
+    <strong>LangSmith Shared Responsibility Model:</strong> docs.langchain.com/langsmith/shared-responsibility-model &mdash; customer owns application-level HA/DR<br>
+    <strong>EU AI Act compliance gap:</strong> acknowledged in public LangChain issues (Article 12 logging) &mdash; raised as open requirement, no resolution<br>
+    <strong>LangChain Series B ($125M, $1.25B valuation):</strong> techcrunch.com, October 2025<br>
+    <strong>Why teams move off LangChain:</strong> octomind.dev/blog/why-we-no-longer-use-langchain-for-building-our-ai-agents &mdash; engineering team case study<br>
+    <strong>Akka availability guarantee:</strong> 99.9999% with active-active HA/DR, sub-1 min RTO, zero byte RPO &mdash; backed by contractual indemnities<br>
+    <strong>Akka governance platform:</strong> 175 regulatory frameworks, 600 controls, multi-persona sign-off workflows, Governance Posture Packages
+  </p>
+</div>
+
+<div class="footer">
+  <div style="display:flex; align-items:center; gap:8px;"><svg width="65" height="15" viewBox="0 0 109 25" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip1)"><path d="M72.1584 0L63.1046 10.1333V0H56.9064V24.9803H63.1046V14.8471L72.1584 24.9803H80.4349L69.2771 12.4894L80.4349 0H72.1584Z" fill="#1A1A1A"/><path d="M13.7804 8.28733L17.2652 16.4097H10.2971L13.7819 8.28733H13.7804ZM11.3362 0.0620117L0 24.9999H6.55216L8.11306 21.5641H19.4493L21.113 24.9999H27.5623L16.276 0.0620117H11.3362Z" fill="#1A1A1A"/><path d="M95.2196 8.28733L98.7044 16.4097H91.7363L95.2196 8.28733ZM92.7754 0.0620117L81.4392 24.9999H87.9914L89.5508 21.5641H100.888L102.552 24.9999H109L97.7152 0.0620117H92.7754Z" fill="#1A1A1A"/><path d="M45.2828 0.0620117L36.2456 10.1786V0.0620117H30.0565V24.9999H36.2456V14.8833L45.2828 24.9999H53.5471L42.4076 12.5302L53.5471 0.0620117H45.2828Z" fill="#1A1A1A"/></g><defs><clipPath id="clip1"><rect width="109" height="25" fill="white"/></clipPath></defs></svg> <span>Reliable AI for Every Industry &nbsp;|&nbsp; akka.ai</span></div>
+  <div>Confidential &mdash; Internal Use Only &nbsp;|&nbsp; April 2026</div>
+</div>
+
+</body>
+</html>
