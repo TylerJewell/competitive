@@ -17,7 +17,7 @@
     "hands-on"
   ],
   "external_inline": {
-    "source": "../../../preso/resilience/resilience.html",
+    "source": "../../assets/resilience/resilience.html",
     "wrapper_id": "s6-rf",
     "root_id": "root",
     "iframe_placeholder": "resilience/resilience.html"

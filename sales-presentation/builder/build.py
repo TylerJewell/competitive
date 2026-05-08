@@ -11,7 +11,7 @@ Usage:
 Output: generated/<mode>/index.html  (default)
 """
 
-import json, os, sys, argparse, re, shutil
+import json, os, sys, argparse, re, shutil, zipfile
 from datetime import datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from inline_external import process as inline_external
@@ -48,12 +48,6 @@ parser.add_argument('--presenter', default=None,
     help='Presenter JSON file stem in presenters/ (e.g. "tyler")')
 parser.add_argument('--out', default=None,
     help='Output file path (default: generated/<mode>/index.html)')
-parser.add_argument('--only-folder', default=None,
-    help='Build only one slide folder, e.g. slides/10-delivery, for standalone review')
-parser.add_argument('--keep-presenter-placeholders', action='store_true',
-    help='Leave {{PRESENTER_*}} placeholders in the output instead of clearing them. '
-         'Use when building a base.html template that will be substituted later '
-         '(e.g. for the /akka:demo plugin bundle).')
 args = parser.parse_args()
 
 out_path = args.out or os.path.join(GEN, args.mode, 'index.html')
@@ -61,16 +55,6 @@ out_path = args.out or os.path.join(GEN, args.mode, 'index.html')
 # ── Load registry ─────────────────────────────────────────────────────────────
 
 registry = read_json(os.path.join(BASE, 'slide-registry.json'))
-if args.only_folder:
-    folder = args.only_folder.replace('\\', '/').rstrip('/')
-    registry = {
-        'slides': [
-            {
-                'id': os.path.basename(folder),
-                'folder': folder
-            }
-        ]
-    }
 
 # ── Load shell ────────────────────────────────────────────────────────────────
 
@@ -112,8 +96,6 @@ for entry in registry['slides']:
 
     # Pre-spacer injection
     pre_spacer = meta.get('pre_spacer', 0)
-    if args.only_folder:
-        pre_spacer = 0
     if pre_spacer and str(pre_spacer) != '0':
         unit = 'vh' if isinstance(pre_spacer, int) else ''
         spacer = f'<div style="height:{pre_spacer}{unit};background:var(--black)"></div>\n'
@@ -314,9 +296,6 @@ def apply_presenter(html, p):
 slides_html_combined = '\n\n'.join(slides_html_parts)
 if presenter:
     slides_html_combined = apply_presenter(slides_html_combined, presenter)
-elif args.keep_presenter_placeholders:
-    # Plugin-template build: keep placeholders intact for downstream substitution.
-    pass
 else:
     # No presenter: clear all PRESENTER_ placeholders so no raw {{...}} leak into output
     slides_html_combined = re.sub(r'\{\{PRESENTER_[A-Z_]+\}\}', '', slides_html_combined)
@@ -330,19 +309,6 @@ result = result.replace('{{SLIDES_HTML}}', slides_html_combined)
 result = result.replace('{{SLIDES_JS}}',   '\n\n'.join(slides_js_parts))
 result = result.replace('{{NAV_JS}}',      nav_js)
 result = result.replace('{{KIOSK_JS}}',    kiosk_js)
-
-if args.only_folder:
-    result = result.replace('<body>', '<body class="single-preview">', 1)
-    result = result.replace(
-        '</style>',
-        '\n/* one-slide preview: render without scroll-triggered reveal gates */\n'
-        'body.single-preview{overflow:hidden!important;}\n'
-        'body.single-preview #s10-delivery-wrapper{height:100vh!important;}\n'
-        'body.single-preview #s10-delivery{position:relative!important;height:100vh!important;top:auto!important;}\n'
-        'body.single-preview .s10d-reveal{opacity:1!important;transform:none!important;}\n'
-        '</style>',
-        1
-    )
 
 # Inject CDN scripts from external inlines just before </head>
 if head_script_tags:
@@ -379,10 +345,28 @@ if os.path.exists(resilience_src):
     shutil.copytree(resilience_src, resilience_dst)
 
 size_kb = os.path.getsize(out_path) // 1024
+
+# ── Zip output dir ────────────────────────────────────────────────────────────
+# Place zip at generated/ root with a descriptive name so it's easy to share.
+
+zip_name = f'akka-presentation-{args.mode}.zip'
+if args.presenter:
+    zip_name = f'akka-presentation-{args.mode}-{args.presenter}.zip'
+zip_path = os.path.join(GEN, zip_name)
+
+with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+    for root, _, files in os.walk(out_dir):
+        for fname in files:
+            if fname.endswith('.zip'):
+                continue
+            fpath = os.path.join(root, fname)
+            zf.write(fpath, os.path.relpath(fpath, out_dir))
+
+zip_kb = os.path.getsize(zip_path) // 1024
+
 print(f'Mode:      {args.mode}')
 print(f'Slides:    {included} included, {skipped} skipped')
 if presenter:
     print(f'Presenter: {args.presenter}')
-print(f'Output:    {out_path}')
-print(f'Size:      {size_kb} KB  ({result.count(chr(10)):,} lines)')
-print(f'Assets:    images/ and logos/ copied to {out_dir}/')
+print(f'Output:    {out_path}  ({size_kb} KB)')
+print(f'Zip:       {zip_path}  ({zip_kb} KB)')
