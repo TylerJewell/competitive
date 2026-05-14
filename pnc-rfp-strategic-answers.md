@@ -38,7 +38,7 @@
 >
 > **Long-term:** Akka's vision is a platform that makes the question "can we prove what our AI decided and why?" answerable in real time — for every interaction, every agent, every deployment — as a built-in property of the platform, not a post-hoc investigation. For PNC, this means AI systems that are auditable by design, not auditable by effort.
 >
-> Akka currently holds 19+ compliance certifications including SOC 2 Type II, ISO 27001, and certifications aligned with the EU AI Act and Singapore Agent Framework. DORA-aligned operational resilience capabilities are actively being strengthened with financial services customers in mind.
+> Akka currently holds 19+ InfoSec certifications including SOC 2 Type II, ISO 27001, and certifications aligned with the EU AI Act and Singapore Agent Framework. DORA-aligned operational resilience capabilities are actively being strengthened with financial services customers in mind.
 
 ---
 

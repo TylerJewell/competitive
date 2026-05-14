@@ -233,7 +233,7 @@ Every quantitative claim in customer conversations should map to one of these:
 | "No supported method for active-active multi-region replication" | learn.microsoft.com Foundry agent DR docs |
 | ~$73k/mo PTU floor, $0.087/GB egress, $2.76/GB Monitor ingestion | Azure published pricing |
 | EU AI Act fines: €35M / 7%; €15M / 3% | EU AI Act Articles 5 and 9–15 |
-| 19+ compliance certifications | akka.io |
+| 19+ InfoSec certifications | akka.io |
 | Manulife selected Akka over Azure Foundry | akka.io/blog/manulife-selects-akka-to-operationalize-agentic-ai |
 
 **Discipline:** never quote a number you can't trace to one of these. Every claim above has a public source.

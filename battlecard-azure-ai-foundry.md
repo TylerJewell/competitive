@@ -194,7 +194,7 @@ Akka's policy enforcement engine is **embedded directly in the runtime** — not
 - **Pre-deployment classification**: Classify AI systems against 175 regulatory frameworks and 600 controls to derive the exact obligation set before a single line of production code ships
 - **Multi-persona sign-off workflows**: Declarative recipe engine routes change events to the right reviewers with dossiers, carry-forward rules, and quorum logic — not email chains and spreadsheets
 - **Governance Posture Package**: Every deployment produces a tamper-evident audit artifact containing the full record of every classification decision, sign-off, and approval — ready for regulatory handoff without scrambling
-- **19+ compliance certifications** including EU AI Act, ISO 42001, SOC 2
+- **19+ InfoSec certifications** including EU AI Act, ISO 42001, SOC 2
 
 **Talk track:** *"Microsoft's governance is spread across five separate services — Content Safety, API Management, Purview, Monitor, and Entra — none of which talk to each other as a unified system. They have no real-time explainability, no human override capability, no immutable interaction ledger, and no solution for PII scrubbing with explainability. And before a system even ships, Azure has no way to classify it against applicable regulations, get the right people to sign off, or produce a sealed audit record. The EU AI Act requires all of these — and the fines are up to 7% of global revenue. Akka covers governance before deployment and in production: every classification decision recorded, every sign-off captured, every runtime interaction witnessed and explainable. It's the difference between governance that works and a compliance checkbox that won't survive an audit."*
 
@@ -216,7 +216,7 @@ Akka's policy enforcement engine is **embedded directly in the runtime** — not
 
 ### "We trust Microsoft on compliance"
 
-*"Microsoft signed the EU AI Pact and published a Responsible AI Transparency Report — but they have not published an article-by-article mapping of which Azure features satisfy which EU AI Act requirements. Their compliance tooling is Purview Compliance Manager templates — self-assessment checklists you fill out yourself. Akka holds 19+ compliance certifications and embeds governance in the runtime so compliance is a property of every deployment, not a checklist exercise."*
+*"Microsoft signed the EU AI Pact and published a Responsible AI Transparency Report — but they have not published an article-by-article mapping of which Azure features satisfy which EU AI Act requirements. Their compliance tooling is Purview Compliance Manager templates — self-assessment checklists you fill out yourself. Akka holds 19+ InfoSec certifications and embeds governance in the runtime so compliance is a property of every deployment, not a checklist exercise."*
 
 ### "Azure is cheaper because we have an EA"
 

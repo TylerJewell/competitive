@@ -161,7 +161,7 @@ A five-step decision tree for discovery calls:
 
 **Primary argument: full feature parity in a country-isolated configuration.** Competing sovereign offerings (Azure Government, Azure China, EU Data Boundary) lag commercial offerings by 3-6 months and restrict AI service availability. Akka's Sovereign Cloud delivers full feature parity with no lagged capabilities, no restricted model access, and a private federation plane with local SREs.
 
-**TCO angle:** Avoided compliance remediation cost. Inherit Akka's 19+ compliance certifications (EU AI Act, ISO 42001, SOC 2, Singapore Agent Framework, and more) rather than building your own compliance posture from scratch. Runtime-native interaction logs, evaluation checkpoints, guardrail verdicts, legal hold, retention, and evidence export make Akka the evidence of record. Every EU AI Act violation is up to 7% of global annual turnover — the cost of getting governance wrong dwarfs the cost of getting it right.
+**TCO angle:** Avoided compliance remediation cost. Inherit Akka's 19+ InfoSec certifications (EU AI Act, ISO 42001, SOC 2, Singapore Agent Framework, and more) rather than building your own compliance posture from scratch. Runtime-native interaction logs, evaluation checkpoints, guardrail verdicts, legal hold, retention, and evidence export make Akka the evidence of record. Every EU AI Act violation is up to 7% of global annual turnover — the cost of getting governance wrong dwarfs the cost of getting it right.
 
 ---
 
