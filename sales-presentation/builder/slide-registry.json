@@ -21,44 +21,48 @@
       "folder": "slides/04-platform"
     },
     {
-      "id": "13-innovations",
-      "folder": "slides/13-innovations"
+      "id": "05-innovations",
+      "folder": "slides/05-innovations"
     },
     {
-      "id": "05-devzero",
-      "folder": "slides/05-devzero"
+      "id": "06-devzero",
+      "folder": "slides/06-devzero"
     },
     {
-      "id": "06-resilience",
-      "folder": "slides/06-resilience"
+      "id": "07-resilience",
+      "folder": "slides/07-resilience"
     },
     {
-      "id": "07-governance",
-      "folder": "slides/07-governance"
+      "id": "08-governance",
+      "folder": "slides/08-governance"
     },
     {
-      "id": "08-customers",
-      "folder": "slides/08-customers"
+      "id": "09-hyperscalers",
+      "folder": "slides/09-hyperscalers"
     },
     {
-      "id": "09-packages",
-      "folder": "slides/09-packages"
+      "id": "10-customers",
+      "folder": "slides/10-customers"
     },
     {
-      "id": "10-delivery",
-      "folder": "slides/10-delivery"
+      "id": "11-packages",
+      "folder": "slides/11-packages"
     },
     {
-      "id": "10-partners",
-      "folder": "slides/10-partners"
+      "id": "12-delivery",
+      "folder": "slides/12-delivery"
     },
     {
-      "id": "12-demo",
-      "folder": "slides/12-demo"
+      "id": "13-partners",
+      "folder": "slides/13-partners"
     },
     {
-      "id": "11-closing",
-      "folder": "slides/11-closing"
+      "id": "14-demo",
+      "folder": "slides/14-demo"
+    },
+    {
+      "id": "15-closing",
+      "folder": "slides/15-closing"
     }
   ]
 }

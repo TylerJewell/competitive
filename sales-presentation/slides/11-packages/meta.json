@@ -1,15 +1,19 @@
 {
-  "id": "13-innovations",
-  "nav_id": "s13-wrapper",
+  "id": "11-packages",
+  "nav_id": "pkg-wrapper",
   "pre_spacer": 0,
   "scroll": {
-    "envelope_vh": "180vh"
+    "envelope_vh": "calc(100vh + 300px)"
   },
   "reveals": {
     "scroll_progress": null,
     "intersection": [
       {
-        "selector": ".s13-reveal",
+        "selector": ".pkg-reveal",
+        "threshold": 0.15
+      },
+      {
+        "selector": ".pkg-tier",
         "threshold": 0.15
       }
     ]

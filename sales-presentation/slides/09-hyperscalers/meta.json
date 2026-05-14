@@ -1,15 +1,15 @@
 {
-  "id": "10-partners",
-  "nav_id": "s9-wrapper",
-  "pre_spacer": 12,
+  "id": "09-hyperscalers",
+  "nav_id": "s6b-wrapper",
+  "pre_spacer": 30,
   "scroll": {
-    "envelope_vh": "140vh"
+    "envelope_vh": "120vh"
   },
   "reveals": {
     "scroll_progress": null,
     "intersection": [
       {
-        "selector": ".s9-reveal",
+        "selector": ".s6b-reveal",
         "threshold": 0.15
       }
     ]

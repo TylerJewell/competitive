@@ -1,7 +1,7 @@
 {
-  "id": "05-devzero",
-  "nav_id": "s5-wrapper",
-  "pre_spacer": 0,
+  "id": "13-partners",
+  "nav_id": "s9-wrapper",
+  "pre_spacer": 12,
   "scroll": {
     "envelope_vh": "140vh"
   },
@@ -9,7 +9,7 @@
     "scroll_progress": null,
     "intersection": [
       {
-        "selector": ".s5-reveal",
+        "selector": ".s9-reveal",
         "threshold": 0.15
       }
     ]
