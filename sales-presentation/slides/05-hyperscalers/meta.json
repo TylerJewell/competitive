@@ -1,6 +1,6 @@
 {
-  "id": "05-innovations",
-  "nav_id": "s13-wrapper",
+  "id": "05-hyperscalers",
+  "nav_id": "s6b-wrapper",
   "pre_spacer": 0,
   "scroll": {
     "envelope_vh": "180vh"
@@ -9,7 +9,7 @@
     "scroll_progress": null,
     "intersection": [
       {
-        "selector": ".s13-reveal",
+        "selector": ".s6b-reveal",
         "threshold": 0.15
       }
     ]

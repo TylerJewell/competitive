@@ -21,24 +21,24 @@
       "folder": "slides/04-platform"
     },
     {
-      "id": "05-innovations",
-      "folder": "slides/05-innovations"
+      "id": "05-hyperscalers",
+      "folder": "slides/05-hyperscalers"
     },
     {
-      "id": "06-devzero",
-      "folder": "slides/06-devzero"
+      "id": "06-innovations",
+      "folder": "slides/06-innovations"
     },
     {
-      "id": "07-resilience",
-      "folder": "slides/07-resilience"
+      "id": "07-devzero",
+      "folder": "slides/07-devzero"
     },
     {
-      "id": "08-governance",
-      "folder": "slides/08-governance"
+      "id": "08-resilience",
+      "folder": "slides/08-resilience"
     },
     {
-      "id": "09-hyperscalers",
-      "folder": "slides/09-hyperscalers"
+      "id": "09-governance",
+      "folder": "slides/09-governance"
     },
     {
       "id": "10-customers",

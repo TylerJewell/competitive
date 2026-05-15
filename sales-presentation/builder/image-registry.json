@@ -12,7 +12,7 @@
     "path": "assets/images/governance-posture.png",
     "alt": "Governance Posture",
     "used_in": [
-      "08-governance"
+      "09-governance"
     ],
     "status": "live-screenshot",
     "notes": ""
@@ -21,7 +21,7 @@
     "path": "assets/images/interaction-log.png",
     "alt": "Interaction Log",
     "used_in": [
-      "08-governance"
+      "09-governance"
     ],
     "status": "live-screenshot",
     "notes": ""
@@ -30,7 +30,7 @@
     "path": "assets/images/control-detail.png",
     "alt": "Control Detail",
     "used_in": [
-      "08-governance"
+      "09-governance"
     ],
     "status": "live-screenshot",
     "notes": ""
@@ -39,7 +39,7 @@
     "path": "assets/images/policy-authoring.png",
     "alt": "Policy Authoring",
     "used_in": [
-      "08-governance"
+      "09-governance"
     ],
     "status": "live-screenshot",
     "notes": ""
@@ -48,7 +48,7 @@
     "path": "assets/images/policy-sandbox.png",
     "alt": "Policy Sandbox",
     "used_in": [
-      "08-governance"
+      "09-governance"
     ],
     "status": "live-screenshot",
     "notes": ""
@@ -57,7 +57,7 @@
     "path": "assets/images/audit.png",
     "alt": "Audit",
     "used_in": [
-      "08-governance"
+      "09-governance"
     ],
     "status": "live-screenshot",
     "notes": ""

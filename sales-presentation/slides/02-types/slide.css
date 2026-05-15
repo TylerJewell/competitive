@@ -105,8 +105,9 @@
 /* Logo photo tiles from JPG */
 .st-logos {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6px;
   overflow: hidden;
   flex: 1; min-height: 0;
   align-content: start;

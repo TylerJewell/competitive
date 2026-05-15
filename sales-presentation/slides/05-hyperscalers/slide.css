@@ -1,5 +1,5 @@
 #s6b-wrapper {
-  height: 120vh;
+  height: 180vh;
   position: relative;
 }
 #s6b {
@@ -31,11 +31,8 @@
 }
 
 .s6b-reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity .6s ease, transform .6s cubic-bezier(0.16,1,0.3,1);
+  opacity: 1;
 }
-.s6b-reveal.visible { opacity: 1; transform: none; }
 
 /* Header */
 .s6b-head { flex-shrink: 0; }
